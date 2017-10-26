@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include "compile/common.h"
-
 FILE * fin;
 
 int main(){

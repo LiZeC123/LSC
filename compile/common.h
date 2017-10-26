@@ -1,9 +1,9 @@
 #ifndef COMMON_H
 #define COMMON_H
-typedef enum _symbol{
+typedef enum {
     ERR,                                // 错误
     END,                                // 文件结束
-    IDENT,                                 // 标识符
+    IDENT,                              // 标识符
     kW_INT,KW_CHAR,KW_VOID,KW_DOUBLE,   // 数据类型
     KW_EXTERN,                          //extern
     NUM,CH,STR,                         //常量
@@ -28,6 +28,8 @@ extern FILE * fin;                      //全局文件输入指针
 
 #define ID_LEN 30                       //定义标识符最大长度
 #define STR_LEN 255                     //定义字符串常量最大长度
+
+#define checkedScan  if(-1==scan()){return -1;}
 
 // 词法分析扫描器
 char scan();

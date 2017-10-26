@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include "common.h"
-#include <stdbool.h>
 #include <string.h>
+
 #define BUF_LEN 80     // 缓冲区最大长度
-int lineLen = 0;      // 当前行长度
-int readPos = -1;     // 但前字符的位置
+int lineLen = 0;       // 当前行长度
+int readPos = -1;      // 但前字符的位置
 char line[BUF_LEN];    // 字符缓冲区
-int lineNum = 1;      // 行号
-int colNum = 0;       // 列号
-char ch;              // 当前字符
-char lastch;          // 上一个字符
+int lineNum = 1;       // 行号
+int colNum = 0;        // 列号
+char ch;               // 当前字符
+char lastch;           // 上一个字符
 //需要全局定义的文件指针fin
 char scan()
 {
@@ -86,9 +86,258 @@ int getSym()
         return f;
     }
     else if((ch>='0')&&(ch<='9')){
+        sym = NUM;
         int f = getNumber();
         return f;
     }
+    else if(ch=='"'){
+        sym = STR;
+        int strCount = 0;
+        int realCount = 0;
+
+        checkedScan;
+        while(ch != '"'){
+            if(strCount < STR_LEN){
+                if(ch=='\\'){
+                    checkedScan;
+                    switch(ch){
+                        case 't':
+                            str[strCount] = '\t';
+                            break;
+                        case 'n':
+                            str[strCount] = '\n';
+                            break;
+                        case '"':
+                            str[strCount] = '"';
+                            break;
+                        case '0':
+                            str[strCount] = '0';
+                            break;
+                        default:
+                            str[strCount] = ch;
+                    }
+                }
+                else{
+                    str[strCount] = ch;
+                }
+                strCount++;
+            }
+            realCount++;
+            checkedScan;
+        }
+        // 最后读取掉结束的"
+        scan();
+        str[strCount] = '\0';
+        if(realCount > STR_LEN){
+            // 字符串过长
+        }
+    }
+    else if(ch=='\''){
+        sym = CH;
+        char c;
+        scan();
+        if(ch=='\\'){
+            scan();
+            switch(ch){
+                case 't':
+                    c = '\t';
+                    break;
+                case 'n':
+                    c = '\n';
+                    break;
+                case '"':
+                    c = '"';
+                    break;
+                case '0':
+                    c = '0';
+                    break;
+                default:
+                    c = ch;
+            }
+            letter = c; 
+        }
+        else if(ch=='\n' || ch==-1){
+            sym = ERR;
+            // 缺少右引号
+        }
+        else if(ch=='\''){
+            sym = ERR;
+            // 空字符
+            //读取掉此引号,从而不影响之后的分析
+            scan();
+        }
+        else{
+            //其他普通字符
+            letter = ch;
+        }
+
+        if(sym != ERR){
+            scan();
+            if(ch == '\''){
+                sym = CH;
+            }
+            else{
+                sym = ERR;
+                // 缺少右括号
+            }
+        }
+    }
+    else{
+        switch(ch){
+            case '+':
+                sym = ADD;
+                checkedScan;
+                if(ch=='+'){
+                    sym = INC;
+                    checkedScan;
+                }
+                break;
+            case '-':
+                sym = SUB;
+                checkedScan;
+                if(ch=='-'){
+                    sym = DEC;
+                    checkedScan;
+                }
+                break;
+            case '*':
+                sym = MUL;
+                checkedScan;
+                break;
+            case '%':
+                sym = MOD;
+                checkedScan;
+                break;
+            case '>':
+                sym = GT;
+                checkedScan;
+                if(ch=='='){
+                    sym = GE;
+                    checkedScan;
+                }
+                break;
+            case '<':
+                sym = LT;
+                checkedScan;
+                if(ch=='='){
+                    sym = LE;
+                    checkedScan;
+                }
+                break;
+            case '=':
+                sym = ASSIGN;
+                checkedScan;
+                if(ch=='='){
+                    sym = EQU;
+                    checkedScan;
+                }
+                break;
+            case '&':
+                sym = LEA;
+                checkedScan;
+                if(ch=='&'){
+                    sym = AND;
+                    checkedScan;
+                }
+                break;
+            case '!':
+                sym = NOT;
+                checkedScan;
+                if(ch=='='){
+                    sym = NEQU;
+                    checkedScan;
+                }
+                break;
+            case ',':
+                sym = COMMA;
+                checkedScan;
+                break;
+            case ':':
+                sym = COLON;
+                checkedScan;
+                break;
+            case ';':
+                sym = SEMICON;
+                checkedScan;
+                break;
+            case '(':
+                sym = LPAREN;
+                checkedScan;
+                break;
+            case ')':
+                sym = RPAREN;
+                checkedScan;
+                break;
+            case '[':
+                sym = LBRACK;
+                checkedScan;
+                break;
+            case ']':
+                sym = RBRACK;
+                checkedScan;
+                break;
+            case '{':
+                sym = LBRACE;
+                checkedScan;
+                break;
+            case '}':
+                sym = RBRACE;
+                checkedScan;
+                break;
+            case '|':
+                sym = ERR;
+                checkedScan;
+                if(ch=='|'){
+                    sym = OR;
+                }
+                else{
+                    // 错误的符号 |
+                }
+                break;
+            case '/':
+                // 注释都视为无效的词
+                sym = ERR;
+                // 已经读入一个/,可能是除号,因此不能因为下一个字符是文件尾就退出
+                scan();
+                // 是单行注释
+                if(ch='/'){
+                    while(ch!='\n'){
+                        checkedScan;
+                    }
+
+                }
+                // 是多行注释
+                else if(ch='*'){
+                    do{
+                        checkedScan;
+                        while(ch=='*'){
+                            checkedScan;
+                            if(ch=='/'){
+                                break;
+                            }
+                        }
+                    }while(1);
+                }
+                // 只是除号
+                else{
+                    sym = DIV;
+                }
+                break;
+            case -1:
+                // 只使用-1表示文件尾,不产生词法符号
+                return -1;
+            default:
+                // 未定义的符号
+                
+
+                checkedScan;
+                
+        }
+    }
+
+
+
+
 
 
 
@@ -137,7 +386,6 @@ void checkKeyWord()
 
 int getNumber()
 {
-    sym = NUM;
     num = 0;
     int numCount = 0;
     int realCount = 0;
@@ -238,4 +486,61 @@ int getNumber()
         }
         return f;
     }
+}
+
+
+
+
+
+/*****************************测试用主函数***********************************************/
+char* sym2Name(int s)
+{
+    static char* names[] = {
+        "ERR",                                // 错误
+        "END",                                // 文件结束
+        "IDENT",                              // 标识符
+        "kW_INT","KW_CHAR","KW_VOID","KW_DOUBLE",   // 数据类型
+        "KW_EXTERN",                          //extern
+        "NUM","CH","STR",                         //常量
+        "NOT","LEA",                            // 单目运算符 ! & - *
+        "ADD","SUB","MUL","DIV","MOD",                //算数运算符
+        "INC","DEC",                            // ++ --
+        "GT","GE","LT","LE","EQU","NEQU",               // 关系运算符
+        "AND","OR",                             // 逻辑运算符
+        "LPAREN","RPAREN",                      // ()
+        "LBRACK","RBRACK",                      // []
+        "LBRACE","RBRACE",                      // {}
+        "COMMA","COLON","SEMICON",                // , : ;
+        "ASSIGN",                             // 赋值
+        "KW_IF","KW_ELSE",                      // if-else
+        "KW_SWITCH","KW_CASE","KW_DEFAULT",       // switch-case
+        "KW_WHIILE","KW_DO","KE_FOR",             // 循环语句
+        "KW_BREAK","KW_CONTINUE","KW_RETURN",     // 流程控制
+        "KW_IN","KW_OUT","KW_STRIN"              // 其他关键字
+    };
+    return names[s];
+}
+
+
+FILE * fin;
+int main(){
+    fin = fopen("/home/lizec/CWorkSpace/lsc/main.c","r");
+    
+    scan();
+    while(getSym() != -1){
+        if(sym == IDENT){
+            printf("id=%s\n",id);
+        }
+        else if(sym == STR){
+            printf("str=%s\n",str);
+        }
+        else if(sym == NUM){
+            printf("num=%d\n",num);
+        }
+        else{
+            printf("type=%s\n",sym2Name(sym));
+        }
+    }
+
+    return 0;
 }
