@@ -125,6 +125,7 @@ int getSym()
             realCount++;
             checkedScan;
         }
+        //实际上,还需要检测是否有换行符和文件结束,否则会导致换行的字符串
         // 最后读取掉结束的"
         scan();
         str[strCount] = '\0';
@@ -175,6 +176,8 @@ int getSym()
             scan();
             if(ch == '\''){
                 sym = CH;
+                //匹配到右引号,读取掉此符号
+                checkedScan;
             }
             else{
                 sym = ERR;
@@ -215,12 +218,20 @@ int getSym()
                     sym = GE;
                     checkedScan;
                 }
+                else if(ch==">"){
+                    sym = KW_IN;
+                    checkedScan;
+                }
                 break;
             case '<':
                 sym = LT;
                 checkedScan;
                 if(ch=='='){
                     sym = LE;
+                    checkedScan;
+                }
+                else if(ch=='<'){
+                    sym = KW_OUT;
                     checkedScan;
                 }
                 break;
@@ -324,10 +335,11 @@ int getSym()
                 }
                 break;
             case -1:
+                // 匹配到此情况说明在上一轮的最后读取到文件末尾
                 // 只使用-1表示文件尾,不产生词法符号
                 return -1;
             default:
-                // 未定义的符号
+                //TODO: 未定义的符号
                 
 
                 checkedScan;
@@ -347,9 +359,9 @@ int getSym()
 
 
 
-#define KEYWORD_NUM 14
-static char keyWordTable[KEYWORD_NUM][ID_LEN]={"break","char","continue","double","else","extern","if","in","int","out","return","string","void","while"};
-static Symbol keyWordSymbol[14]={KW_BREAK,KW_CHAR,KW_CONTINUE,KW_DOUBLE,KW_ELSE,KW_EXTERN,KW_IF,KW_IN,kW_INT,KW_OUT,KW_RETURN,KW_OUT,KW_VOID,KW_WHIILE};
+#define KEYWORD_NUM 16
+static char keyWordTable[KEYWORD_NUM][ID_LEN]={"break","case","char","continue","default","double","else","extern","if","in","int","out","return","string","void","while"};
+static Symbol keyWordSymbol[KEYWORD_NUM]={KW_BREAK,KW_CASE,KW_CHAR,KW_CONTINUE,KW_DEFAULT,KW_DOUBLE,KW_ELSE,KW_EXTERN,KW_IF,KW_IN,kW_INT,KW_OUT,KW_RETURN,KW_STRING,KW_VOID,KW_WHIILE};
 
 void checkKeyWord()
 {
@@ -489,9 +501,6 @@ int getNumber()
 }
 
 
-
-
-
 /*****************************测试用主函数***********************************************/
 char* sym2Name(int s)
 {
@@ -536,6 +545,9 @@ int main(){
         }
         else if(sym == NUM){
             printf("num=%d\n",num);
+        }
+        else if(sym == CH){
+            printf("ch=%c\n",letter);
         }
         else{
             printf("type=%s\n",sym2Name(sym));

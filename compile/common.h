@@ -21,7 +21,7 @@ typedef enum {
     KW_SWITCH,KW_CASE,KW_DEFAULT,       // switch-case
     KW_WHIILE,KW_DO,KE_FOR,             // 循环语句
     KW_BREAK,KW_CONTINUE,KW_RETURN,     // 流程控制
-    KW_IN,KW_OUT,KW_STRIN               // 其他关键字
+    KW_IN,KW_OUT,KW_STRING               // 其他关键字
 } Symbol;
 
 extern FILE * fin;                      //全局文件输入指针
