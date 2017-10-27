@@ -26,14 +26,14 @@ typedef enum {
 
 extern FILE * fin;                      //全局文件输入指针
 
-#define ID_LEN 30                       //定义标识符最大长度
-#define STR_LEN 255                     //定义字符串常量最大长度
-
-#define checkedScan  if(-1==scan()){return -1;}
-
 // 词法分析扫描器
 char scan();
 // 词法分析获得标记
 int getSym();
+// 处于while循环中的代码为了确保一定能退出,使用这个宏函数
+// 其他情况下可以直接使用scan函数
+#define checkedScan  if(-1==scan()){return -1;}
+
+
 
 #endif // COMMON_H
