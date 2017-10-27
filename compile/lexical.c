@@ -2,6 +2,19 @@
 #include "common.h"
 #include <string.h>
 
+// 获得一个标识符
+static int getIdent();
+// 检查是否是关键字
+static void checkKeyWord();
+// 获得一个数字
+static int getNumber();
+// 获得一个字符串常量
+static int getStr();
+//获得一个字符常量
+static int getChar();
+
+
+
 #define BUF_LEN 80     // 缓冲区最大长度
 int lineLen = 0;       // 当前行长度
 int readPos = -1;      // 但前字符的位置
@@ -63,25 +76,8 @@ int getSym()
     }
 
     if((ch>='a'&&ch<='z')||(ch>='A'&&ch<='Z')||(ch=='_')){
-        int idcount = 0;
-        int realCount = 0;
-        int f;
-
-        do{
-            if(idcount < ID_LEN){
-                id[idcount] = ch;
-                idcount++;
-            }
-            realCount++;
-            f = scan();
-
-        }while((ch>='a'&&ch<='z')||(ch>='A'&&ch<='Z')||(ch=='_')||(ch>='0'&&ch<='9'));
-
-        id[idcount] = '\0';
-
-        if(realCount > ID_LEN){
-            // 标识符过长
-        }
+        sym = IDENT;
+        int f = getIdent();
         checkKeyWord();
         return f;
     }
@@ -92,98 +88,13 @@ int getSym()
     }
     else if(ch=='"'){
         sym = STR;
-        int strCount = 0;
-        int realCount = 0;
-
-        checkedScan;
-        while(ch != '"'){
-            if(strCount < STR_LEN){
-                if(ch=='\\'){
-                    checkedScan;
-                    switch(ch){
-                        case 't':
-                            str[strCount] = '\t';
-                            break;
-                        case 'n':
-                            str[strCount] = '\n';
-                            break;
-                        case '"':
-                            str[strCount] = '"';
-                            break;
-                        case '0':
-                            str[strCount] = '0';
-                            break;
-                        default:
-                            str[strCount] = ch;
-                    }
-                }
-                else{
-                    str[strCount] = ch;
-                }
-                strCount++;
-            }
-            realCount++;
-            checkedScan;
-        }
-        //实际上,还需要检测是否有换行符和文件结束,否则会导致换行的字符串
-        // 最后读取掉结束的"
-        scan();
-        str[strCount] = '\0';
-        if(realCount > STR_LEN){
-            // 字符串过长
-        }
+        int f = getStr();
+        return f;
     }
     else if(ch=='\''){
         sym = CH;
-        char c;
-        scan();
-        if(ch=='\\'){
-            scan();
-            switch(ch){
-                case 't':
-                    c = '\t';
-                    break;
-                case 'n':
-                    c = '\n';
-                    break;
-                case '"':
-                    c = '"';
-                    break;
-                case '0':
-                    c = '0';
-                    break;
-                default:
-                    c = ch;
-            }
-            letter = c; 
-        }
-        else if(ch=='\n' || ch==-1){
-            sym = ERR;
-            // 缺少右引号
-        }
-        else if(ch=='\''){
-            sym = ERR;
-            // 空字符
-            //读取掉此引号,从而不影响之后的分析
-            scan();
-        }
-        else{
-            //其他普通字符
-            letter = ch;
-        }
-
-        if(sym != ERR){
-            scan();
-            if(ch == '\''){
-                sym = CH;
-                //匹配到右引号,读取掉此符号
-                checkedScan;
-            }
-            else{
-                sym = ERR;
-                // 缺少右括号
-            }
-        }
+        int f = getChar();
+        return f;
     }
     else{
         switch(ch){
@@ -218,7 +129,7 @@ int getSym()
                     sym = GE;
                     checkedScan;
                 }
-                else if(ch==">"){
+                else if(ch=='>'){
                     sym = KW_IN;
                     checkedScan;
                 }
@@ -311,19 +222,21 @@ int getSym()
                 // 已经读入一个/,可能是除号,因此不能因为下一个字符是文件尾就退出
                 scan();
                 // 是单行注释
-                if(ch='/'){
+                if(ch=='/'){
                     while(ch!='\n'){
                         checkedScan;
                     }
 
                 }
                 // 是多行注释
-                else if(ch='*'){
+                else if(ch=='*'){
                     do{
                         checkedScan;
-                        while(ch=='*'){
+                        if(ch=='*'){
                             checkedScan;
                             if(ch=='/'){
+                                // 匹配结束符号,读取掉此符号
+                                checkedScan;
                                 break;
                             }
                         }
@@ -359,11 +272,38 @@ int getSym()
 
 
 
+// 获得一个标识符
+static int getIdent()
+{
+    int idcount = 0;
+    int realCount = 0;
+    int f;
+
+    do{
+        if(idcount < ID_LEN){
+            id[idcount] = ch;
+            idcount++;
+        }
+        realCount++;
+        f = scan();
+
+    }while((ch>='a'&&ch<='z')||(ch>='A'&&ch<='Z')||(ch=='_')||(ch>='0'&&ch<='9'));
+
+    id[idcount] = '\0';
+
+    if(realCount > ID_LEN){
+        // 标识符过长
+    }
+    return f;
+}
+
+// 语言中定义的关键字如下
 #define KEYWORD_NUM 16
 static char keyWordTable[KEYWORD_NUM][ID_LEN]={"break","case","char","continue","default","double","else","extern","if","in","int","out","return","string","void","while"};
 static Symbol keyWordSymbol[KEYWORD_NUM]={KW_BREAK,KW_CASE,KW_CHAR,KW_CONTINUE,KW_DEFAULT,KW_DOUBLE,KW_ELSE,KW_EXTERN,KW_IF,KW_IN,kW_INT,KW_OUT,KW_RETURN,KW_STRING,KW_VOID,KW_WHIILE};
 
-void checkKeyWord()
+// 检查是否是关键字
+static void checkKeyWord()
 {
   int i=0,j=KEYWORD_NUM-1,k=0;
   do
@@ -391,12 +331,15 @@ void checkKeyWord()
   }
 }
 
+
+//各种进制的数字的最大长度,考虑到可能的溢出,部分进制的字面值不能达到最大值
 #define BIN_NUM_LEN 32
 #define OCT_NUM_LEN 10
 #define DEC_NUM_LEN 9
 #define HEX_NUM_LEN 8
 
-int getNumber()
+// 获得一个数字
+static int getNumber()
 {
     num = 0;
     int numCount = 0;
@@ -500,6 +443,106 @@ int getNumber()
     }
 }
 
+
+static int getStr()
+{
+    int strCount = 0;
+    int realCount = 0;
+
+    checkedScan;
+    while(ch != '"'){
+        if(strCount < STR_LEN){
+            if(ch=='\\'){
+                checkedScan;
+                switch(ch){
+                    case 't':
+                        str[strCount] = '\t';
+                        break;
+                    case 'n':
+                        str[strCount] = '\n';
+                        break;
+                    case '"':
+                        str[strCount] = '"';
+                        break;
+                    case '0':
+                        str[strCount] = '\0';
+                        break;
+                    default:
+                        str[strCount] = ch;
+                }
+            }
+            else{
+                str[strCount] = ch;
+            }
+            strCount++;
+        }
+        realCount++;
+        checkedScan;
+    }
+    //实际上,还需要检测是否有换行符和文件结束,否则会导致换行的字符串
+    // 最后读取掉结束的"
+    scan();
+    str[strCount] = '\0';
+    if(realCount > STR_LEN){
+        // 字符串过长
+    }
+    return ch;
+}
+
+//获得一个字符常量
+static int getChar()
+{
+    char c;
+    scan();
+    if(ch=='\\'){
+        scan();
+        switch(ch){
+            case 't':
+                c = '\t';
+                break;
+            case 'n':
+                c = '\n';
+                break;
+            case '"':
+                c = '"';
+                break;
+            case '0':
+                c = '\0';
+                break;
+            default:
+                c = ch;
+        }
+        letter = c; 
+    }
+    else if(ch=='\n' || ch==-1){
+        sym = ERR;
+        // 缺少右引号
+    }
+    else if(ch=='\''){
+        sym = ERR;
+        // 空字符
+        //读取掉此引号,从而不影响之后的分析
+        scan();
+    }
+    else{
+        //其他普通字符
+        letter = ch;
+    }
+
+    if(sym != ERR){
+        scan();
+        if(ch == '\''){
+            sym = CH;
+            //匹配到右引号,读取掉此符号
+            scan();
+        }
+        else{
+            sym = ERR;
+            // 缺少右括号
+        }
+    }
+    return ch;
+}
 
 /*****************************测试用主函数***********************************************/
 char* sym2Name(int s)
