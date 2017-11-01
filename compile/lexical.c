@@ -15,12 +15,15 @@ static int getStr();
 //获得一个字符常量
 static int getChar();
 
-#define BUF_LEN 80  // 缓冲区最大长度
-int lineLen = 0;    // 当前行长度
-int readPos = -1;   // 但前字符的位置
-char line[BUF_LEN]; // 字符缓冲区
+
 int lineNum = 1;    // 行号
 int colNum = 0;     // 列号
+
+int lineLen = 0;    // 当前行长度
+int readPos = -1;   // 但前字符的位置
+#define BUF_LEN 80  // 缓冲区最大长度
+char line[BUF_LEN]; // 字符缓冲区
+
 char ch;            // 当前字符
 char lastch;        // 上一个字符
 //需要全局定义的文件指针fin
@@ -314,7 +317,7 @@ static int getIdent()
 
     if (realCount > ID_LEN)
     {
-        // 标识符过长
+       lexError(ID_TOO_LOOG);
     }
     return f;
 }
@@ -384,8 +387,8 @@ static int getNumber()
                     }
                     else
                     {
-                        // 数字格式错误
-                        // 由于循环条件的检测,只有第一次进入循环体时,有可能发生这一情况
+                        // 二进制数字缺少数据实体
+                        lexError(NUM_BIN_TYPE);
                     }
                     numCount++;
                 }
@@ -396,6 +399,7 @@ static int getNumber()
             if (realCount > BIN_NUM_LEN)
             {
                 // 数字过长
+                lexError(NUM_TOO_LONG); 
             }
         }
         // 16进制
@@ -420,8 +424,8 @@ static int getNumber()
                     }
                     else
                     {
-                        // 数字格式错误
-                        // 由于循环条件的检测,只有第一次进入循环体时,有可能发生这一情况
+                        // 十六进制数缺少数据实体
+                        lexError(NUM_HEX_TYPE);
                     }
                     numCount++;
                 }
@@ -432,6 +436,7 @@ static int getNumber()
             if (realCount > HEX_NUM_LEN)
             {
                 // 数字过长
+                lexError(NUM_TOO_LONG);  
             }
         }
         //八进制
@@ -445,11 +450,6 @@ static int getNumber()
                     {
                         num = num * 8 + (ch - '0');
                     }
-                    else
-                    {
-                        // 数字格式错误
-                        // 由于循环条件的检测,只有第一次进入循环体时,有可能发生这一情况
-                    }
                     numCount++;
                 }
                 realCount++;
@@ -459,6 +459,7 @@ static int getNumber()
             if (realCount > OCT_NUM_LEN)
             {
                 // 数字过长
+                lexError(NUM_TOO_LONG);
             }
         }
     }
@@ -479,11 +480,13 @@ static int getNumber()
         if (realCount > DEC_NUM_LEN)
         {
             // 数字过长
+            lexError(NUM_TOO_LONG);
         }
     }
     return ch;
 }
 
+//TODO: stirng 缺少错误检查
 static int getStr()
 {
     int strCount = 0;
@@ -530,7 +533,7 @@ static int getStr()
     str[strCount] = '\0';
     if (realCount > STR_LEN)
     {
-        // 字符串过长
+        lexError(STR_TOO_LONG);
     }
     return ch;
 }
@@ -566,12 +569,14 @@ static int getChar()
     {
         sym = ERR;
         // 缺少右引号
+        lexError(CHAR_NO_R_QUTION);
     }
     else if (ch == '\'')
     {
         sym = ERR;
         // 空字符
         //读取掉此引号,从而不影响之后的分析
+        lexError(CHAR_NO_DATA);
         scan();
     }
     else
@@ -592,7 +597,8 @@ static int getChar()
         else
         {
             sym = ERR;
-            // 缺少右括号
+            // 缺少右引号
+            lexError(CHAR_NO_R_QUTION);
         }
     }
     return ch;
@@ -628,9 +634,10 @@ char *sym2Name(int s)
 }
 
 FILE *fin;
+char * filename = "main.c";
 int main()
 {
-    fin = fopen("/home/lizec/CWorkSpace/lsc/main.c", "r");
+    fin = fopen("/home/lizec/CWorkSpace/lsc/errorTest.c", "r");
 
     scan();
     while (getSym() != -1)

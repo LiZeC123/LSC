@@ -1,5 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
+
+#include <stdio.h>
+//所有的词法记号
 typedef enum {
     ERR,                                // 错误
     END,                                // 文件结束
@@ -21,8 +24,23 @@ typedef enum {
     KW_SWITCH,KW_CASE,KW_DEFAULT,       // switch-case
     KW_WHIILE,KW_DO,KE_FOR,             // 循环语句
     KW_BREAK,KW_CONTINUE,KW_RETURN,     // 流程控制
-    KW_IN,KW_OUT,KW_STRING               // 其他关键字
+    KW_IN,KW_OUT,KW_STRING              // 其他关键字
 } Symbol;
+
+// 所有的错误码
+typedef enum{
+    STR_NO_R_QUTION,            // 字符串缺少右引号        
+    NUM_BIN_TYPE,               // 二进制数字缺少数据实体
+    NUM_HEX_TYPE,               // 十六进制数字缺少数据实体
+    CHAR_NO_R_QUTION,           // 字符缺少右引号
+    CHAR_NO_DATA,               // 不支持空字符
+    OR_NO_PAIR,                 // 不支持的"或"运算符
+    COMMENT_NO_END,             // 多行注释缺少结束符
+    TOKEN_NO_EXIST,             // 未定义的符号
+    ID_TOO_LOOG,                // 标识符过长
+    NUM_TOO_LONG,               // 数字常量过长
+    STR_TOO_LONG,               // 字符串常量过长
+} ErrCode;
 
 extern FILE * fin;                      //全局文件输入指针
 
@@ -35,5 +53,13 @@ int getSym();
 #define checkedScan  if(-1==scan()){return -1;}
 
 
+/*********************************错误处理*******************************************/
+
+void lexError(ErrCode code);
+
+/*********************************全局变量声明****************************************/
+extern char* filename;
+extern int lineNum;    // 行号
+extern int colNum;     // 列号
 
 #endif // COMMON_H
