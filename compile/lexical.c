@@ -284,8 +284,8 @@ int getSym()
             // 只使用-1表示文件尾,不产生词法符号
             return -1;
         default:
-            //TODO: 未定义的符号
-
+            // 没有匹配上述任何情况,是没有定义的字符
+            lexError(TOKEN_NO_EXIST);
             checkedScan;
         }
     }
@@ -554,8 +554,8 @@ static int getChar()
         case 'n':
             c = '\n';
             break;
-        case '"':
-            c = '"';
+        case '\'':
+            c = '\'';
             break;
         case '0':
             c = '\0';
@@ -638,7 +638,7 @@ char * filename = "main.c";
 int main()
 {
     fin = fopen("/home/lizec/CWorkSpace/lsc/errorTest.c", "r");
-
+    //fin = fopen("/home/lizec/CWorkSpace/lsc/main.c","r");
     scan();
     while (getSym() != -1)
     {

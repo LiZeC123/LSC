@@ -4,5 +4,8 @@ void error(){
 	int q = 1234567890987654321223456;
 	char * r = "12321979834794798iufhdskhffdsfsfsdfdosiaydfioaosuofuosidfoisaudoifuhvkjzhvkhdsifhaoisyf9q09478hkjdhfphpqywnofhdalkshf98wae98wyn98rynsoyfnoisydfnyaspdfunoipadsynfoisayndfoiysnadfyoinsaydfoiyonidsayfnoynasofiysnoiadfyonisayfdoinsaydffyoinasydfoyfndasfjlkadsjgl;akdsjflksjdfl;kj;asoihfbdsklfhThis is end";
 	char s = '';
+
+	char t = '\'';
+#include <stdio.h>
 	
 }
