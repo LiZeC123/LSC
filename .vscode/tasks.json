@@ -4,9 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "makeall",
+            "label": "make",
             "type": "shell",
-            "command": "./makeall"
+            "command": "./makeProject"
         }
     ]
 }

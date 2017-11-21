@@ -5,7 +5,7 @@
                 "name": "(gdb) Launch",
                 "type": "cppdbg",
                 "request": "launch",
-                "preLaunchTask": "makeall",
+                "preLaunchTask": "make",
                 "program": "${workspaceRoot}/compile/lscc",
                 "args": [],
                 "stopAtEntry": false,

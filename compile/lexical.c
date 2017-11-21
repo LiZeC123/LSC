@@ -638,7 +638,7 @@ char * filename = "main.c";
 int main()
 {
     //fin = fopen("/home/lizec/CWorkSpace/lsc/errorTest.c", "r");
-    fin = fopen("/home/lizec/CWorkSpace/lsc/main.c","r");
+    fin = fopen("/home/lizec/CWorkSpace/lsc/test/main.c","r");
     scan();
     while (getSym() != -1)
     {
