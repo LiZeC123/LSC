@@ -119,11 +119,11 @@ int g(){ }
 
 上述两类有可以声明对应的数组类型,因此有如下的产生式
 ```
-<defvar> -> <ID><defvarr>
-<defvar> -> * <ID><defvarr>
+<def> -> <ID><defvar>
+<def> -> * <ID><defvar>
 
-<defvarr> -> [ <NUM> ]
-<defvarr> -> <init>
+<defvar> -> [ <NUM> ]
+<defvar> -> <init>
 
 <init> -> = <expr>
 <init> -> e
@@ -161,8 +161,8 @@ int g(){ }
 <idtail>  -> <defvar><deflist>
 <idtail>  -> ( <para> ) <funtail>
 
-<defvarr> -> [ <NUM> ]
-<defvarr> -> <init>
+<defvar> -> [ <NUM> ]
+<defvar> -> <init>
 
 <init>    -> = <expr>
 <init>    -> e
@@ -174,7 +174,7 @@ int g(){ }
 <funtail> -> <block>
 ```
 #### 函数参数列表
-参数列表和变量定义大致相同,因此直接给出产生式
+在上述的产生式中,使用`<para>`表示函数的参数列表,参数列表和变量定义大致相同,因此直接给出产生式
 ```
 <para> -> <type><paradata><paralist>
 <para> -> e
@@ -190,5 +190,145 @@ int g(){ }
 ```
 
 #### 函数体
+函数体是由花括号包含的局部变量定义和语句的组合,所以有如下产生式
+```
+<block>      -> { <subprogram> }
+<subprogram> -> <localdef><subprogram>
+<subprogram> -> <statement><subprogram>
+<subprogram> -> e
+```
+其中`<localdef>`的定义与全局变量的定义没有区别,产生式如下
+```
+<localdef> -> <type><defvar><deflist>
+```
+
+#### 表达式
+语句的定义比较复杂,且各种表达式中涉及运算符优先级的问题,构造保持运算符优先级特训的文法的核心思想是:**将高优先级运算符形成的表达式整体作为低优先级形成的表达式的操作数**
+
+此外,各种运算符之间还有结合性的区别,对于这一点,在后续的语义分析中再进行讨论
+以下给出本语言中所有运算符的优先级关系
+
+运算符                       | 含义                              | 优先级 | 结合性
+:---------------------------|:---------------------------------|------|-----
+`=`                         | 赋值                               | 10   |**右**
+`||`                        | 逻辑或                             |  9   | 左
+`&&`                        | 逻辑与                             |  8   | 左
+`>`,`<`,`>=`,`<=`,`==`,`!=` | 大于,小于,大于等于,小于等于,等于,不等于 |  7   | 左
+`+`,`-`                     | 加,减                              |  6   | 左
+`*`,`/`,`%`                 | 乘,除,取余                          |  5   | 左
+`!`,`-`,`&`,`*`,`++`,`--`   | 逻辑非,取负,取地址,指针,前置++,前置--  |  4   |**右**
+`++`,`--`                   | 后置++,后置--                       |  3   |**右**
+`()`                        | 括号                               |  2   | 左
+`[]`,`()`                   | 数组索引,函数调用                    |  1   | 左
+
+由于Lsc语言目前是C系列的语言,因此上述的运算符的优先级和结合性与C语言的定义基本一致
+
+下面给出语句的产生式
+```
+// 赋值表达式
+<assexp> -> <orexpr><asstail>
+<asstail> -> = <orexpr><asstail>
+<asstail> -> e
+
+//逻辑或表达式
+<orexpr> -> <andexpr><ortail>
+<ortail> -> || <andexpr><ortail>
+<ortail> -> e
+
+//逻辑与表达式
+<andexpr> -> <comexpr><andtail>
+<andtail> -> && <comexpr><andtail>
+<andtail> -> e
+
+//关系表达式
+<comexpt> -> <aloexpr><comtail>
+<comtail> -> <cmps><aloexpr><coptail>
+<comtail> -> e
+<cmps>    -> >= | <= | > | < | == | !=
+
+// 算数表达式
+<aloexpr> -> <item><alotail>
+<alotail> -> <adds><item><alotail>
+<alotail> -> e
+<ands>    -> + | -
+
+//项表达式
+<item>     -> <factor><itemtail>
+<itemtail> -> <muls><factor><itemtail>
+<itemtail> -> e
+<muls> -> * | / | %
+
+//因子表达式
+<factor> -> <lop><factor>
+<factor> -> <val>
+<lop>    -> ! | - | & | * | ++ | --
+<val>    -> <elem><rop>       
+<rop>    -> ++ | --                // 后置的++和--
+```
+
+最后是元素表达式
+```
+<elem> -> <ID>
+		| <ID> [ <expr> ]
+		| <ID> ( <realarg> )
+		| ( <exp> )
+		| <literal>
+```
+由于上述产生式中由于前三项有左因子,因此可以对其进行提取,提取后有如下表达式
+```
+<elem> -> <ID><idexpr>
+<elem> -> ( <exp> )
+<elem> -> <literal>
+<idexpr> [ <expr> ] | ( <realarg> )
+
+// 常量
+<literal> -> <NUM> | <CH> | <STR> 
+
+// 函数实参
+<realarg> -> <arg><arglist>
+<arg>     -> <exp>
+<arglist> -> , <arg><arglist>
+<arglist> -> e
+```
+以上便是全部的表达式的产生式,由于没有比赋值运算等级更低的表达式,所以最后可以得到
+```
+<exp> -> <assexpr>
+```
+考虑到,部分语句中可以使用空语句(例如for语句的条件部分),因此额外的定义
+```
+<altexpr> -> <altexpr>
+<altexpr> -> e
+```
+关于以上的产生式还有以下几点补充
+1. 在`<assexpr>`语句中,实际上逻辑或表达式是不能作为左值出现的,但是在当前阶段并不检查这种问题,留到语义分析的时候在进一步检查
+
+#### 语句
+总体来看,语句包含表达式,while,for,dowhile构成的循环语句,if,switch构成的分支语句,break,continue,return构成的流程控制语句,所以语句的产生式如下
+```
+<statement> -> <altexpr>;
+             | <whilestat> | <forstat> | <dowhilestat>
+			 | <ifstat>    | <switchstat>
+			 | break;
+			 | continue;
+			 | return <altexpr>;
+
+```
+
+下面依次给出各种语句的产生式
+```
+<whilestat>     -> while ( <altexpr> ) <block>
+<dowhilestat>   -> do <block> while ( <altexpr> )
+<forsata>       -> for(<forinit><altexpr>;<altexpr>) <block>
+<forinit>       -> <localdef> | <altexpr> ;  // for的初始语句可以是局部变量定义,或者一个表达式
+
+<ifstat> -> if ( <expr> ) <block> <elsestat>
+<elsestat> -> else <block> | e
+
+<switchstat> -> switch ( <expr> ) { <casestat> }
+<casestat>   -> case <caselable> : <subprogram><casetate>
+              | default: <subprigram>
+<caselable> -> <literal>
+```
+以上Lsc语言全部的产生式,根据以上的表达式结合递归下降方法即可完成对Lsc语言的语法分析,对于此文法的SELECT集计算就作为作业留给同学们作为练习啦~
 
 
