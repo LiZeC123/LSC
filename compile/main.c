@@ -7,7 +7,7 @@ char * filename = "main.c";
 int main()
 {
     //fin = fopen("/home/lizec/CWorkSpace/lsc/errorTest.c", "r");
-    fin = fopen("/home/lizec/CWorkSpace/lsc/test/main.c","r");
+    fin = fopen("/home/lizec/CWorkSpace/lsc/test/t1.c","r");
     showToken = 1; 
     program();
 

@@ -290,6 +290,10 @@ int getSym()
             // 匹配到此情况说明在上一轮的最后读取到文件末尾
             // 只使用-1表示文件尾,不产生词法符号
             return -1;
+        case 0:
+            // 第一次调用,初始化数据
+            scan();
+            return 0;
         default:
             // 没有匹配上述任何情况,是没有定义的字符
             lexError(TOKEN_NO_EXIST);
