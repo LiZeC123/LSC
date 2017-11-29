@@ -137,8 +137,6 @@ char *sym2Name(int s)
         "ERR",                                       // 错误
         "END",                                       // 文件结束
         "IDENT",                                     // 标识符
-        "kW_INT", "KW_CHAR", "KW_VOID", "KW_DOUBLE", // 数据类型
-        "KW_EXTERN",                                 //extern
         "NUM", "CH", "STR",                          //常量
         "!", "&",                                    // 单目运算符 ! & 
         "+", "-", "*", "/", "%%",                    //算数运算符
@@ -150,11 +148,16 @@ char *sym2Name(int s)
         "{", "}",                                    // {}
         ",", ":", ";",                               // , : ;
         "=",                                         // 赋值
+        " ",                                         // 空白,与符号声明对应
+        "kW_INT", "KW_CHAR", "KW_VOID", "KW_DOUBLE", // 数据类型
+        "KW_EXTERN",                                 //extern
         "KW_IF", "KW_ELSE",                          // if-else
         "KW_SWITCH", "KW_CASE", "KW_DEFAULT",        // switch-case
         "KW_WHIILE", "KW_DO", "KE_FOR",              // 循环语句
         "KW_BREAK", "KW_CONTINUE", "KW_RETURN",      // 流程控制
         "KW_IN", "KW_OUT", "KW_STRING"               // 其他关键字
+        " ",                                         // 空白,与符号声明对应
+        "IS_NULL"
     };
     return names[s];
 }
@@ -178,9 +181,12 @@ void printTokenInfo()
     {
         printf("字符\t\t%c\n", letter);
     }
+    else if(sym > _KW_BEGIN_ && sym < _KW_END_){
+        printf("关键字\t\t%s\n",sym2Name(sym));
+    }
     else
     {
-        printf("符号\t\t%s\n", sym2Name(sym));
+        printf("界符\t\t%s\n", sym2Name(sym));
     }
 }
 

@@ -7,8 +7,6 @@ typedef enum {
     ERR,                                // 错误
     END,                                // 文件结束
     IDENT,                              // 标识符
-    kW_INT,KW_CHAR,KW_VOID,KW_DOUBLE,   // 数据类型
-    KW_EXTERN,                          //extern
     NUM,CH,STR,                         //常量
     NOT,LEA,                            // 单目运算符 ! &
     ADD,SUB,MUL,DIV,MOD,                //算数运算符
@@ -20,11 +18,15 @@ typedef enum {
     LBRACE,RBRACE,                      // {}
     COMMA,COLON,SEMICON,                // , : ;
     ASSIGN,                             // 赋值
+    _KW_BEGIN_,                         // 不是词法记号,仅标识后续记号为关键字,用于输出判断
+    kW_INT,KW_CHAR,KW_VOID,KW_DOUBLE,   // 数据类型
+    KW_EXTERN,                          //extern
     KW_IF,KW_ELSE,                      // if-else
     KW_SWITCH,KW_CASE,KW_DEFAULT,       // switch-case
     KW_WHIILE,KW_DO,KE_FOR,             // 循环语句
     KW_BREAK,KW_CONTINUE,KW_RETURN,     // 流程控制
     KW_IN,KW_OUT,KW_STRING,             // 其他关键字
+    _KW_END_,                           // 不是词法记号,仅标识后续记号为关键字,用于输出判断
     M_NULL                              // 空
 } Symbol;
 

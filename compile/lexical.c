@@ -31,7 +31,7 @@ int readPos = -1;   // 但前字符的位置
 #define BUF_LEN 80  // 缓冲区最大长度
 char line[BUF_LEN]; // 字符缓冲区
 
-char ch;            // 当前字符
+char ch = 0;            // 当前字符
 char lastch;        // 上一个字符
 //需要全局定义的文件指针fin
 static char scan()
