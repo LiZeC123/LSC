@@ -1,18 +1,22 @@
-OBJ = main.o lexical.o error.o parser.o
+OBJ = main.o Error.o Lexer.o Scanner.o Token.o 
 WARNFLG = -Wall -Wextra
 DEBUG = -g
+STD = -std=c++11
+FLAG = $(DEBUG) $(WARNFLG) $(STD)
 CC = g++
 
 all: $(OBJ) 
-	$(CC) $(OBJ) -o lscc $(DEBUG) $(WARNFLG)
-main.o:main.c common.h
-	$(CC) main.c -c -o main.o $(DEBUG) $(WARNFLG)
-lexical.o:lexical.c common.h
-	$(CC) lexical.c -c -o lexical.o $(DEBUG) $(WARNFLG)
-error.o:error.c common.h
-	$(CC) error.c -c -o error.o $(DEBUG) $(WARNFLG)
-parser.o:parser.cpp common.h
-	$(CC) parser.cpp -c -o parser.o $(DEBUG) $(WARNFLG)
+	$(CC) $(OBJ) -o lscc $(FLAG)
+main.o:main.cpp common.h
+	$(CC) main.cpp -c -o main.o $(FLAG)
+Error.o: Error.cpp Error.h Scanner.h
+	$(CC) Error.cpp -c -o Error.o $(FLAG)
+Lexer.o: Lexer.cpp Lexer.h common.h Scanner.h Token.h Error.h
+	$(CC) Lexer.cpp -c -o Lexer.o $(FLAG)
+Scanner.o: Scanner.cpp Scanner.h Error.h
+	$(CC) Scanner.cpp -c -o Scanner.o $(FLAG)
+Token.o: Token.cpp Token.h Error.h common.h
+	$(CC) Token.cpp -c -o Token.o $(FLAG)
 clear:
 	rm *.o
 help:
