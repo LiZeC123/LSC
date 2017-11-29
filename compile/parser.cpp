@@ -1,3 +1,4 @@
+#include <string>
 #include "common.h"
 
 Symbol oldtoken = M_NULL, token = M_NULL; //最近的两个符号
@@ -131,9 +132,9 @@ void def()
 
 
 
-char *sym2Name(int s)
+const char *sym2Name(int s)
 {
-    static char *names[] = {
+    static std::string names[] = {
         "ERR",                                       // 错误
         "END",                                       // 文件结束
         "IDENT",                                     // 标识符
@@ -159,7 +160,7 @@ char *sym2Name(int s)
         " ",                                         // 空白,与符号声明对应
         "IS_NULL"
     };
-    return names[s];
+    return names[s].c_str();
 }
 
 

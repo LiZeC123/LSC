@@ -1,17 +1,18 @@
 OBJ = main.o lexical.o error.o parser.o
 WARNFLG = -Wall -Wextra
 DEBUG = -g
+CC = g++
 
 all: $(OBJ) 
-	gcc $(OBJ) -o lscc $(DEBUG) $(WARNFLG)
+	$(CC) $(OBJ) -o lscc $(DEBUG) $(WARNFLG)
 main.o:main.c common.h
-	gcc main.c -c -o main.o $(DEBUG) $(WARNFLG)
+	$(CC) main.c -c -o main.o $(DEBUG) $(WARNFLG)
 lexical.o:lexical.c common.h
-	gcc lexical.c -c -o lexical.o $(DEBUG) $(WARNFLG)
+	$(CC) lexical.c -c -o lexical.o $(DEBUG) $(WARNFLG)
 error.o:error.c common.h
-	gcc error.c -c -o error.o $(DEBUG) $(WARNFLG)
-parser.o:parser.c common.h
-	gcc parser.c -c -o parser.o $(DEBUG) $(WARNFLG)
+	$(CC) error.c -c -o error.o $(DEBUG) $(WARNFLG)
+parser.o:parser.cpp common.h
+	$(CC) parser.cpp -c -o parser.o $(DEBUG) $(WARNFLG)
 clear:
 	rm *.o
 help:
