@@ -2,6 +2,8 @@
 #include "common.h"
 #include <stdio.h>
 
+int warnNum = 0, errorNum = 0;
+
 static const char *ErrorTable[] =
     {
         "字符串缺少右引号",

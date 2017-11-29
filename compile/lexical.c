@@ -4,6 +4,9 @@
 
 //TODO: 通过分析代码,进可能使用静态全局变量代替全局变量
 
+
+// 词法分析扫描器
+static char scan();
 // 获得一个标识符
 static int getIdent();
 // 检查是否是关键字
@@ -14,6 +17,10 @@ static int getNumber();
 static int getStr();
 //获得一个字符常量
 static int getChar();
+
+// 处于while循环中的代码为了确保一定能退出,使用这个宏函数
+// 其他情况下可以直接使用scan函数
+#define checkedScan  if(-1==scan()){return -1;}
 
 
 int lineNum = 1;    // 行号
@@ -27,7 +34,7 @@ char line[BUF_LEN]; // 字符缓冲区
 char ch;            // 当前字符
 char lastch;        // 上一个字符
 //需要全局定义的文件指针fin
-char scan()
+static char scan()
 {
     //没有指向文件,直接返回
     if (!fin)
@@ -602,67 +609,4 @@ static int getChar()
         }
     }
     return ch;
-}
-
-/*****************************测试用主函数***********************************************/
-char *sym2Name(int s)
-{
-    static char *names[] = {
-        "ERR",                                       // 错误
-        "END",                                       // 文件结束
-        "IDENT",                                     // 标识符
-        "kW_INT", "KW_CHAR", "KW_VOID", "KW_DOUBLE", // 数据类型
-        "KW_EXTERN",                                 //extern
-        "NUM", "CH", "STR",                          //常量
-        "NOT", "LEA",                                // 单目运算符 ! & - *
-        "ADD", "SUB", "MUL", "DIV", "MOD",           //算数运算符
-        "INC", "DEC",                                // ++ --
-        "GT", "GE", "LT", "LE", "EQU", "NEQU",       // 关系运算符
-        "AND", "OR",                                 // 逻辑运算符
-        "LPAREN", "RPAREN",                          // ()
-        "LBRACK", "RBRACK",                          // []
-        "LBRACE", "RBRACE",                          // {}
-        "COMMA", "COLON", "SEMICON",                 // , : ;
-        "ASSIGN",                                    // 赋值
-        "KW_IF", "KW_ELSE",                          // if-else
-        "KW_SWITCH", "KW_CASE", "KW_DEFAULT",        // switch-case
-        "KW_WHIILE", "KW_DO", "KE_FOR",              // 循环语句
-        "KW_BREAK", "KW_CONTINUE", "KW_RETURN",      // 流程控制
-        "KW_IN", "KW_OUT", "KW_STRING"               // 其他关键字
-    };
-    return names[s];
-}
-
-FILE *fin;
-char * filename = "main.c";
-int main()
-{
-    //fin = fopen("/home/lizec/CWorkSpace/lsc/errorTest.c", "r");
-    fin = fopen("/home/lizec/CWorkSpace/lsc/test/main.c","r");
-    scan();
-    while (getSym() != -1)
-    {
-        if (sym == IDENT)
-        {
-            printf("id=%s\n", id);
-        }
-        else if (sym == STR)
-        {
-            printf("str=%s\n", str);
-        }
-        else if (sym == NUM)
-        {
-            printf("num=%d\n", num);
-        }
-        else if (sym == CH)
-        {
-            printf("ch=%c\n", letter);
-        }
-        else
-        {
-            printf("type=%s\n", sym2Name(sym));
-        }
-    }
-
-    return 0;
 }
