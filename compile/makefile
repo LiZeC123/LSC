@@ -22,6 +22,7 @@ SymTab.o: SymTab.cpp SymTab.h
 Token.o: Token.cpp Token.h Error.h common.h
 	$(CC) Token.cpp -c -o Token.o $(FLAG)
 clear:
-	rm *.o
+	rm -rf *.o
+	rm -rf lscc
 help:
 	echo "注意检查新添加的文件有没有加入编译"
