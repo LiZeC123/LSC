@@ -19,4 +19,8 @@ private:
     void move();
     bool match(Symbol need);
 
+    void program();
+    void segment();
+    Symbol type();
+    void def();
 };

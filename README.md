@@ -80,8 +80,8 @@ Lsc语言目前定义为一个在C语言的子集上扩展的语言.希望通过
 	- 包括字符串,字符常量的符号
 2. 数字识别中出现错误
 	- 例如不合法的二进制或16进制数字
-3. 长度超过限制
-	- 包括标识符,数字常量,字符串常量
+3. 无法识别的符号
+4. 没有结束的注释符号
 
 对于这些错误,目前处理方案是仅仅报告错误的位置,然后继续进行词法分析
 
@@ -109,7 +109,7 @@ int g(){ }
 ```
 <segment> -> extern <type><def>
 <segment> -> <type><def>
-<type>    -> int | void | char | double
+<type>    -> int | void | char 
 ```
 
 #### 变量定义与声明的识别
@@ -307,10 +307,10 @@ int g(){ }
 ```
 <statement> -> <altexpr>;
              | <whilestat> | <forstat> | <dowhilestat>
-			 | <ifstat>    | <switchstat>
-			 | break;
-			 | continue;
-			 | return <altexpr>;
+             | <ifstat>    | <switchstat>
+             | break;
+             | continue;
+             | return <altexpr>;
 
 ```
 
