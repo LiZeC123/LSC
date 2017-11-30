@@ -1,4 +1,4 @@
-OBJ = main.o Error.o Lexer.o Parser.o Scanner.o Token.o 
+OBJ = main.o Error.o Lexer.o Parser.o Scanner.o SymTab.o Token.o 
 WARNFLG = -Wall -Wextra
 DEBUG = -g
 STD = -std=c++11
@@ -17,6 +17,8 @@ Parser.o: Parser.cpp Parser.h common.h Token.h Lexer.h
 	$(CC) Parser.cpp -c -o Parser.o $(FLAG)
 Scanner.o: Scanner.cpp Scanner.h Error.h
 	$(CC) Scanner.cpp -c -o Scanner.o $(FLAG)
+SymTab.o: SymTab.cpp SymTab.h
+	$(CC) SymTab.cpp -c -o SymTab.o $(FLAG)
 Token.o: Token.cpp Token.h Error.h common.h
 	$(CC) Token.cpp -c -o Token.o $(FLAG)
 clear:
