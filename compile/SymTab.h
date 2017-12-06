@@ -3,9 +3,17 @@
 #include <vector>
 #include <string>
 #include "common.h"
+#include "Token.h"
 
 class Var
 {
+public:
+    Var(Token* literal);
+
+
+    std::string getName();
+    std::vector<int>& getPath();
+    int getSize();
 private:
     bool literal;                   // 是否是字面常量值
     std::vector<int> scopePath;     // 作用于路径
@@ -27,6 +35,9 @@ private:
     Var* ptr;                       // 变量的指针变量
     int size;                       // 变量大小
     int offset;                     // 变量的栈帧偏移值
+
+
+    void baseInit();                // 默认初始化
 };
 
 class Fun
@@ -53,7 +64,7 @@ public:
     void enter();
     void leave();
 
-
+    void addVar(Var* var);
 
 private:
     std::map<std::string,std::vector<Var*>*> varTab;
