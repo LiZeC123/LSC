@@ -17,12 +17,16 @@ public:
 private:
     bool literal;                   // 是否是字面常量值
     std::vector<int> scopePath;     // 作用于路径
+
+
     bool externed;                  // 是否有extern声明
     Symbol type;                    // 变量类型
     std::string name;               // 变量名
     bool isPtr;                     // 是否是指针
     bool isArray;                   // 是否是数组
     int arraySize;                  // 数组长度
+
+
     bool isLeft;                    // 是否是左值
     Var* initData;                  // 初始数据
     bool inited;                    // 是否初始化
@@ -33,6 +37,8 @@ private:
     std::string strVal;             // 字符串常量初始值
     std::string ptrVal;             // 字符指针初始值
     Var* ptr;                       // 变量的指针变量
+
+
     int size;                       // 变量大小
     int offset;                     // 变量的栈帧偏移值
 
@@ -65,6 +71,8 @@ public:
     void leave();
 
     void addVar(Var* var);
+    void addStr(Var* var);
+    Var* getVal(std::string name);
 
 private:
     std::map<std::string,std::vector<Var*>*> varTab;

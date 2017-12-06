@@ -1,6 +1,8 @@
 #include "Error.h"
 #include "Scanner.h"
 
+using namespace std;
+
 Scanner* Error::scanner = nullptr;
 int Error::warnNum = 0;
 int Error::errorNum = 0;
@@ -87,4 +89,38 @@ void Error::synError(int code, Token* token)
             scanner->getRow(),token->toString().c_str(),synErrorTable[code/2]);
     }
 
+}
+
+void Error::semError(int code,string name)
+{
+	//语义错误信息串
+	static const char *semErrorTable[]=
+	{
+        //附加名称信息
+		"变量重定义",                               
+		"函数重定义",
+		"变量未声明",
+		"函数未声明",
+		"函数声明与定义不匹配",
+		"函数行参实参不匹配",
+		"变量声明时不允许初始化",
+		"函数定义不能声明extern",
+		"数组长度应该是正整数",
+		"变量初始化类型错误",
+		"全局变量初始化值不是常量",
+        //没有名称信息
+		"变量不能声明为void类型",                       
+		"无效的左值表达式",
+		"赋值表达式类型不兼容",
+		"表达式运算对象不能是基本类型",
+		"表达式运算对象不是基本类型",
+		"数组索引运算类型错误",
+		"void的函数返回值不能参与表达式运算",
+		"break语句不能出现在循环或switch语句之外",
+		"continue不能出现在循环之外",
+		"return语句和函数返回值类型不匹配"
+	};
+	errorNum++;
+	printf("%s<第%d行> 语义错误 : %s %s.\n",scanner->getFilename(),scanner->getRow(),
+		name.c_str(),semErrorTable[code]);
 }

@@ -1,5 +1,5 @@
 #include "SymTab.h"
-
+#include <stdexcept>
 using namespace std;
 
 Var::Var(Token *literal)
@@ -26,6 +26,10 @@ Var::Var(Token *literal)
         strVal = ((Str*)literal)->str;
         isArray = true;
         arraySize = strVal.size()+1;
+    default:
+        // 正常情况下,调用此函数时,必然没有其他类型
+        // 如果到达这里,说明存在程序逻辑错误,可以直接中止程序
+        throw runtime_error("Var(Token) miss type");
     }
 }
 
@@ -114,7 +118,7 @@ void SymTab::addVar(Var* var)
     else{
         // 如果存在同名符号,检查作用域
         vector<Var*>& list = *varTab[var->getName()];
-        int i;
+        unsigned int i;
         for(i=0;i<list.size();i++){
             if(list[i]->getPath().back() == var->getPath().back()){
                 break;
@@ -128,4 +132,33 @@ void SymTab::addVar(Var* var)
             // 语义错误,变量重定义
         }
     }
+}
+
+void SymTab::addStr(Var* var)
+{
+    strTab[var->getName()] = var;
+}
+
+Var* SymTab::getVal(std::string name)
+{
+    Var* r = nullptr;
+    if(varTab.find(name) != varTab.end()){
+        vector<Var*>& list = *varTab[name];
+        int maxLen = 0;
+        int pathLen = scopePath.size();
+        for(int i=0;i<list.size();i++){
+            int len = list[i]->getPath().size();
+            if(len<=pathLen && list[i]->getPath()[len-1] == scopePath[len-1]){
+                if(len > maxLen){
+                    maxLen = len;
+                    r = list[i];
+                }
+            }
+        }
+    }
+
+    if(!r){
+        // 语义错误,未定义的变量
+    }
+    return r;
 }
