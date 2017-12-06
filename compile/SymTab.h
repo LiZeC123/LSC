@@ -31,6 +31,11 @@ private:
 
 class Fun
 {
+public:
+    Fun();
+    void enterScope();              // 进入一个新的作用于
+    void leaveScope();              // 退出作用域并计算栈帧大小
+
 private:
     bool externed;                  // 是否有extern声明
     Symbol type;                    // 返回类型

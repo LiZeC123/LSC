@@ -9,7 +9,7 @@ all: $(OBJ)
 	$(CC) $(OBJ) -o lscc $(FLAG)
 main.o:main.cpp common.h
 	$(CC) main.cpp -c -o main.o $(FLAG)
-Error.o: Error.cpp Error.h Scanner.h
+Error.o: Error.cpp Error.h Scanner.h Token.h
 	$(CC) Error.cpp -c -o Error.o $(FLAG)
 Lexer.o: Lexer.cpp Lexer.h common.h Scanner.h Token.h Error.h
 	$(CC) Lexer.cpp -c -o Lexer.o $(FLAG)

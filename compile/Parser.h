@@ -3,6 +3,7 @@
 #include "Token.h"
 #include "Lexer.h"
 
+
 class Parser
 {
 public:
@@ -23,4 +24,9 @@ private:
     void segment();
     Symbol type();
     void def();
+
+
+
+private:
+    void recover(bool cond,SynError lost,SynError wrong);
 };
