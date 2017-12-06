@@ -55,17 +55,7 @@ void Error::lexWarm(int code)
         lexWarnTable[code]);
 }
 
-void Error::synLostError(Token* token)
-{
-    synError(0,token);
-}
-
-void Error::synMissMatchError(Token* token)
-{
-    synError(1,token);
-}
-
-void Error::synError(int errorType, Token* token)
+void Error::synError(int code, Token* token)
 {
     static const char * synErrorTable[] = 
     {
@@ -88,13 +78,13 @@ void Error::synError(int errorType, Token* token)
 
     errorNum++;
 
-    if(errorType == 0){
+    if(code % 2 == 0){
         printf("%s<第%d行> 语法错误 : 在 %s 之前丢失 %s .\n",scanner->getFilename(),
-            scanner->getRow(),token->toString().c_str(),synErrorTable[errorType/2]);
+            scanner->getRow(),token->toString().c_str(),synErrorTable[code/2]);
     }
     else{
 		printf("%s<第%d行> 语法错误 : 在 %s 处没有正确匹配 %s .\n",scanner->getFilename(),
-            scanner->getRow(),token->toString().c_str(),synErrorTable[errorType/2]);
+            scanner->getRow(),token->toString().c_str(),synErrorTable[code/2]);
     }
 
 }

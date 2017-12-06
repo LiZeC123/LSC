@@ -1,4 +1,8 @@
 #include "Parser.h"
+#include "Error.h"
+
+#define firstIs(C) look->sym == C       // 判断向前读取的一个符号是不是指定的符号
+#define _OR_(T) || look->sym == T       // 与上面的宏连用,组成更复杂的条件语句
 
 Parser::Parser(Lexer& lex): lexer(lex) { }
 
@@ -58,3 +62,13 @@ void Parser::def()
     //TODO
 }
 
+
+void Parser::recover(bool cond,SynError lost,SynError wrong)
+{
+    if(cond){
+        Error::synError(lost,look);
+    }
+    else{
+        Error::synError(wrong,look);
+    }
+}

@@ -13,7 +13,7 @@ Error.o: Error.cpp Error.h Scanner.h Token.h
 	$(CC) Error.cpp -c -o Error.o $(FLAG)
 Lexer.o: Lexer.cpp Lexer.h common.h Scanner.h Token.h Error.h
 	$(CC) Lexer.cpp -c -o Lexer.o $(FLAG)
-Parser.o: Parser.cpp Parser.h common.h Token.h Lexer.h
+Parser.o: Parser.cpp Parser.h common.h Token.h Lexer.h Error.h
 	$(CC) Parser.cpp -c -o Parser.o $(FLAG)
 Scanner.o: Scanner.cpp Scanner.h Error.h
 	$(CC) Scanner.cpp -c -o Scanner.o $(FLAG)

@@ -12,11 +12,7 @@ public:
 
     static void lexError(int code);
     static void lexWarm(int code);
-    static void synLostError(Token* token);
-    static void synMissMatchError(Token* token);
-
-private:
-    static void synError(int errorType,Token * token);
+    static void synError(int code,Token* token);
 
 private:
     static Scanner * scanner;
