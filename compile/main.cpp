@@ -2,23 +2,25 @@
 #include "common.h"
 #include "Scanner.h"
 #include "Lexer.h"
+#include "Parser.h"
+#include "Error.h"
 
 
 int main()
 {
-    const char* filename = "/home/lizec/CWorkSpace/lsc/test/main.c";
-    Scanner scanner(filename);
-    Lexer lex(scanner);
+    const char* filename = "/home/lizec/CWorkSpace/lsc/test/baseTest.c";
+    Scanner scanner = Scanner(filename);
+    Error err     = Error(&scanner);
+    Lexer lex       = Lexer(scanner);
+    SymTab tab      = SymTab();
+    Parser parser   = Parser(lex,tab);
 
-    Token * token;
-    while(true){
-        token = lex.nextToken();
-        std::cout << token->toString() << std::endl;
-        if(token->sym == END){
-            break;
-        } 
-   }
+    parser.analyse();
 
+    tab.printValTab();
+
+    printf("编译完成!");
+    printf("%d 错误 %d警告\n",err.getErrorNum(),err.getWarnNum());
     return 0;
 }
 

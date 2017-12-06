@@ -8,7 +8,7 @@
 class Parser
 {
 public:
-    Parser(Lexer& lex);
+    Parser(Lexer& lex,SymTab& tab);
 
     void analyse();
 
@@ -16,7 +16,7 @@ public:
 private:
     Token* look;
     Lexer& lexer;
-
+    SymTab & symtab;
 private:
     void move();
     bool match(Symbol need);

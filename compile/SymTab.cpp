@@ -1,7 +1,11 @@
 #include "SymTab.h"
+#include "Error.h"
 #include <stdexcept>
+#include <iostream>
+#include <sstream>
 using namespace std;
 
+// 常量初始化,字符串储存在字符串表中,其他常量仅用于初始化,使用后调用者负责删除
 Var::Var(Token *literal)
 {
     baseInit();
@@ -10,27 +14,48 @@ Var::Var(Token *literal)
     switch (literal->sym)
     {
     case NUM:
-        type = KW_INT;
+        setType(KW_INT);
         name = "<int>";
         intVal = ((Num*)literal)->val;
         break;
     case CH:
-        type = KW_CHAR;
+        setType(KW_CHAR);
         name = "<char>";
         charVal = ((Char*)literal)->ch;
         break;
     case STR:
-        type = KW_CHAR;
+        setType(KW_CHAR);
         //TODO: 生成唯一ID
         name = "<>";
         strVal = ((Str*)literal)->str;
-        isArray = true;
-        arraySize = strVal.size()+1;
+        setArray(strVal.size()+1);
     default:
         // 正常情况下,调用此函数时,必然没有其他类型
         // 如果到达这里,说明存在程序逻辑错误,可以直接中止程序
         throw runtime_error("Var(Token) miss type");
     }
+}
+
+Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,int len)
+{
+    baseInit();
+    this->scopePath = scopePath;
+    setExterned(isExtern);
+    setType(s);
+    setPtr(isPtr);
+    setName(name);
+    setArray(len);
+}
+
+Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,Var* init)
+{
+    baseInit();
+    this->scopePath = scopePath;
+    setExterned(isExtern);
+    setType(s);
+    setPtr(isPtr);
+    setName(name);
+    initData = init;
 }
 
 string Var::getName()
@@ -48,6 +73,7 @@ int Var::getSize()
     return size;
 }
 
+
 void Var::baseInit()
 {
     literal = false;
@@ -62,6 +88,76 @@ void Var::baseInit()
     ptr = nullptr;
     size = 0;
     offset = 0;
+}
+
+void Var::setExterned(bool isExtern)
+{
+    if(isExtern){
+        externed = true;
+        size = 0;
+    }
+}
+
+void Var::setType(Symbol s)
+{
+    type = s;
+    if(type == KW_VOID){
+        // 变量类型不能为void
+        Error::semError(VOID_VAR,"");
+        type = KW_INT;
+    }
+    if(!externed && type==KW_INT){
+        size = 4;
+    }
+    else if(!externed && type==KW_CHAR){
+        size = 1;
+    }
+}
+
+
+void Var::setPtr(bool isPtr)
+{
+    if(isPtr){
+        this->isPtr = true;
+        if(!externed){
+            // 指针全部都是4字节
+            size = 4;
+        }
+    }
+}
+
+
+void Var::setName(std::string name)
+{
+    this->name = name;
+}
+
+
+void Var::setArray(int len)
+{
+    if(len < 0){
+        Error::semError(ARRAY_LEN_INVALID,name);
+    }
+    else{
+        isArray = true;
+        isLeft = false;
+        arraySize = len;
+        if(!externed){
+            size = size*len;
+        }
+    }
+}
+
+
+string Var::toString()
+{
+    stringstream ss;
+    ss << "路径:";
+    for(unsigned int i=0;i<scopePath.size();i++){
+        ss << "/" << i;
+    }
+    ss << "\n变量名: " << this->name << endl;
+    return ss.str();
 }
 
 Fun::Fun()
@@ -129,7 +225,10 @@ void SymTab::addVar(Var* var)
             list.push_back(var);
         }
         else{
-            // 语义错误,变量重定义
+            // 变量重定义,只报错,不需要额外处理
+            Error::semError(VAR_RE_DEF,var->getName());
+            delete var;
+            return;
         }
     }
 }
@@ -146,7 +245,7 @@ Var* SymTab::getVal(std::string name)
         vector<Var*>& list = *varTab[name];
         int maxLen = 0;
         int pathLen = scopePath.size();
-        for(int i=0;i<list.size();i++){
+        for(unsigned int i=0;i<list.size();i++){
             int len = list[i]->getPath().size();
             if(len<=pathLen && list[i]->getPath()[len-1] == scopePath[len-1]){
                 if(len > maxLen){
@@ -158,7 +257,25 @@ Var* SymTab::getVal(std::string name)
     }
 
     if(!r){
+        Error::semError(VAR_UN_DEC,name);
         // 语义错误,未定义的变量
     }
     return r;
+}
+
+vector<int>& SymTab::getScopePath()
+{
+    return scopePath;
+}
+
+
+void SymTab::printValTab()
+{
+    auto it = varTab.begin();
+    for(;it!=varTab.end();it++){
+        for(const auto&i:*(it->second)){
+            cout << i->toString() << endl;
+        }
+        
+    }
 }

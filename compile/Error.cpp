@@ -17,7 +17,7 @@ int Error::getWarnNum()
     return Error::warnNum;
 }
 
-int Error::getErrorNUm()
+int Error::getErrorNum()
 {
     return errorNum;
 }

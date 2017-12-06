@@ -10,10 +10,22 @@ class Var
 public:
     Var(Token* literal);
 
-
+    Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,int len);
+    Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,Var* init);
     std::string getName();
     std::vector<int>& getPath();
     int getSize();
+    std::string toString();
+private:
+    // 注意:由于每个函数并不只初始化一个属性,且部分属性相互依赖
+    // 所以必须按照下面的顺序依次使用以下函数(如果需要,不需要的函数不用调用)
+    void baseInit();                            // 默认初始化
+    void setExterned(bool isExtern);
+    void setType(Symbol s);
+    void setPtr(bool isPtr);
+    void setName(std::string name);
+    void setArray(int len);
+               
 private:
     bool literal;                   // 是否是字面常量值
     std::vector<int> scopePath;     // 作用于路径
@@ -42,8 +54,6 @@ private:
     int size;                       // 变量大小
     int offset;                     // 变量的栈帧偏移值
 
-
-    void baseInit();                // 默认初始化
 };
 
 class Fun
@@ -74,6 +84,10 @@ public:
     void addStr(Var* var);
     Var* getVal(std::string name);
 
+    std::vector<int>& getScopePath();
+
+    // 输出变量表,调试用
+    void printValTab();
 private:
     std::map<std::string,std::vector<Var*>*> varTab;
     std::map<std::string,Var*> strTab;

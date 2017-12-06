@@ -8,7 +8,7 @@ class Error
 public:
     Error(Scanner * scanner);
     int getWarnNum();
-    int getErrorNUm();
+    int getErrorNum();
 
 
     static void lexError(int code);

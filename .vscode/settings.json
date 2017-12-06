@@ -3,6 +3,9 @@
         "string.h": "c",
         "stdlib.h": "c",
         "common.h": "c",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "stdexcept": "cpp",
+        "*.tcc": "cpp",
+        "ostream": "cpp"
     }
 }

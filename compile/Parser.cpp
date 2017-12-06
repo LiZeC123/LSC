@@ -15,7 +15,7 @@ _OR_(KW_DO)_OR_(KW_IF)_OR_(KW_SWITCH)_OR_(KW_RETURN)_OR_(KW_BREAK)_OR_(KW_CONTIN
 
 using namespace std;
 
-Parser::Parser(Lexer& lex): lexer(lex) { }
+Parser::Parser(Lexer& lex,SymTab& tab) : lexer(lex),symtab(tab) { }
 
 void Parser::analyse()
 {
@@ -102,10 +102,10 @@ void Parser::idtail(bool isExtern,Symbol s,bool isPtr,std::string name)
         //TODO: function
     }
     else{
-        //TODO: 存符号表
-        defvar(isExtern,s,isPtr,name);
+        Var* var = defvar(isExtern,s,isPtr,name);
+        symtab.addVar(var);
+
         deflist(isExtern,s);
-        //TODO: 处理后续声明
     }
 }
 
@@ -113,21 +113,21 @@ void Parser::idtail(bool isExtern,Symbol s,bool isPtr,std::string name)
 // <defvar> -> <init>
 Var* Parser::defvar(bool isExtern,Symbol s,bool isPtr,std::string name)
 {
-    if(match(LBRACE)){
+    if(match(LBRACK)){
         int len = 0;
         if(firstIs(NUM)){
             len = ((Num*)look)->val;
             move();
         }
         else{
-            recover(firstIs(RBRACE),NUM_LOST,NUM_WRONG);
+            recover(firstIs(RBRACK),NUM_LOST,NUM_WRONG);
         }
 
-        if(!match(RBRACE)){
-            recover(firstIs(COMMA),RBRACE_LOST,RBRACE_WRONG);
+        if(!match(RBRACK)){
+            recover(firstIs(COMMA),RBRACK_LOST,RBRACK_WRONG);
         }
 
-        // TODO: 返回符号
+        return new Var(symtab.getScopePath(),isExtern, s, isPtr,name,len);
     }
     else{
         return init(isExtern,s,isPtr,name);
@@ -139,20 +139,20 @@ Var* Parser::defvar(bool isExtern,Symbol s,bool isPtr,std::string name)
 // <init>    -> e
 Var* Parser::init(bool isExtern,Symbol s,bool isPtr,std::string name)
 {
+    Var* init = nullptr;
     if(match(ASSIGN)){
         //TODO 调用expr()
     }
-    //TODO: 返回变量
+    return new Var(symtab.getScopePath(),isExtern,s,isPtr,name,init);
 }
 
 
-// <deflist> -> ,<defvar><deflist>
+// <deflist> -> ,<def>
 // <deflist> -> ;
 void Parser::deflist(bool isExtern,Symbol s)
 {
     if(match(COMMA)){
         def(isExtern,s);
-        deflist(isExtern,s);
     }
     else if(match(SEMICON)){
         return;
@@ -160,9 +160,8 @@ void Parser::deflist(bool isExtern,Symbol s)
     else{
         if(firstIs(MUL)){
             recover(true,COMMA_LOST,COMMA_WRONG);
-            //TODO: 处理符号
-
-            // 虽然此处缺少来逗号,但还是继续编译
+            // 虽然此处缺少逗号,但还是继续编译
+            def(isExtern,s);
             deflist(isExtern,s);
         }
         else{

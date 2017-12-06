@@ -7,7 +7,7 @@ CC = g++
 
 all: $(OBJ) 
 	$(CC) $(OBJ) -o lscc $(FLAG)
-main.o:main.cpp common.h
+main.o:main.cpp common.h Scanner.h Lexer.h Parser.h
 	$(CC) main.cpp -c -o main.o $(FLAG)
 Error.o: Error.cpp Error.h Scanner.h Token.h
 	$(CC) Error.cpp -c -o Error.o $(FLAG)
@@ -17,7 +17,7 @@ Parser.o: Parser.cpp Parser.h common.h Token.h Lexer.h Error.h
 	$(CC) Parser.cpp -c -o Parser.o $(FLAG)
 Scanner.o: Scanner.cpp Scanner.h Error.h
 	$(CC) Scanner.cpp -c -o Scanner.o $(FLAG)
-SymTab.o: SymTab.cpp SymTab.h Token.h
+SymTab.o: SymTab.cpp SymTab.h Token.h Error.h
 	$(CC) SymTab.cpp -c -o SymTab.o $(FLAG)
 Token.o: Token.cpp Token.h Error.h common.h
 	$(CC) Token.cpp -c -o Token.o $(FLAG)
