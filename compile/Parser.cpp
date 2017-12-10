@@ -385,25 +385,119 @@ void Parser::whilestat()
 
 }
 
+// <forsata>       -> for(<forinit><altexpr>;<altexpr>) <block>
 void Parser::forstat()
 {
+    match(KW_FOR);
+    if(!match(LPAREN)){
+        recovery(FIRST_EXPR||firstIs(RPAREN),LPAREN_LOST,LPAREN_WRONG);
+    }
+    forinit();
+    altexpr();
+    if(!match(SEMICON)){
+        recovery(FIRST_EXPR||firstIs(RPAREN),SEMICON_LOST,SEMICON_WRONG);
+    }
+    altexpr();    
+    if(!match(RPAREN)){
+        recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
+    }
+    block();
 
 }
 
+
+//  <forinit>       -> <localdef> | <altexpr> ;
+void Parser::forinit()
+{
+    if(FIRST_TYPE){
+        localdef();
+    }
+    else{
+        altexpr();
+    }
+}
+
+
+// <dowhilestat>   -> do <block> while ( <altexpr> );
 void Parser::dowhilestat()
 {
-
+    match(KW_DO);
+    block();
+    if(!match(KW_WHILE)){
+        recovery(firstIs(LPAREN),WHILE_LOST,WHILE_WRONG);
+    }
+    if(!match(RPAREN)){
+        recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
+    }
+    if(!match(SEMICON)){
+        recovery(FIRST_TYPE||FIRST_STATEMENT||firstIs(RBRACE),SEMICON_LOST,SEMICON_WRONG);
+    }
 }
 
+
+// <ifstat>     -> if ( <expr> ) <block> <elsestat>
 void Parser::ifstat()
 {
-
+    match(KW_IF);
+    if(!match(LPAREN)){
+        recovery(FIRST_EXPR,LPAREN_LOST,LPAREN_WRONG);
+    } 
+    expr();
+    if(!match(RPAREN)){
+        recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
+    }
+    block();
+    elsestat();
 }
 
+// <elsestat>   -> else <block> | e
+void Parser::elsestat()
+{
+    if(match(KW_ELSE)){
+        block();
+    }
+}
+
+// <switchstat> -> switch ( <expr> ) { <casestat> }
 void Parser::switchstat()
 {
-
+    match(KW_SWITCH);
+    if(!match(LPAREN)){
+        recovery(FIRST_EXPR,LPAREN_LOST,LPAREN_WRONG);
+    } 
+    expr();
+    if(!match(RPAREN)){
+        recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
+    }
+    casestat();
 }
+
+// <casestat>   -> case <caselable> : <subprogram><casetate>
+//               | default: <subprigram>
+void Parser::casestat()
+{
+    if(match(KW_CASE)){
+        caselable();
+        if(!match(COLON)){
+            recovery(FIRST_TYPE||FIRST_EXPR,COLON_LOST,COLON_WRONG);
+        }
+        subprogram();
+        casestat();
+    }
+    else if(match(KW_DEFAULT)){
+        if(!match(COLON)){
+            recovery(FIRST_TYPE||FIRST_EXPR,COLON_LOST,COLON_WRONG);
+        }
+    }
+}
+
+// <caselable> -> <literal>
+void Parser::caselable()
+{
+    literal();
+}
+
+
 
 // <altexpr> -> <expr>
 // <altexpr> -> e

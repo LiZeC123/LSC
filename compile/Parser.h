@@ -51,6 +51,8 @@ private:
 	void ifstat();
 	void elsestat();
 	void switchstat();
+    void casestat();
+    void caselable();
 
     // 表达式
     Var* altexpr();
