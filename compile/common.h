@@ -80,6 +80,15 @@ enum SynError
     RBRACE_WRONG
 };
 
+// 所有的语义警告
+enum SemWarn
+{
+	FUN_DEC_CONFLICT,            //函数参数列表类型冲突
+	FUN_RET_CONFLICT             //函数返回值类型冲突
+};
+
+
+// 所有的语义错误
 enum SemError
 {
     VAR_RE_DEF,                    // 变量重定义

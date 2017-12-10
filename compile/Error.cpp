@@ -91,12 +91,24 @@ void Error::synError(int code, Token* token)
 
 }
 
+void Error::semWarm(int code,string name)
+{
+	//语义警告信息串
+	static const char *semWarnTable[]=
+	{
+		"函数参数列表类型冲突",					//附加名称信息
+		"函数返回值类型不精确匹配"
+	};
+	warnNum++;
+	printf("%s<第%d行> 语义警告 : %s %s.\n",scanner->getFilename(),scanner->getRow(),
+		name.c_str(),semWarnTable[code]);
+}
+
 void Error::semError(int code,string name)
 {
 	//语义错误信息串
 	static const char *semErrorTable[]=
 	{
-        //附加名称信息
 		"变量重定义",                               
 		"函数重定义",
 		"变量未声明",
@@ -108,7 +120,6 @@ void Error::semError(int code,string name)
 		"数组长度应该是正整数",
 		"变量初始化类型错误",
 		"全局变量初始化值不是常量",
-        //没有名称信息
 		"变量不能声明为void类型",                       
 		"无效的左值表达式",
 		"赋值表达式类型不兼容",

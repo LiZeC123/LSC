@@ -14,8 +14,9 @@ public:
     static void lexError(int code);
     static void lexWarm(int code);
     static void synError(int code,Token* token);
+    static void semWarm(int code,std::string name);
     static void semError(int code,std::string name);
-
+    
 private:
     static Scanner * scanner;
 

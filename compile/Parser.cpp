@@ -72,7 +72,7 @@ Symbol Parser::type()
         return temp;
     }
     else{
-        recover(firstIs(MUL)_OR_(IDENT),TYPE_LOST,TYPE_WRONG);
+        recovery(firstIs(MUL)_OR_(IDENT),TYPE_LOST,TYPE_WRONG);
         return KW_INT;  // 错误情况,返回int
     }
 }
@@ -90,7 +90,7 @@ void Parser::def(bool isExtern,Symbol s)
         idtail(isExtern,s,isPtr,name);
     }
     else{
-        recover(firstIs(SEMICON)_OR_(ASSIGN)_OR_(COMMA), ID_LOST,ID_WRONG);
+        recovery(firstIs(SEMICON)_OR_(ASSIGN)_OR_(COMMA), ID_LOST,ID_WRONG);
     }
 }
 
@@ -99,7 +99,16 @@ void Parser::def(bool isExtern,Symbol s)
 void Parser::idtail(bool isExtern,Symbol s,bool isPtr,std::string name)
 {
     if(match(LPAREN)){
-        //TODO: function
+        symtab.enter();
+        vector<Var*> paraList;
+        para(paraList);
+        if(!match(RPAREN)){
+            recovery(firstIs(LBRACE)_OR_(SEMICON),RPAREN_LOST,RPAREN_WRONG);
+        }
+        // 创建函数
+        Fun* fun = new Fun(isExtern,s,name,paraList);
+        funtail(fun);
+        symtab.leave();
     }
     else{
         Var* var = defvar(isExtern,s,isPtr,name);
@@ -120,11 +129,11 @@ Var* Parser::defvar(bool isExtern,Symbol s,bool isPtr,std::string name)
             move();
         }
         else{
-            recover(firstIs(RBRACK),NUM_LOST,NUM_WRONG);
+            recovery(firstIs(RBRACK),NUM_LOST,NUM_WRONG);
         }
 
         if(!match(RBRACK)){
-            recover(firstIs(COMMA),RBRACK_LOST,RBRACK_WRONG);
+            recovery(firstIs(COMMA),RBRACK_LOST,RBRACK_WRONG);
         }
 
         return new Var(symtab.getScopePath(),isExtern, s, isPtr,name,len);
@@ -159,13 +168,12 @@ void Parser::deflist(bool isExtern,Symbol s)
     }
     else{
         if(firstIs(MUL)){
-            recover(true,COMMA_LOST,COMMA_WRONG);
+            recovery(true,COMMA_LOST,COMMA_WRONG);
             // 虽然此处缺少逗号,但还是继续编译
             def(isExtern,s);
-            deflist(isExtern,s);
         }
         else{
-            recover(FIRST_TYPE || FIRST_STATEMENT || firstIs(KW_EXTERN)_OR_(RBRACE),
+            recovery(FIRST_TYPE || FIRST_STATEMENT || firstIs(KW_EXTERN)_OR_(RBRACE),
                 SEMICON_LOST,SEMICON_WRONG);
         }
     }
@@ -174,16 +182,232 @@ void Parser::deflist(bool isExtern,Symbol s)
 
 // <funtail> -> ;
 // <funtail> -> <block>
+void Parser::funtail(Fun* fun)
+{
+    if(match(SEMICON)){
+        symtab.decFun(fun);
+    }
+    else{
+       symtab.defFun(fun);
+       block();
+       symtab.endDefFun(fun);
+    }
+}
+
+
+// <para> -> <type><paradata><paralist>
+// <para> -> e
+void Parser::para(std::vector<Var*>& para)
+{
+    if(firstIs(RPAREN)){
+        return;
+    }
+    
+    Symbol s = type();
+    Var* var = paradata(s);
+    symtab.addVar(var);
+    para.push_back(var);
+    paralist(para);
+    
+}
+
+// <paradata> -> * <ID>
+// <paradata> -> <ID> <paradatatail>
+Var* Parser::paradata(Symbol s)
+{
+    string name;
+    if(match(MUL)){
+        if(firstIs(IDENT)){
+            name = ((ID*)look) -> name;
+            move();
+            return new Var(symtab.getScopePath(),false,s,true,name,nullptr);
+        }
+        else{
+            recovery(firstIs(COMMA)_OR_(RPAREN), ID_LOST,ID_WRONG);
+        }
+    }
+    else{
+        if(firstIs(IDENT)){
+            name = ((ID*)look) -> name;
+            move();
+            return paradatatail(s,name);
+        }
+        else{
+            recovery(firstIs(COMMA)_OR_(RPAREN)_OR_(LBRACK), ID_LOST,ID_WRONG);
+        }
+    }
+    // 无论何种错误,最后都需要返回一个Var*
+    return new Var(symtab.getScopePath(),false,s,false,name,nullptr);
+}
+
+// <paradatatail> -> [ <num> ]
+// <paradatatail> -> e
+Var* Parser::paradatatail(Symbol s,string name)
+{
+    if(match(LBRACK)){
+        // 函数参数列表中的数组可以没有指定长度
+        // 所以不需要错误处理,并且以非0数值作为初始值(否在,在写入符号表是会报错)
+        int len = 1;
+        if(firstIs(NUM)){
+            len = ((Num*)look)->val;
+            move();
+        }
+
+        if(!match(RBRACK)){
+            recovery(firstIs(COMMA),RBRACK_LOST,RBRACK_WRONG);
+        }
+
+        return new Var(symtab.getScopePath(),false,s,false,name,len);
+    }
+    else{
+        return new Var(symtab.getScopePath(),false,s,false,name,nullptr);
+    }
+}
+
+
+// <paralist> -> ,<paradata><paralist>
+// <paralist> -> e
+void Parser::paralist(std::vector<Var*>& para)
+{
+    if(match(COMMA)){
+        Symbol s = type();
+        Var* var = paradata(s);
+        symtab.addVar(var);
+        para.push_back(var);
+        paralist(para);
+    }
+}
+
+// <block>      -> { <subprogram> }
+void Parser::block()
+{
+    if(!match(LBRACE)){
+       recovery(FIRST_TYPE||FIRST_STATEMENT||firstIs(RBRACE),LBRACE_LOST,LBRACE_WRONG);
+    }
+
+    subprogram();
+
+    if(!match(RBRACE)){
+        recovery(FIRST_TYPE||FIRST_STATEMENT||firstIs(KW_EXTERN)_OR_(KW_ELSE)
+            _OR_(KW_CASE)_OR_(KW_DEFAULT),RBRACE_LOST,RBRACE_WRONG);
+    }
+
+    
+}
+
+// <subprogram> -> <localdef><subprogram>
+// <subprogram> -> <statement><subprogram>
+// <subprogram> -> e
+void Parser::subprogram()
+{
+    if(FIRST_TYPE){
+        localdef();
+        subprogram();
+    }
+    else if(FIRST_STATEMENT){
+        statement();
+        subprogram();
+    }
+    else{
+        return;
+    }
+}
+
+// <localdef> -> <type><def>
+void Parser::localdef()
+{
+    string name;
+    Symbol s = type();
+    def(false,s);
+}
+
+// <statement> -> <altexpr>;
+//              | <whilestat> | <forstat> | <dowhilestat>
+//              | <ifstat>    | <switchstat>
+//              | break;
+//              | continue;
+//              | return <altexpr>;
+void Parser::statement()
+{
+    switch(look->sym){
+    case KW_WHILE:
+        whilestat();
+        break;
+    case KW_FOR:
+        forstat();
+        break;
+    case KW_DO:
+        dowhilestat();
+        break;
+    case KW_IF:
+        ifstat();
+        break;
+    case KW_SWITCH:
+        switchstat();
+        break;
+    case KW_BREAK:
+        move();
+        statCheckSemicon();
+        break;
+    case KW_CONTINUE:
+        move();
+        statCheckSemicon();
+        break;
+    case KW_RETURN:
+        move();
+        altexpr();
+        statCheckSemicon();
+    default:
+        altexpr();
+        statCheckSemicon();
+    }
+}
+
+void Parser::whilestat()
+{
+
+}
+
+void Parser::forstat()
+{
+
+}
+
+void Parser::dowhilestat()
+{
+
+}
+
+void Parser::ifstat()
+{
+
+}
+
+void Parser::switchstat()
+{
+
+}
+
+void Parser::altexpr()
+{
+
+}
 
 
 
-
-void Parser::recover(bool cond,SynError lost,SynError wrong)
+void Parser::recovery(bool cond,SynError lost,SynError wrong)
 {
     if(cond){
         Error::synError(lost,look);
     }
     else{
         Error::synError(wrong,look);
+    }
+}
+
+void Parser::statCheckSemicon()
+{
+    if(!match(SEMICON)){
+        recovery(FIRST_TYPE||FIRST_STATEMENT||firstIs(RBRACE),SEMICON_LOST,SEMICON_WRONG);
     }
 }

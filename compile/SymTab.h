@@ -12,13 +12,16 @@ public:
 
     Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,int len);
     Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,Var* init);
+ 
     std::string getName();
     std::vector<int>& getPath();
     int getSize();
-    std::string toString();
+    Symbol getType();
+ 
+    void printSelf();
 private:
     // 注意:由于每个函数并不只初始化一个属性,且部分属性相互依赖
-    // 所以必须按照下面的顺序依次使用以下函数(如果需要,不需要的函数不用调用)
+    // 所以必须按照下面的顺序依次使用以下函数(不需要的函数不用调用)
     void baseInit();                            // 默认初始化
     void setExterned(bool isExtern);
     void setType(Symbol s);
@@ -59,9 +62,16 @@ private:
 class Fun
 {
 public:
-    Fun();
-    void enterScope();              // 进入一个新的作用于
+    Fun(bool isExtern,Symbol type,std::string name,std::vector<Var*> para);
+    void enterScope();              // 进入一个新的作用域
     void leaveScope();              // 退出作用域并计算栈帧大小
+
+    bool match(Fun* f);
+    void define(Fun* f);
+
+    bool getExtern();
+    void setExtern(bool isExtern);
+    std::string getName();
 
 private:
     bool externed;                  // 是否有extern声明
@@ -70,21 +80,26 @@ private:
     std::vector<Var*> paraVar;      // 参数列表
     int maxDepth;                   // 栈最大深度
     int curEsp;                     // 当前栈指针位置
-    std::vector<int> scopeEsp;      // 作用于栈指针位置
+    std::vector<int> scopeEsp;      // 作用域栈指针位置
 };
 
 class SymTab
 {
 public:
     SymTab();
+    // 作用域管理
     void enter();
     void leave();
-
+    std::vector<int>& getScopePath();
+    // 变量管理
     void addVar(Var* var);
     void addStr(Var* var);
     Var* getVal(std::string name);
 
-    std::vector<int>& getScopePath();
+    // 函数管理
+    void decFun(Fun* f);
+    void defFun(Fun* f);
+    void endDefFun(Fun* f);
 
     // 输出变量表,调试用
     void printValTab();
