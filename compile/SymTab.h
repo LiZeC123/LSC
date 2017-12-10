@@ -8,9 +8,16 @@
 class Var
 {
 public:
+    // 初始化一个特殊的void变量
+    Var();
+
+    // 初始化一个字面值常量
     Var(Token* literal);
 
+    // 初始化一个数组
     Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,int len);
+    
+    // 初始化普通的变量,指针
     Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,Var* init);
  
     std::string getName();
@@ -103,6 +110,12 @@ public:
 
     // 输出变量表,调试用
     void printValTab();
+
+public:
+    static Var* varVoid;
+    
+    // 获得一个共用的表示Void的符号
+    static Var* getVoid();
 private:
     std::map<std::string,std::vector<Var*>*> varTab;
     std::map<std::string,Var*> strTab;

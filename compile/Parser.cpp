@@ -9,6 +9,13 @@
 //表达式First集
 #define FIRST_EXPR firstIs(LPAREN)_OR_(NUM)_OR_(CH)_OR_(STR)_OR_(IDENT)_OR_(NOT)         \
 _OR_(SUB)_OR_(LEA)_OR_(MUL)_OR_(INC)_OR_(DEC)
+//左值First集
+#define LVAL_OP firstIs(ASSIGN)_OR_(OR)_OR_(AND)_OR_(GT)_OR_(GE)_OR_(LT)_OR_(LE)_OR_(EQU) \
+_OR_(NEQU)_OR_(AND)_OR_(SUB)_OR_(MUL)_OR_(DIV)_OR_(MOD)_OR_(INC)_OR_(DEC)
+// 右值First
+#define RVAL_OP firstIs(OR)_OR_(AND)_OR_(GT)_OR_(GE)_OR_(LT)_OR_(LE)_OR_(EQU) \
+_OR_(NEQU)_OR_(AND)_OR_(SUB)_OR_(MUL)_OR_(DIV)_OR_(MOD)
+
 //语句First集
 #define FIRST_STATEMENT (FIRST_EXPR)_OR_(SEMICON)_OR_(KW_WHILE)_OR_(KW_FOR)              \
 _OR_(KW_DO)_OR_(KW_IF)_OR_(KW_SWITCH)_OR_(KW_RETURN)_OR_(KW_BREAK)_OR_(KW_CONTINUE)
@@ -363,8 +370,18 @@ void Parser::statement()
     }
 }
 
+// <whilestat>     -> while ( <altexpr> ) <block>
 void Parser::whilestat()
 {
+    match(KW_WHILE);
+    if(!match(LPAREN)){
+        recovery(FIRST_EXPR||firstIs(RPAREN),LPAREN_LOST,LPAREN_WRONG);
+    }
+    altexpr();
+    if(!match(RPAREN)){
+        recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
+    }
+    block();
 
 }
 
@@ -388,11 +405,323 @@ void Parser::switchstat()
 
 }
 
-void Parser::altexpr()
+// <altexpr> -> <expr>
+// <altexpr> -> e
+Var* Parser::altexpr()
 {
-
+    if(FIRST_EXPR){
+        return expr();
+    }
+    else{
+        return SymTab::getVoid();
+    }
 }
 
+// <exp> -> <assexpr>
+Var* Parser::expr()
+{
+    return assexpr();
+}
+
+// <assexp> -> <orexpr><asstail>
+Var* Parser::assexpr()
+{
+    Var* lval = orexpr();
+    return asstail(lval);
+}
+
+// <asstail> -> = <orexpr><asstail>
+// <asstail> -> e
+Var* Parser::asstail(Var* lval)
+{
+    if(match(ASSIGN)){
+        Var* var = orexpr();
+        Var* rval = asstail(var);
+        // 右结合,在递归之后生成代码
+        // TODO: 代码生成
+        return rval;
+    }
+
+    return lval;
+}
+
+// <orexpr> -> <andexpr><ortail>
+Var* Parser::orexpr()
+{
+    Var* lval = andexpr();
+    return ortail(lval);
+}
+
+// <ortail> -> || <andexpr><ortail>
+// <ortail> -> e
+Var* Parser::ortail(Var* lval)
+{
+    if(match(OR)){
+        Var* var = andexpr();
+        // 左结合,在递归之前生成代码
+        return ortail(lval);
+    }
+    return lval;
+}
+
+// <andexpr> -> <comexpr><andtail>
+Var* Parser::andexpr()
+{
+    Var* lval = comexpr();
+    return andtail(lval);
+}
+
+// <andtail> -> && <comexpr><andtail>
+// <andtail> -> e
+Var* Parser::andtail(Var* lval)
+{
+    if(match(AND)){
+        Var* var = comexpr();
+
+        return andtail(lval);
+    }
+
+    return lval;
+}
+
+// <comexpt> -> <aloexpr><comtail>
+Var* Parser::comexpr()
+{
+    Var* lval = aloexpr();
+    return comtail(lval);
+}
+
+// <comtail> -> <cmps><aloexpr><comtail>
+// <comtail> -> e
+Var* Parser::comtail(Var* lval)
+{
+    // 把cmps的判断内容提前,从而可以简单的判定是否结束递归
+    if(firstIs(GE)_OR_(LE)_OR_(GT)_OR_(LT)_OR_(EQU)_OR_(NEQU)){
+         Symbol op = cmps();
+         Var* var = aloexpr();
+
+         return comtail(lval);
+    }
+
+    return lval;
+}
+
+// <cmps>    -> >= | <= | > | < | == | !=
+Symbol Parser::cmps()
+{
+    Symbol op = look->sym;
+    move();
+    return op;
+}
+
+// <aloexpr> -> <item><alotail>
+Var* Parser::aloexpr()
+{
+    Var* lval = item();
+    return alotail(lval);
+}
+
+// <alotail> -> <adds><item><alotail>
+// <alotail> -> e
+Var* Parser::alotail(Var* lval)
+{
+    if(firstIs(ADD)_OR_(SUB)){
+        Symbol op = ands();
+        Var* val = item();
+
+        return alotail(lval);
+    }
+
+    return lval;
+}
+
+
+// <ands>    -> + | -
+Symbol Parser::ands()
+{
+    Symbol op = look->sym;
+    move();
+    return op;
+}
+
+// <item>     -> <factor><itemtail>
+Var* Parser::item()
+{
+    Var* lval = factor();
+    return itemtail(lval);
+}
+
+// <itemtail> -> <muls><factor><itemtail>
+// <itemtail> -> e
+Var* Parser::itemtail(Var* lval)
+{
+    if(firstIs(MUL)_OR_(DIV)_OR_(MOD)){
+        Symbol op = muls();
+        Var* val = factor();
+
+        return itemtail(lval);
+    }
+
+    return lval;
+}
+
+
+// <muls> -> * | / | %
+Symbol Parser::muls()
+{
+    Symbol op = look->sym;
+    move();
+    return op;
+}
+
+// <factor> -> <lop><factor>
+// <factor> -> <val>
+Var* Parser::factor()
+{
+    if(firstIs(NOT)_OR_(SUB)_OR_(LEA)_OR_(MUL)_OR_(INC)_OR_(DEC)){
+        Symbol op = lop();
+        Var* val = factor();
+
+        return val;
+    }
+    else{
+        return val();
+    }
+}
+
+// <lop>    -> ! | - | & | * | ++ | --
+Symbol Parser::lop()
+{
+    Symbol op = look->sym;
+    move();
+    return op;
+}
+
+// <val>    -> <elem><rop>       
+Var* Parser::val()
+{
+    Var* val = elem();
+    Symbol op;
+    if(firstIs(INC)_OR_(DEC)){
+        op = rop();
+    }
+
+    return val;
+}
+
+// <rop>    -> ++ | --                // 后置的++和--
+Symbol Parser::rop()
+{
+    Symbol op = look->sym;
+    move();
+    return op;
+}
+
+// <elem>   -> <ID><idexpr>
+// <elem>   -> ( <exp> )
+// <elem>   -> <literal>
+Var* Parser::elem()
+{
+    Var* val = nullptr;
+    if(firstIs(IDENT)){
+        string name = ((ID*)look)->name;
+        move();
+        val = idexpr(name);
+    }
+    else if(match(LPAREN)){
+        val = exp();
+        
+        if(!match(RPAREN)){
+            recovery(LVAL_OP,RPAREN_LOST,RPAREN_WRONG);
+        }
+    }
+    else{
+        val = literal();
+    }
+
+    return val;
+}
+
+// <idexpr> -> [ <expr> ] | ( <realarg> ) | e
+Var* Parser::idexpr(string name)
+{
+    Var* val = nullptr;
+    if(match(LBRACK)){
+        Var* index = expr();
+
+        if(!match(RBRACK)){
+            recovery(LVAL_OP,RBRACE_LOST,RBRACE_WRONG);
+        }
+        val = symtab.getVal(name);
+        // 后续生成数组的相关代码
+    }
+    else if(match(LPAREN)){
+        vector<Var*> args;
+        realarg(args);
+
+        if(!match(RPAREN)){
+            recovery(LVAL_OP,RPAREN_LOST,RPAREN_WRONG);
+        }
+        // 后续产生函数调用的代码
+    }
+    else{
+        // 没有其他后缀,是普通的变量
+        val = symtab.getVal(name);
+    }
+
+    return val;
+}
+
+// <realarg> -> <arg><arglist>
+
+void Parser::realarg(vector<Var*>& vec)
+{
+    Var* a = arg();
+    vec.push_back(a);
+    arglist(vec);
+}
+
+// <arg>     -> <exp>
+Var* Parser::arg()
+{
+    return exp();
+}
+
+// <arglist> -> , <arg><arglist>
+// <arglist> -> e
+void Parser::arglist(vector<Var*>& vec)
+{
+    if(match(COMMA)){
+        vec.push_back(arg());
+        arglist(vec);
+    }
+}
+
+// <literal> -> <NUM> | <CH> | <STR> 
+Var* Parser::literal()
+{
+    Var* val = nullptr;
+    if(firstIs(NUM)_OR_(CH)_OR_(STR)){
+        val = new Var(look);
+        if(firstIs(STR)){
+            symtab.addStr(val);
+        }
+        else{
+            symtab.addVar(val);
+        }
+    }
+    else{
+        recovery(RVAL_OP,LITERAL_LOST,LITERAL_WRONG);
+    }
+
+    return val;
+}
+
+// <exp> -> <assexpr>
+Var* Parser::exp()
+{
+    return assexpr();
+}
 
 
 void Parser::recovery(bool cond,SynError lost,SynError wrong)

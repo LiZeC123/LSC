@@ -242,7 +242,7 @@ int g(){ }
 
 //关系表达式
 <comexpt> -> <aloexpr><comtail>
-<comtail> -> <cmps><aloexpr><coptail>
+<comtail> -> <cmps><aloexpr><comtail>
 <comtail> -> e
 <cmps>    -> >= | <= | > | < | == | !=
 
@@ -263,7 +263,7 @@ int g(){ }
 <factor> -> <val>
 <lop>    -> ! | - | & | * | ++ | --
 <val>    -> <elem><rop>       
-<rop>    -> ++ | --                // 后置的++和--
+<rop>    -> ++ | -- | e              // 后置的++和--
 ```
 
 最后是元素表达式
@@ -279,7 +279,7 @@ int g(){ }
 <elem>   -> <ID><idexpr>
 <elem>   -> ( <exp> )
 <elem>   -> <literal>
-<idexpr> -> [ <expr> ] | ( <realarg> )
+<idexpr> -> [ <expr> ] | ( <realarg> ) | e
 
 // 常量
 <literal> -> <NUM> | <CH> | <STR> 

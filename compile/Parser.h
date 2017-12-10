@@ -12,7 +12,6 @@ public:
 
     void analyse();
 
-
 private:
     Token* look;
     Lexer& lexer;
@@ -53,13 +52,36 @@ private:
 	void elsestat();
 	void switchstat();
 
-    void altexpr();
+    // 表达式
+    Var* altexpr();
+    Var* expr();
+    Var* assexpr();
+    Var* asstail(Var* lval);
+    Var* orexpr();
+    Var* ortail(Var* lval);
+    Var* andexpr();
+    Var* andtail(Var* lval);
+    Var* comexpr();
+    Var* comtail(Var* lval);
+    Symbol cmps();
+    Var* aloexpr();
+    Var* alotail(Var* lval);
+    Symbol ands();
+    Var* item();
+    Var* itemtail(Var* lval);
+    Symbol muls();
+    Var* factor();
+    Symbol lop();
+    Var* val();
+    Symbol rop();
+    Var* elem();
+    Var* idexpr(std::string name);
+    void realarg(std::vector<Var*>& vec);
+    Var* arg();
+    void arglist(std::vector<Var*>& vec);
+    Var* literal();
+    Var* exp();
 
-
-
-
-
-private:
     // 错误恢复
     void recovery(bool cond,SynError lost,SynError wrong);
     // 检查非终结符<statement>末尾分号

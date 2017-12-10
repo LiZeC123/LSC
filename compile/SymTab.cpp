@@ -7,7 +7,18 @@ using namespace std;
 
 // 引用Token.cpp中的符号数组,用于打印符号名
 extern const char * tokenName[];
+Var* SymTab::varVoid = nullptr;
 
+Var::Var()
+{
+    baseInit();
+    literal = false;
+    type = KW_VOID;
+    name = "<void>";
+    isLeft = false;
+    intVal = 0;
+    isPtr = true;
+}
 
 // 常量初始化,字符串储存在字符串表中,其他常量仅用于初始化,使用后调用者负责删除
 Var::Var(Token *literal)
@@ -274,6 +285,7 @@ void Fun::define(Fun* f)
 
 SymTab::SymTab()
 {
+    varVoid = new Var();
     scopeId = 0;
     currFun = nullptr;
     scopePath.push_back(0); // 初始为全局作用域
@@ -422,4 +434,9 @@ void SymTab::printValTab()
         }
         
     }
+}
+
+Var* SymTab::getVoid()
+{
+    return SymTab::varVoid;
 }
