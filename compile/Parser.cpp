@@ -94,11 +94,11 @@ void Parser::def(bool isExtern,Symbol s)
     if(firstIs(IDENT)){
         name = ((ID*)look)->name;
         move();
-        idtail(isExtern,s,isPtr,name);
     }
     else{
         recovery(firstIs(SEMICON)_OR_(ASSIGN)_OR_(COMMA), ID_LOST,ID_WRONG);
     }
+    idtail(isExtern,s,isPtr,name);
 }
 
 // <idtail>  -> <defvar><deflist>
@@ -140,7 +140,7 @@ Var* Parser::defvar(bool isExtern,Symbol s,bool isPtr,std::string name)
         }
 
         if(!match(RBRACK)){
-            recovery(firstIs(COMMA),RBRACK_LOST,RBRACK_WRONG);
+            recovery(firstIs(COMMA)_OR_(SEMICON),RBRACK_LOST,RBRACK_WRONG);
         }
 
         return new Var(symtab.getScopePath(),isExtern, s, isPtr,name,len);
@@ -253,7 +253,7 @@ Var* Parser::paradatatail(Symbol s,string name)
 {
     if(match(LBRACK)){
         // 函数参数列表中的数组可以没有指定长度
-        // 所以不需要错误处理,并且以非0数值作为初始值(否在,在写入符号表是会报错)
+        // 所以不需要错误处理,并且以大于0数值作为初始值(否在,在写入符号表时会报错)
         int len = 1;
         if(firstIs(NUM)){
             len = ((Num*)look)->val;
@@ -812,7 +812,7 @@ Var* Parser::literal()
     return val;
 }
 
-
+//TODO: 检查各个错误恢复部分能否正确的执行后续递归调用
 void Parser::recovery(bool cond,SynError lost,SynError wrong)
 {
     if(cond){
@@ -820,6 +820,7 @@ void Parser::recovery(bool cond,SynError lost,SynError wrong)
     }
     else{
         Error::synError(wrong,look);
+        move();
     }
 }
 

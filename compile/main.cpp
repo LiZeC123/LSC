@@ -19,8 +19,8 @@ int main()
 
     tab.printValTab();
 
-    printf("编译完成!");
-    printf("%d 错误 %d警告\n",err.getErrorNum(),err.getWarnNum());
+    printf("编译完成!\n");
+    printf("%d 错误 %d 警告\n",err.getErrorNum(),err.getWarnNum());
     return 0;
 }
 
