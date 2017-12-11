@@ -286,6 +286,26 @@ void Fun::define(Fun* f)
     paraVar  = f->paraVar;
 }
 
+void Fun::printSelf()
+{
+    //输出type
+	printf("%s",tokenName[type]);
+	//输出名字
+	printf(" %s",name.c_str());
+	//输出参数列表
+	printf("(");
+	for(int i=0;i<paraVar.size();i++){
+		printf("<%s>",paraVar[i]->getName().c_str());
+		if(i!=paraVar.size()-1)printf(",");
+	}
+	printf(")");
+	if(externed)printf(";\n");
+	else{
+		printf(":\n");
+		printf("\t\tmaxDepth=%d\n",maxDepth);
+	}
+}
+
 SymTab::SymTab()
 {
     varVoid = new Var();
@@ -430,8 +450,7 @@ void SymTab::endDefFun(Fun* f)
 
 void SymTab::printValTab()
 {
-    auto it = varTab.begin();
-    for(;it!=varTab.end();it++){
+    for(auto it = varTab.begin();it!=varTab.end();it++){
         for(const auto&i:*(it->second)){
             i->printSelf();
         }
@@ -439,7 +458,19 @@ void SymTab::printValTab()
     }
 }
 
+void SymTab::printFunTab()
+{
+    for(auto it = funTab.begin();it!=funTab.end();it++){
+        it->second->printSelf();
+    }
+}
+
 Var* SymTab::getVoid()
 {
     return SymTab::varVoid;
+}
+
+void SymTab::setGenIR(GenIR* ir)
+{
+    this->ir = ir;
 }

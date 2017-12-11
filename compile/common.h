@@ -1,7 +1,6 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <stdio.h>
 //所有的词法记号
 typedef enum {
     ERR,                            //错误，异常

@@ -4,6 +4,8 @@
 #include <string>
 #include "common.h"
 #include "Token.h"
+#include "InterInst.h"
+#include "GenIR.h"
 
 class Var
 {
@@ -70,24 +72,32 @@ class Fun
 {
 public:
     Fun(bool isExtern,Symbol type,std::string name,std::vector<Var*> para);
+
     void enterScope();              // 进入一个新的作用域
     void leaveScope();              // 退出作用域并计算栈帧大小
 
-    bool match(Fun* f);
-    void define(Fun* f);
+    bool match(Fun* f);             // 比较两个函数是否匹配(函数声明和函数定义)
+    void define(Fun* f);            // 将函数声明转化为函数定义
 
     bool getExtern();
     void setExtern(bool isExtern);
     std::string getName();
+
+    void printSelf();
 
 private:
     bool externed;                  // 是否有extern声明
     Symbol type;                    // 返回类型
     std::string name;               // 函数名
     std::vector<Var*> paraVar;      // 参数列表
+
     int maxDepth;                   // 栈最大深度
     int curEsp;                     // 当前栈指针位置
+    bool relocated;                 // 栈帧重定位标记
+
     std::vector<int> scopeEsp;      // 作用域栈指针位置
+    InterCode intercode;            // 中间代码
+    InterInst* returnPoint;         // 函数返回点
 };
 
 class SymTab
@@ -108,8 +118,12 @@ public:
     void defFun(Fun* f);
     void endDefFun(Fun* f);
 
-    // 输出变量表,调试用
+    // 输出表,调试用
     void printValTab();
+    void printFunTab();
+
+    // 添加代码生成器
+    void setGenIR(GenIR* ir);
 
 public:
     static Var* varVoid;
@@ -117,10 +131,14 @@ public:
     // 获得一个共用的表示Void的符号
     static Var* getVoid();
 private:
-    std::map<std::string,std::vector<Var*>*> varTab;
-    std::map<std::string,Var*> strTab;
-    std::map<std::string,Fun*> funTab;
-    Fun* currFun;
-    int scopeId;
-    std::vector<int> scopePath;
+    std::map<std::string,std::vector<Var*>*> varTab;    // 变量表
+    std::map<std::string,Var*> strTab;                  // 字符串表
+    std::map<std::string,Fun*> funTab;                  // 函数表
+    
+    Fun* currFun;                   // 当前分析的函数
+    
+    int scopeId;                    // 作用域ID,依次递增
+    std::vector<int> scopePath;     // 当前作用域路径
+
+    GenIR* ir;                      // 中间代码生成器
 };

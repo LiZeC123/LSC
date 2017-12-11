@@ -16,8 +16,11 @@ int main()
     Parser parser   = Parser(lex,tab);
 
     parser.analyse();
-
+    printf("变量表内容如下:\n");
     tab.printValTab();
+    printf("\n");
+    printf("函数表内容如下:\n");
+    tab.printFunTab();
 
     printf("编译完成!\n");
     printf("%d 错误 %d 警告\n",err.getErrorNum(),err.getWarnNum());
