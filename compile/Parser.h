@@ -82,7 +82,6 @@ private:
     Var* arg();
     void arglist(std::vector<Var*>& vec);
     Var* literal();
-    Var* exp();
 
     // 错误恢复
     void recovery(bool cond,SynError lost,SynError wrong);

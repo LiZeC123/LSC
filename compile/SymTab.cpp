@@ -5,8 +5,11 @@
 #include <sstream>
 using namespace std;
 
+//TODO: 表达式部分符号管理
+
 // 引用Token.cpp中的符号数组,用于打印符号名
 extern const char * tokenName[];
+
 Var* SymTab::varVoid = nullptr;
 
 Var::Var()
@@ -47,7 +50,7 @@ Var::Var(Token *literal)
     default:
         // 正常情况下,调用此函数时,必然没有其他类型
         // 如果到达这里,说明存在程序逻辑错误,可以直接中止程序
-        throw runtime_error("Var(Token) miss type");
+        throw runtime_error("Var(Token) miss type,this type is"+literal->toString());
     }
 }
 

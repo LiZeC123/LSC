@@ -157,7 +157,7 @@ Var* Parser::init(bool isExtern,Symbol s,bool isPtr,std::string name)
 {
     Var* init = nullptr;
     if(match(ASSIGN)){
-        //TODO 调用expr()
+        init = expr();
     }
     return new Var(symtab.getScopePath(),isExtern,s,isPtr,name,init);
 }
@@ -511,7 +511,7 @@ Var* Parser::altexpr()
     }
 }
 
-// <exp> -> <assexpr>
+// <expr> -> <assexpr>
 Var* Parser::expr()
 {
     return assexpr();
@@ -712,7 +712,7 @@ Symbol Parser::rop()
 }
 
 // <elem>   -> <ID><idexpr>
-// <elem>   -> ( <exp> )
+// <elem>   -> ( <expr> )
 // <elem>   -> <literal>
 Var* Parser::elem()
 {
@@ -723,7 +723,7 @@ Var* Parser::elem()
         val = idexpr(name);
     }
     else if(match(LPAREN)){
-        val = exp();
+        val = expr();
         
         if(!match(RPAREN)){
             recovery(LVAL_OP,RPAREN_LOST,RPAREN_WRONG);
@@ -775,10 +775,10 @@ void Parser::realarg(vector<Var*>& vec)
     arglist(vec);
 }
 
-// <arg>     -> <exp>
+// <arg>     -> <expr>
 Var* Parser::arg()
 {
-    return exp();
+    return expr();
 }
 
 // <arglist> -> , <arg><arglist>
@@ -803,18 +803,13 @@ Var* Parser::literal()
         else{
             symtab.addVar(val);
         }
+        move();
     }
     else{
         recovery(RVAL_OP,LITERAL_LOST,LITERAL_WRONG);
     }
 
     return val;
-}
-
-// <exp> -> <assexpr>
-Var* Parser::exp()
-{
-    return assexpr();
 }
 
 

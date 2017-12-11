@@ -271,13 +271,13 @@ int g(){ }
 <elem> -> <ID>
 		| <ID> [ <expr> ]
 		| <ID> ( <realarg> )
-		| ( <exp> )
+		| ( <expr> )
 		| <literal>
 ```
 由于上述产生式中由于前三项有左因子,因此可以对其进行提取,提取后有如下表达式
 ```
 <elem>   -> <ID><idexpr>
-<elem>   -> ( <exp> )
+<elem>   -> ( <expr> )
 <elem>   -> <literal>
 <idexpr> -> [ <expr> ] | ( <realarg> ) | e
 
@@ -286,13 +286,13 @@ int g(){ }
 
 // 函数实参
 <realarg> -> <arg><arglist>
-<arg>     -> <exp>
+<arg>     -> <expr>
 <arglist> -> , <arg><arglist>
 <arglist> -> e
 ```
 以上便是全部的表达式的产生式,由于没有比赋值运算等级更低的表达式,所以最后可以得到
 ```
-<exp> -> <assexpr>
+<expr> -> <assexpr>
 ```
 考虑到,部分语句中可以使用空语句(例如for语句的条件部分),因此额外的定义
 ```
