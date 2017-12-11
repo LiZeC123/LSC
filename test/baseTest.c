@@ -1,10 +1,15 @@
-char* c;
+char* a;
 
 int main()
 {
-    char d = 1+2*3;
-    int e = 7*d;
-    int* fp;
+    int b = 4;
+    for(int i=0;i<10;i++){
+        while(i < b){
+            int c;
+            i++;
+        }
+        int d;
+    }
 }
 
 int f()

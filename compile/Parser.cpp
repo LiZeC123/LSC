@@ -373,6 +373,7 @@ void Parser::statement()
 // <whilestat>     -> while ( <altexpr> ) <block>
 void Parser::whilestat()
 {
+    symtab.enter();
     match(KW_WHILE);
     if(!match(LPAREN)){
         recovery(FIRST_EXPR||firstIs(RPAREN),LPAREN_LOST,LPAREN_WRONG);
@@ -382,12 +383,13 @@ void Parser::whilestat()
         recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
     }
     block();
-
+    symtab.leave();
 }
 
 // <forsata>       -> for(<forinit><altexpr>;<altexpr>) <block>
 void Parser::forstat()
 {
+    symtab.enter();
     match(KW_FOR);
     if(!match(LPAREN)){
         recovery(FIRST_EXPR||firstIs(RPAREN),LPAREN_LOST,LPAREN_WRONG);
@@ -402,7 +404,7 @@ void Parser::forstat()
         recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
     }
     block();
-
+    symtab.leave();
 }
 
 
@@ -421,11 +423,19 @@ void Parser::forinit()
 // <dowhilestat>   -> do <block> while ( <altexpr> );
 void Parser::dowhilestat()
 {
+    // do-while循环的条件部分不属于循环体,而其他语句可以将条件合并到循环体中
+    symtab.enter();
     match(KW_DO);
     block();
     if(!match(KW_WHILE)){
         recovery(firstIs(LPAREN),WHILE_LOST,WHILE_WRONG);
     }
+    symtab.leave();
+
+    if(!match(LPAREN)){
+        recovery(FIRST_EXPR||firstIs(RPAREN),LPAREN_LOST,LPAREN_WRONG);
+    }
+    altexpr();
     if(!match(RPAREN)){
         recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
     }
@@ -438,6 +448,7 @@ void Parser::dowhilestat()
 // <ifstat>     -> if ( <expr> ) <block> <elsestat>
 void Parser::ifstat()
 {
+    symtab.enter();
     match(KW_IF);
     if(!match(LPAREN)){
         recovery(FIRST_EXPR,LPAREN_LOST,LPAREN_WRONG);
@@ -447,6 +458,7 @@ void Parser::ifstat()
         recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
     }
     block();
+    symtab.leave();
     elsestat();
 }
 
@@ -454,13 +466,16 @@ void Parser::ifstat()
 void Parser::elsestat()
 {
     if(match(KW_ELSE)){
+        symtab.enter();
         block();
+        symtab.leave();
     }
 }
 
 // <switchstat> -> switch ( <expr> ) { <casestat> }
 void Parser::switchstat()
 {
+    symtab.enter();
     match(KW_SWITCH);
     if(!match(LPAREN)){
         recovery(FIRST_EXPR,LPAREN_LOST,LPAREN_WRONG);
@@ -470,6 +485,7 @@ void Parser::switchstat()
         recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
     }
     casestat();
+    symtab.leave();
 }
 
 // <casestat>   -> case <caselable> : <subprogram><casetate>
