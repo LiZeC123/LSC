@@ -26,6 +26,7 @@ public:
     std::vector<int>& getPath();
     int getSize();
     Symbol getType();
+    bool isBase();          // 是否是基本类型
  
     void printSelf();
 private:

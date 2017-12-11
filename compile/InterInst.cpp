@@ -5,7 +5,7 @@ using namespace std;
 
 void InterInst::printSelf()
 {
-    //TODO: 输出指令
+    //TODO: 打印指令
 }
 
 void InterCode::addInst(InterInst* inst)

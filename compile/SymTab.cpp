@@ -43,8 +43,7 @@ Var::Var(Token *literal)
         break;
     case STR:
         setType(KW_CHAR);
-        //TODO: 生成唯一ID
-        name = "<>";
+        name = GenIR::genLb();
         strVal = ((Str*)literal)->str;
         setArray(strVal.size()+1);
     default:
@@ -94,6 +93,11 @@ int Var::getSize()
 Symbol Var::getType()
 {
     return type;
+}
+
+bool Var::isBase()
+{
+    return (!isPtr)&&(!isArray);
 }
 
 void Var::baseInit()
@@ -260,21 +264,22 @@ bool Fun::match(Fun* f)
         return false;
     }
     unsigned int len = f->paraVar.size();
-    // MoreTODO: 编写函数使兼容类型匹配
-    // 例如 int[] 与int*
+
     for(unsigned int i=0;i<len;i++){
-        if(f->paraVar[i]->getType() != this->paraVar[i]->getType()){
+        // 部分类型可以兼容使用,例如int* 与int[]
+        if(GenIR::checkTypeMatch(f->paraVar[i],this->paraVar[i])){
+            if(f->paraVar[i]->getType() != this->paraVar[i]->getType()){
+                Error::semWarm(FUN_DEC_CONFLICT,name);
+            }
+        }
+        else{
             return false;
         }
     }
 
-
-    // 最后检查返回值
-    // MoreTODO: 返回值兼容问题
     if(f->type != this->type){
         // 报告语义警告,返回类型不匹配
         Error::semWarm(FUN_RET_CONFLICT,f->getName());
-        return false;
     }
 
     return true;
