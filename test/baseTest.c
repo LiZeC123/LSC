@@ -1,6 +1,7 @@
 char* a;
 
 int f(int a);
+int printf(char* s);
 
 int main()
 {
@@ -10,6 +11,7 @@ int main()
         while(i < b){
             int c;
             i++;
+            printf("Hello World");
         }
         int d;
     }

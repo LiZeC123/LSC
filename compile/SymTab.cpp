@@ -46,6 +46,7 @@ Var::Var(Token *literal)
         name = GenIR::genLb();
         strVal = ((Str*)literal)->str;
         setArray(strVal.size()+1);
+        break;
     default:
         // 正常情况下,调用此函数时,必然没有其他类型
         // 如果到达这里,说明存在程序逻辑错误,可以直接中止程序
@@ -466,6 +467,13 @@ void SymTab::printValTab()
 void SymTab::printFunTab()
 {
     for(auto it = funTab.begin();it!=funTab.end();it++){
+        it->second->printSelf();
+    }
+}
+
+void SymTab::printStrTab()
+{
+    for(auto it = strTab.begin();it!=strTab.end();it++){
         it->second->printSelf();
     }
 }

@@ -122,6 +122,7 @@ public:
     // 输出表,调试用
     void printValTab();
     void printFunTab();
+    void printStrTab();
 
     // 添加代码生成器
     void setGenIR(GenIR* ir);

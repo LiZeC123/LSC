@@ -21,8 +21,11 @@ int main()
     printf("\n");
     printf("函数表内容如下:\n");
     tab.printFunTab();
+    printf("\n");
+    printf("字符串表内容如下:\n");
+    tab.printStrTab();
 
-    printf("编译完成!\n");
+    printf("\n编译完成!\n");
     printf("%d 错误 %d 警告\n",err.getErrorNum(),err.getWarnNum());
     return 0;
 }
