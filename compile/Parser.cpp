@@ -364,6 +364,7 @@ void Parser::statement()
         move();
         altexpr();
         statCheckSemicon();
+        break;
     default:
         altexpr();
         statCheckSemicon();

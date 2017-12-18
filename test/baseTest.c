@@ -15,6 +15,7 @@ int main()
         }
         int d;
     }
+	return 0;
 }
 
 int f(int a)
