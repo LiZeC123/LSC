@@ -8,7 +8,7 @@
 
 int main()
 {
-    const char* filename = "/home/lizec/CWorkSpace/lsc/test/baseTest.c";
+    const char* filename = "/home/lizec/CWorkSpace/lsc/test/baseLostTest.c";
     Scanner scanner = Scanner(filename);
     Error err     = Error(&scanner);
     Lexer lex       = Lexer(scanner);

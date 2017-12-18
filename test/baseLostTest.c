@@ -1,13 +1,12 @@
-int f(char a);
-int g(int b);
-
+int f(char fa,int fb);
 
 int main(){
-	int a
-	int b[5];
-	int  = 12;
-	a = f(a);
-	char c;
-	c = g(c);
+	char* str = "12343";
+	char c = f(str,4);
 	return 0;
+}
+
+int f(int fa,int fb)
+{
+	return fa+fb;
 }
