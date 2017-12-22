@@ -8,14 +8,15 @@
 class Parser
 {
 public:
-    Parser(Lexer& lex,SymTab& tab);
+    Parser(Lexer& lex,SymTab& tab,GenIR& iir);
 
     void analyse();
 
 private:
     Token* look;
     Lexer& lexer;
-    SymTab & symtab;
+    SymTab& symtab;
+    GenIR& ir;
 private:
     void move();
     bool match(Symbol need);

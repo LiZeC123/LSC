@@ -27,6 +27,7 @@ public:
     int getSize();
     Symbol getType();
     bool isBase();          // 是否是基本类型
+    bool isVoid();          // 是否是Void,特殊类型,表示空
  
     void printSelf();
 private:
@@ -80,8 +81,14 @@ public:
     bool match(Fun* f);             // 比较两个函数是否匹配(函数声明和函数定义)
     void define(Fun* f);            // 将函数声明转化为函数定义
 
+    void addInst(InterInst* inst);  // 添加一条中间代码
+    
+    void setReturnPoint(InterInst* inst);   // 设置函数返回点
+    InterInst* getReturnPoint();            // 获得函数返回点
+
     bool getExtern();
     void setExtern(bool isExtern);
+    Symbol getType();
     std::string getName();
 
     void printSelf();
@@ -109,6 +116,7 @@ public:
     void enter();
     void leave();
     std::vector<int>& getScopePath();
+
     // 变量管理
     void addVar(Var* var);
     void addStr(Var* var);
@@ -126,6 +134,12 @@ public:
 
     // 添加代码生成器
     void setGenIR(GenIR* ir);
+
+    // 中间代码管理
+    void addInst(InterInst* interInst);
+
+    // 外部接口
+    Fun* getCurrFun();
 
 public:
     static Var* varVoid;

@@ -14,7 +14,7 @@ main.o:main.cpp common.h Scanner.h Lexer.h Parser.h
 	$(CC) main.cpp -c -o main.o 
 Error.o: Error.cpp Error.h Scanner.h Token.h
 	$(CC) Error.cpp -c -o Error.o 
-GenIR.o: GenIR.h SymTab.h
+GenIR.o: GenIR.h SymTab.h Error.h common.h
 	$(CC) GenIR.cpp -c -o GenIR.o
 InterInst.o: InterInst.h common.h SymTab.h
 	$(CC) InterInst.cpp -c -o InterInst.o
@@ -31,5 +31,3 @@ Token.o: Token.cpp Token.h Error.h common.h
 clear:
 	rm -rf *.o
 	rm -rf lscc
-help:
-	echo "注意检查新添加的文件有没有加入编译"

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "common.h"
 
 class SymTab;
 class Var;
@@ -8,12 +9,17 @@ class Fun;
 class GenIR
 {
 public:
-    GenIR(SymTab tab);
+    GenIR(SymTab& tab);
 
+    void genFunHead(Fun* fun);
+    void genFunTail(Fun* fun);
+    void genReturn(Var* result);
 
-    //TODO: 两个静态函数
-    static std::string genLb();
-    static bool checkTypeMatch(Var* lval,Var* rval);
+    Var* genTwoOp(Var* lval,Symbol op,Var* rval);
+
+    
+    static std::string genLb();                         //生成唯一的字符串表示
+    static bool checkTypeMatch(Var* lval,Var* rval);    // 检查两个变量类型是否匹配
 private:
     static int lbNum;
     SymTab& symtab;

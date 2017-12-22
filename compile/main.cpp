@@ -10,10 +10,11 @@ int main()
 {
     const char* filename = "/home/lizec/CWorkSpace/lsc/test/baseLostTest.c";
     Scanner scanner = Scanner(filename);
-    Error err     = Error(&scanner);
+    Error err       = Error(&scanner);
     Lexer lex       = Lexer(scanner);
     SymTab tab      = SymTab();
-    Parser parser   = Parser(lex,tab);
+    GenIR ir        = GenIR(tab);
+    Parser parser   = Parser(lex,tab,ir);
 
     parser.analyse();
     printf("变量表内容如下:\n");

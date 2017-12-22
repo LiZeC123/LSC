@@ -115,37 +115,31 @@ enum SemError
 
 enum Operator
 {
-	//占位指令,默认值
-	OP_NOP,
-	//声明指令
-	OP_DEC, 
-	//函数入口和出口
-	OP_ENTRY,OP_EXIT,
-	//赋值运算
-	OP_AS,
-	//算数运算
-	OP_ADD,OP_SUB,OP_MUL,OP_DIV,OP_MOD,
-	OP_NEG,//负 
-	//比较运算
-	OP_GT,OP_GE,OP_LT,OP_LE,OP_EQU,OP_NE,
-	//逻辑运算
-	OP_NOT,//非 
-	OP_AND,OP_OR,//与或 
-	//指针运算
-	OP_LEA,//取址 eg: LEA result,arg1 => result=&arg1
-	OP_SET,//设置左值 eg: SET result,arg1 => *arg1=result
-	OP_GET,//取右值 eg: GET result,arg1 => result=*arg1
-	//跳转
-	OP_JMP,//无条件跳转 eg: JMP result => goto result
-	OP_JT,//真跳转	 eg: JT result,arg1 => if(arg1) goto result
-	OP_JF,//假跳转	 eg: JF result,arg1 => if(!arg1) goto result
-	OP_JNE,//跳转 
-	//函数调用
-	OP_ARG,//参数传递 eg: ARG arg1 => 传递参数arg1
-	OP_PROC,//调用过程 eg: PROC fun => 调用fun函数,fun()
-	OP_CALL,//调用函数 eg: CALL result,fun => 调用fun函数,返回值result=fun()
-	OP_RET,//直接返回 eg: RET => return
-	OP_RETV//带数据返回 eg:RET arg1 => return arg1
+	OP_NOP,                                 //空指令
+	OP_DEC,                                 //声明指令
+	OP_ENTRY,OP_EXIT,                       //函数入口和出口
+	OP_AS,                                  //赋值运算
+	OP_ADD,OP_SUB,OP_MUL,OP_DIV,OP_MOD,     //算数运算
+	OP_NEG,                                 //负 
+	OP_GT,OP_GE,OP_LT,OP_LE,OP_EQU,OP_NE,   //比较运算
+
+	OP_NOT,                                 //逻辑非 
+	OP_AND,OP_OR,                           //逻辑与,逻辑或 
+
+	OP_LEA,                                 //取址
+	OP_SET,                                 //设置左值 
+	OP_GET,                                 //取右值 
+
+	OP_JMP,                                 //无条件跳转 
+	OP_JT,                                  //真跳转	
+	OP_JF,                                  //假跳转	
+	OP_JNE,                                 //跳转 
+
+	OP_ARG,                                 //参数传递 
+	OP_PROC,                                //调用过程 
+	OP_CALL,                                //调用函数 
+	OP_RET,                                 //直接返回
+	OP_RETV                                 //带数据返回 
 };
 
 #endif // COMMON_H

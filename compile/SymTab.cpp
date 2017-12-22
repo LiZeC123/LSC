@@ -101,6 +101,11 @@ bool Var::isBase()
     return (!isPtr)&&(!isArray);
 }
 
+bool Var::isVoid()
+{
+    return (type == KW_VOID);
+}
+
 void Var::baseInit()
 {
     literal = false;
@@ -237,6 +242,11 @@ void Fun::setExtern(bool isExtern)
     externed = isExtern;
 }
 
+Symbol Fun::getType()
+{
+    return type;
+}
+
 void Fun::enterScope()
 {
     scopeEsp.push_back(0);
@@ -264,8 +274,8 @@ bool Fun::match(Fun* f)
     if(f->paraVar.size() != this->paraVar.size()){
         return false;
     }
-    unsigned int len = f->paraVar.size();
 
+    unsigned int len = f->paraVar.size();
     for(unsigned int i=0;i<len;i++){
         // 部分类型可以兼容使用,例如int* 与int[]
         if(GenIR::checkTypeMatch(f->paraVar[i],this->paraVar[i])){
@@ -290,6 +300,21 @@ void Fun::define(Fun* f)
 {
     externed = false;
     paraVar  = f->paraVar;
+}
+
+void Fun::addInst(InterInst* inst)
+{
+    intercode.addInst(inst);
+}
+
+void Fun::setReturnPoint(InterInst* inst)
+{
+    returnPoint = inst;
+}
+
+InterInst* Fun::getReturnPoint()
+{
+    return returnPoint;
 }
 
 void Fun::printSelf()
@@ -447,10 +472,12 @@ void SymTab::defFun(Fun* f)
         f = last;
     }
     currFun = f;
+    ir->genFunHead(currFun);   // 产生当前函数的函数头中间代码
 }
 
 void SymTab::endDefFun(Fun* f)
 {
+    ir->genFunTail(currFun);  // 产生当前函数结束的中间代码 
     currFun = nullptr;
 }
 
@@ -486,4 +513,22 @@ Var* SymTab::getVoid()
 void SymTab::setGenIR(GenIR* ir)
 {
     this->ir = ir;
+}
+
+void SymTab::addInst(InterInst* interInst)
+{
+    if(currFun){
+        currFun->addInst(interInst);
+    }
+    else{
+        delete interInst;
+        // 调用此函数添加中间代码,但是此时没有函数,是程序的逻辑错误
+        // 直接抛出异常使程序中止
+        throw runtime_error("InterInst without function");
+    }
+}
+
+Fun* SymTab::getCurrFun()
+{
+    return currFun;
 }

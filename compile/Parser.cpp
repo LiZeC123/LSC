@@ -22,7 +22,7 @@ _OR_(KW_DO)_OR_(KW_IF)_OR_(KW_SWITCH)_OR_(KW_RETURN)_OR_(KW_BREAK)_OR_(KW_CONTIN
 
 using namespace std;
 
-Parser::Parser(Lexer& lex,SymTab& tab) : lexer(lex),symtab(tab) { }
+Parser::Parser(Lexer& lex,SymTab& tab,GenIR& iir) : lexer(lex),symtab(tab),ir(iir) { }
 
 void Parser::analyse()
 {
@@ -362,7 +362,7 @@ void Parser::statement()
         break;
     case KW_RETURN:
         move();
-        altexpr();
+        ir.genReturn(altexpr());
         statCheckSemicon();
         break;
     default:
@@ -524,6 +524,7 @@ Var* Parser::altexpr()
         return expr();
     }
     else{
+        // 空语句,返回特殊的Void变量
         return SymTab::getVoid();
     }
 }

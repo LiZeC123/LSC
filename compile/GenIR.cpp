@@ -1,15 +1,15 @@
 #include "GenIR.h"
 #include "SymTab.h"
 #include <sstream>
+#include "Error.h"
 
 using namespace std;
 
 int GenIR::lbNum = 0;
 
-GenIR::GenIR(SymTab tab): symtab(tab)
+GenIR::GenIR(SymTab& tab): symtab(tab)
 {
     symtab.setGenIR(this);
-    
 }
 
 string GenIR::genLb()
@@ -39,4 +39,48 @@ bool GenIR::checkTypeMatch(Var* lval,Var* rval)
     else{
         return false;
     }
+}
+
+void GenIR::genFunHead(Fun* fun)
+{
+    fun->enterScope();
+    symtab.addInst(new InterInst(OP_ENTRY,fun));
+    fun->setReturnPoint(new InterInst());
+}
+
+
+void GenIR::genFunTail(Fun* fun)
+{
+    symtab.addInst(fun->getReturnPoint());
+    symtab.addInst(new InterInst(OP_EXIT,fun));
+    fun->leaveScope();
+}
+
+void GenIR::genReturn(Var* result)
+{
+    if(result == nullptr){
+        return;
+    }
+
+    Fun* fun = symtab.getCurrFun();
+    
+    if((result->isVoid() && fun->getType() != KW_VOID) || 
+        (result->isBase() && fun->getType() == KW_VOID)){
+        
+        Error::semError(RETURN_ERR,fun->getName());
+        return;
+    }
+
+    InterInst* returnPoint = fun->getReturnPoint();
+
+    if(result->isVoid()){
+        symtab.addInst(new InterInst(OP_RET,returnPoint));
+    }
+    else{
+        if(result->isBase()){
+            //TODO: 处理ret是*p的q情况
+        }
+        symtab.addInst(new InterInst(OP_RETV,returnPoint,result));
+    }
+    
 }
