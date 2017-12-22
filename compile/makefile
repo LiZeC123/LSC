@@ -16,7 +16,7 @@ Error.o: Error.cpp Error.h Scanner.h Token.h
 	$(CC) Error.cpp -c -o Error.o 
 GenIR.o: GenIR.h SymTab.h Error.h common.h
 	$(CC) GenIR.cpp -c -o GenIR.o
-InterInst.o: InterInst.h common.h SymTab.h
+InterInst.o: InterInst.h common.h SymTab.h GenIR.h
 	$(CC) InterInst.cpp -c -o InterInst.o
 Lexer.o: Lexer.cpp Lexer.h common.h Scanner.h Token.h Error.h
 	$(CC) Lexer.cpp -c -o Lexer.o 
