@@ -197,7 +197,7 @@ void Parser::funtail(Fun* fun)
     else{
        symtab.defFun(fun);
        block();
-       symtab.endDefFun(fun);
+       symtab.endDefFun();
     }
 }
 
@@ -550,8 +550,8 @@ Var* Parser::asstail(Var* lval)
         Var* var = orexpr();
         Var* rval = asstail(var);
         // 右结合,在递归之后生成代码
-        // TODO: 代码生成
-        return rval;
+        Var* result = ir.genTwoOp(lval,ASSIGN,rval);
+        return result;
     }
 
     return lval;
@@ -569,9 +569,10 @@ Var* Parser::orexpr()
 Var* Parser::ortail(Var* lval)
 {
     if(match(OR)){
-        Var* var = andexpr();
+        Var* rval = andexpr();
         // 左结合,在递归之前生成代码
-        return ortail(lval);
+        Var* result = ir.genTwoOp(lval,OR,rval);
+        return ortail(result);
     }
     return lval;
 }
@@ -588,9 +589,9 @@ Var* Parser::andexpr()
 Var* Parser::andtail(Var* lval)
 {
     if(match(AND)){
-        Var* var = comexpr();
-
-        return andtail(lval);
+        Var* rval = comexpr();
+        Var* result = ir.genTwoOp(lval,AND,rval);
+        return andtail(result);
     }
 
     return lval;
@@ -609,10 +610,10 @@ Var* Parser::comtail(Var* lval)
 {
     // 把cmps的判断内容提前,从而可以简单的判定是否结束递归
     if(firstIs(GE)_OR_(LE)_OR_(GT)_OR_(LT)_OR_(EQU)_OR_(NEQU)){
-         Symbol op = cmps();
-         Var* var = aloexpr();
-
-         return comtail(lval);
+        Symbol op = cmps();
+        Var* rval = aloexpr();
+        Var* result = ir.genTwoOp(lval,op,rval);
+        return comtail(result);
     }
 
     return lval;
@@ -639,9 +640,9 @@ Var* Parser::alotail(Var* lval)
 {
     if(firstIs(ADD)_OR_(SUB)){
         Symbol op = ands();
-        Var* val = item();
-
-        return alotail(lval);
+        Var* rval = item();
+        Var* result = ir.genTwoOp(lval,op,rval);
+        return alotail(result);
     }
 
     return lval;
@@ -669,9 +670,9 @@ Var* Parser::itemtail(Var* lval)
 {
     if(firstIs(MUL)_OR_(DIV)_OR_(MOD)){
         Symbol op = muls();
-        Var* val = factor();
-
-        return itemtail(lval);
+        Var* rval = factor();
+        Var* result = ir.genTwoOp(lval,op,rval);
+        return itemtail(result);
     }
 
     return lval;
@@ -693,8 +694,7 @@ Var* Parser::factor()
     if(firstIs(NOT)_OR_(SUB)_OR_(LEA)_OR_(MUL)_OR_(INC)_OR_(DEC)){
         Symbol op = lop();
         Var* val = factor();
-
-        return val;
+        return ir.genOneLeftOp(op,val);
     }
     else{
         return val();
@@ -716,6 +716,7 @@ Var* Parser::val()
     Symbol op;
     if(firstIs(INC)_OR_(DEC)){
         op = rop();
+        return ir.genOneRightOp(val,op);
     }
 
     return val;
@@ -759,22 +760,26 @@ Var* Parser::idexpr(string name)
 {
     Var* val = nullptr;
     if(match(LBRACK)){
+        //方括号,是数组
         Var* index = expr();
 
         if(!match(RBRACK)){
             recovery(LVAL_OP,RBRACE_LOST,RBRACE_WRONG);
         }
-        val = symtab.getVal(name);
-        // 后续生成数组的相关代码
+
+        Var* array = symtab.getVal(name);
+        return ir.genArray(array,index);
     }
     else if(match(LPAREN)){
+        // 圆括号,是函数调用
         vector<Var*> args;
         realarg(args);
 
         if(!match(RPAREN)){
             recovery(LVAL_OP,RPAREN_LOST,RPAREN_WRONG);
         }
-        // 后续产生函数调用的代码
+        Fun* fun = symtab.getFun(name,args);
+        return ir.genCall(fun,args);
     }
     else{
         // 没有其他后缀,是普通的变量

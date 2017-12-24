@@ -78,9 +78,145 @@ void GenIR::genReturn(Var* result)
     }
     else{
         if(result->isBase()){
-            //TODO: 处理ret是*p的q情况
+            //TODO: 处理ret是*p的情况
         }
         symtab.addInst(new InterInst(OP_RETV,returnPoint,result));
     }
     
+}
+
+
+Var* GenIR::genPtr(Var* val)
+{
+    if(val->isBase()){
+        Error::semError(EXPR_IS_BASE,"");
+        return val;
+    }
+
+    Var* tmp = new Var(symtab.getScopePath(),val->getType(),false);
+    tmp->setLeft(true);
+    tmp->setPoint(val);
+    symtab.addVar(tmp);
+    return tmp;
+}
+
+Var* GenIR::genLea(Var* val)
+{
+    if(!val->getLeft()){
+        Error::semError(EXPR_NOT_LEFT_VAL,"");
+        return val;
+    }
+
+    if(val->isRef()){
+        return val->getPointer();
+    }
+    else{
+        Var* tmp = new Var(symtab.getScopePath(),val->getType(),true);
+        symtab.addVar(tmp);
+        symtab.addInst(new InterInst(OP_LEA,tmp,val));
+        return tmp;
+    }
+
+}
+
+Var* GenIR::genAssign(Var* val)
+{
+    Var* tmp = new Var(symtab.getScopePath(),val);
+    symtab.addVar(tmp);
+    if(val->isRef()){
+        symtab.addInst(new InterInst(OP_GET,tmp,val->getPointer()));
+    }
+    else{
+        symtab.addInst(new InterInst(OP_AS,tmp,val));
+    }
+    return tmp;
+}
+
+Var* GenIR::genAssign(Var* lval,Var* rval)
+{
+    if(!lval->getLeft()){
+        Error::semError(EXPR_NOT_LEFT_VAL,"");
+        return rval;
+    }
+
+    if(!typeCheck(lval,rval)){
+        Error::semError(ASSIGN_TYPE_ERR,"");
+        return rval;
+    }
+
+    if(rval->isRef()){
+        // r = (*r)  OR r = r
+        rval = genAssign(rval);
+    }
+
+    if(lval->isRef()){
+        //  (*l) = r
+        symtab.addInst(new InterInst(OP_SET,rval,lval->getPointer()));
+    }
+    else{
+        //  l = r
+        symtab.addInst(new InterInst(OP_AS,lval,rval));
+    }
+
+    return lval;
+}
+
+Var* GenIR::genTwoOp(Var* lval,Symbol op,Var* rval)
+{
+    if(!lval || !rval ){
+        return nullptr;
+    }
+
+    if(lval->isVoid() || rval->isVoid()){
+        Error::semError(EXPR_IS_VOID,"");
+        return nullptr;
+    }
+
+    if(op == ASSIGN) return genAssign(lval,rval);
+    if(lval->isRef()) lval = genAssign(lval);
+    if(rval->isRef()) rval = genAssign(lval);
+
+    return lval;
+}
+
+Var* GenIR::genOneLeftOp(Symbol op,Var* val)
+{
+    return val;
+}
+
+Var* GenIR::genOneRightOp(Var* val,Symbol op)
+{
+    return val;
+}
+
+Var* GenIR::genArray(Var* val,Var* index)
+{
+    //TODO: 数组代码
+    return val;
+}
+
+
+
+Var* GenIR::genCall(Fun* fun, std::vector<Var*>& args)
+{
+    //TODO: 函数调用代码
+    return nullptr;
+}
+
+
+bool GenIR::typeCheck(Var* lval,Var* rval)
+{
+    if(!rval || !lval){
+        return false;
+    }
+    if(lval->isBase() && rval->isBase()){
+        // 都是基本类型
+        return true;
+    }
+    else if(!lval->isBase() && rval->isBase()){
+        // 都是指针
+        return true;
+    }
+
+    return false;
 }

@@ -76,6 +76,34 @@ Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::strin
     initData = init;
 }
 
+Var::Var(std::vector<int> scopePath,Symbol s,bool isPtr)
+{
+    baseInit();
+    this->scopePath = scopePath;
+    setType(s);
+    setPtr(isPtr);
+    setName(GenIR::genLb());
+    setLeft(false);         // 临时变量默认是右值
+}
+
+Var::Var(std::vector<int> scopePath, Var* val) : Var(scopePath,val->type,val->isPtr) { }
+
+void Var::baseInit()
+{
+    literal = false;
+    scopePath.push_back(-1);
+    externed = false;
+    isPtr = false;
+    isArray = false;
+    arraySize = 0;
+    isLeft = true; // 变量默认是可以作为左值
+    initData = nullptr;
+    inited = false;
+    ptr = nullptr;
+    size = 0;
+    offset = 0;
+}
+
 string Var::getName()
 {
     return name;
@@ -96,6 +124,16 @@ Symbol Var::getType()
     return type;
 }
 
+Var* Var::getPointer()
+{
+    return ptr;
+}
+
+bool Var::getLeft()
+{
+    return isLeft;
+}
+
 bool Var::isBase()
 {
     return (!isPtr)&&(!isArray);
@@ -106,20 +144,10 @@ bool Var::isVoid()
     return (type == KW_VOID);
 }
 
-void Var::baseInit()
+bool Var::isRef()
 {
-    literal = false;
-    scopePath.push_back(-1);
-    externed = false;
-    isPtr = false;
-    isArray = false;
-    arraySize = 0;
-    isLeft = true; // 变量默认是可以作为左值
-    initData = nullptr;
-    inited = false;
-    ptr = nullptr;
-    size = 0;
-    offset = 0;
+    // 是不是一个类似与(*p)的变量
+    return (ptr != nullptr);
 }
 
 void Var::setExterned(bool isExtern)
@@ -180,6 +208,15 @@ void Var::setArray(int len)
     }
 }
 
+void Var::setLeft(bool isLeft)
+{
+    this->isLeft = isLeft;
+}
+
+void Var::setPoint(Var* ptr)
+{
+    this->ptr = ptr;
+}
 
 void Var::printSelf()
 {
@@ -271,26 +308,31 @@ bool Fun::match(Fun* f)
         return false;
     }
 
-    if(f->paraVar.size() != this->paraVar.size()){
+    if(f->type != this->type){
+        // 报告语义警告,返回类型不匹配
+        Error::semWarm(FUN_RET_CONFLICT,f->getName());
+    }
+
+    return match(f->paraVar);
+}
+
+bool Fun::match(std::vector<Var*>& paraVar)
+{
+    if(paraVar.size() != this->paraVar.size()){
         return false;
     }
 
-    unsigned int len = f->paraVar.size();
+    unsigned int len = paraVar.size();
     for(unsigned int i=0;i<len;i++){
         // 部分类型可以兼容使用,例如int* 与int[]
-        if(GenIR::checkTypeMatch(f->paraVar[i],this->paraVar[i])){
-            if(f->paraVar[i]->getType() != this->paraVar[i]->getType()){
+        if(GenIR::checkTypeMatch(paraVar[i],this->paraVar[i])){
+            if(paraVar[i]->getType() != this->paraVar[i]->getType()){
                 Error::semWarm(FUN_DEC_CONFLICT,name);
             }
         }
         else{
             return false;
         }
-    }
-
-    if(f->type != this->type){
-        // 报告语义警告,返回类型不匹配
-        Error::semWarm(FUN_RET_CONFLICT,f->getName());
     }
 
     return true;
@@ -325,7 +367,7 @@ void Fun::printSelf()
 	printf(" %s",name.c_str());
 	//输出参数列表
 	printf("(");
-	for(int i=0;i<paraVar.size();i++){
+	for(unsigned int i=0;i<paraVar.size();i++){
 		printf("<%s>",paraVar[i]->getName().c_str());
 		if(i!=paraVar.size()-1)printf(",");
 	}
@@ -446,7 +488,7 @@ void SymTab::decFun(Fun* f)
         if(!last->match(f)){
             Error::semError(FUN_DEC_ERR,f->getName());
         }
-        // 函数已经出现并存入表中了,这个重复的可以直接delete
+        // 函数可以重复声明,出现过的同名函数可以直接忽略
         delete f;
     }
 }
@@ -468,6 +510,9 @@ void SymTab::defFun(Fun* f)
             }
             last->define(f);                                // 用函数定义覆盖以前的函数声明
         }
+        else{
+            Error::semError(FUN_RE_DEF,f->getName());      // 函数重定义
+        }
         delete f;
         f = last;
     }
@@ -475,10 +520,30 @@ void SymTab::defFun(Fun* f)
     ir->genFunHead(currFun);   // 产生当前函数的函数头中间代码
 }
 
-void SymTab::endDefFun(Fun* f)
+void SymTab::endDefFun()
 {
     ir->genFunTail(currFun);  // 产生当前函数结束的中间代码 
     currFun = nullptr;
+}
+
+Fun* SymTab::getFun(std::string name, std::vector<Var*>& args)
+{
+    if(funTab.find(name) != funTab.end()){
+        Fun* last = funTab[name];
+        if(!last->match(args)){
+            return last;
+        }
+        else{
+            // 调用不匹配
+            Error::semError(FUN_CALL_ERR,name);
+        }
+    }
+    else{
+        // 函数未声明
+        Error::semError(FUN_UN_DEC,name);
+    }
+
+    return nullptr;
 }
 
 void SymTab::printValTab()

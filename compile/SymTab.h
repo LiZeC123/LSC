@@ -21,16 +21,24 @@ public:
     
     // 初始化普通的变量,指针
     Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,Var* init);
+
+    // 临时变量
+    Var(std::vector<int> scopePath,Symbol s,bool isPtr);
+
+    // 变量拷贝
+    Var(std::vector<int> scopePath, Var* val);
  
     std::string getName();
     std::vector<int>& getPath();
     int getSize();
+    bool getLeft();
     Symbol getType();
+    Var* getPointer();      // 获得当前变量对应的指针
     bool isBase();          // 是否是基本类型
     bool isVoid();          // 是否是Void,特殊类型,表示空
+    bool isRef();           // 是否是引用
  
-    void printSelf();
-private:
+
     // 注意:由于每个函数并不只初始化一个属性,且部分属性相互依赖
     // 所以必须按照下面的顺序依次使用以下函数(不需要的函数不用调用)
     void baseInit();                            // 默认初始化
@@ -39,6 +47,10 @@ private:
     void setPtr(bool isPtr);
     void setName(std::string name);
     void setArray(int len);
+    void setLeft(bool isLeft);
+    void setPoint(Var* ptr);
+
+    void printSelf();
                
 private:
     bool literal;                   // 是否是字面常量值
@@ -78,8 +90,9 @@ public:
     void enterScope();              // 进入一个新的作用域
     void leaveScope();              // 退出作用域并计算栈帧大小
 
-    bool match(Fun* f);             // 比较两个函数是否匹配(函数声明和函数定义)
-    void define(Fun* f);            // 将函数声明转化为函数定义
+    bool match(Fun* f);                     // 比较两个函数是否匹配(函数声明和函数定义)
+    bool match(std::vector<Var*>& paraVar); // 比较参数列表是否匹配
+    void define(Fun* f);                    // 将函数声明转化为函数定义
 
     void addInst(InterInst* inst);  // 添加一条中间代码
     
@@ -125,7 +138,8 @@ public:
     // 函数管理
     void decFun(Fun* f);
     void defFun(Fun* f);
-    void endDefFun(Fun* f);
+    void endDefFun();
+    Fun* getFun(std::string name, std::vector<Var*>& args);
 
     // 输出表,调试用
     void printValTab();

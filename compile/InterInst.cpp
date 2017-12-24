@@ -23,9 +23,10 @@ InterInst::InterInst(Operator op, Var* result, Var* arg1, Var* arg2)
     this->arg2 = arg2;
 }
 
-InterInst::InterInst(Operator s, Fun* fun, Var* result)
+InterInst::InterInst(Operator op, Fun* fun, Var* result)
 {
     init();
+    this->op = op;
     this->fun = fun;
     this->result = result;
 }
