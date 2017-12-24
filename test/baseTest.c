@@ -1,17 +1,18 @@
-char* a;
+char* globalChar;
 
-int f(int a);
+int f(int funcA);
 int printf(char* s);
 
 int main()
 {
     int b = 4;
-    char ca;
+    char ca = 'a';
+    char* str = "Hello World";
     for(int i=0;i<10;i++){
         while(i < b){
             int c;
             i++;
-            printf("Hello World");
+            printf(str);
         }
         int d;
     }

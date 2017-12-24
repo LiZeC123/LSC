@@ -253,7 +253,7 @@ Var* Parser::paradatatail(Symbol s,string name)
 {
     if(match(LBRACK)){
         // 函数参数列表中的数组可以没有指定长度
-        // 所以不需要错误处理,并且以大于0数值作为初始值(否在,在写入符号表时会报错)
+        // 所以不需要错误处理,并且以大于0数值作为初始值(否则,在写入符号表时会报错)
         int len = 1;
         if(firstIs(NUM)){
             len = ((Num*)look)->val;

@@ -8,6 +8,7 @@
 
 int main()
 {
+    //const char* filename = "/home/lizec/CWorkSpace/lsc/test/baseTest.c";
     const char* filename = "/home/lizec/CWorkSpace/lsc/test/baseLostTest.c";
     Scanner scanner = Scanner(filename);
     Error err       = Error(&scanner);
@@ -17,7 +18,7 @@ int main()
     Parser parser   = Parser(lex,tab,ir);
 
     parser.analyse();
-    printf("变量表内容如下:\n");
+    printf("\n变量表内容如下:\n");
     tab.printValTab();
     printf("\n");
     printf("函数表内容如下:\n");

@@ -246,15 +246,15 @@ void Var::printSelf()
 	for(unsigned int i=0;i<scopePath.size();i++){
 		printf("/%d",scopePath[i]);
 	}
-	printf("\" ");
-	if(offset>0)
-		printf("addr=[ebp+%d]",offset);
-	else if(offset<0)
-		printf("addr=[ebp%d]",offset);
-	else if(name[0]!='<')
-		printf("addr=<%s>",name.c_str());
-	else
-		printf("value='%d'",this->intVal);
+	// printf("\" ");
+	// if(offset>0)
+	// 	printf("addr=[ebp+%d]",offset);
+	// else if(offset<0)
+	// 	printf("addr=[ebp%d]",offset);
+	// else if(name[0]!='<')
+	// 	printf("addr=<%s>",name.c_str());
+	// else
+	// 	printf("value='%d'",this->intVal);
     
     printf("\n");
 }
@@ -371,12 +371,12 @@ void Fun::printSelf()
 		printf("<%s>",paraVar[i]->getName().c_str());
 		if(i!=paraVar.size()-1)printf(",");
 	}
-	printf(")");
-	if(externed)printf(";\n");
-	else{
-		printf(":\n");
-		printf("\t\tmaxDepth=%d\n",maxDepth);
-	}
+	printf(")\n");
+	// if(externed)printf(";\n");
+	// else{
+	// 	printf(":\n");
+	// 	printf("\t\tmaxDepth=%d\n",maxDepth);
+	// }
 }
 
 SymTab::SymTab()
@@ -530,7 +530,7 @@ Fun* SymTab::getFun(std::string name, std::vector<Var*>& args)
 {
     if(funTab.find(name) != funTab.end()){
         Fun* last = funTab[name];
-        if(!last->match(args)){
+        if(last->match(args)){
             return last;
         }
         else{
