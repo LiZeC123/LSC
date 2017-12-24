@@ -168,10 +168,8 @@ Token* Lexer::nextToken()
     if(token){
         delete token;
     }
-    return new Token(END);
-    // 内存回收处理
-
-
+    // 最后一个符号在析构函数中释放内存
+    return token = new Token(END);
 }
 
 Token * Lexer::getIdent()
