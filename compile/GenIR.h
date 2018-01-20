@@ -36,6 +36,10 @@ public:
 private:
     bool typeCheck(Var* lval,Var* rval);
 
+    Var* genAdd(Var* lval,Var* rval);
+    Var* genSub(Var* lval,Var* rval);
+    Var* genMul(Var* lval,Var* rval);
+
 
 private:
     static int lbNum;

@@ -372,6 +372,12 @@ void Fun::printSelf()
 		if(i!=paraVar.size()-1)printf(",");
 	}
 	printf(")\n");
+    auto v = intercode.getCode();
+
+    for(auto& i:v){
+        i->printSelf();
+    }
+
 	// if(externed)printf(";\n");
 	// else{
 	// 	printf(":\n");

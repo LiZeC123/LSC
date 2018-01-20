@@ -1,7 +1,37 @@
 #include "InterInst.h"
 #include "GenIR.h"
+#include "SymTab.h"
 
 using namespace std;
+
+const char* OPNameTable[] = 
+{
+	"OP_NOP",   
+	"OP_DEC",                                 
+	"OP_ENTRY","OP_EXIT",                      
+	"OP_AS",                                  
+	"OP_ADD","OP_SUB","OP_MUL","OP_DIV","OP_MOD",     
+	"OP_NEG",                                 
+	"OP_GT","OP_GE","OP_LT","OP_LE","OP_EQU","OP_NE",   
+
+	"OP_NOT",                                
+	"OP_AND","OP_OR",                           
+
+	"OP_LEA",                                 
+	"OP_SET",                                 
+	"OP_GET",                                
+
+	"OP_JMP",                                 
+	"OP_JT",                                  
+	"OP_JF",                                  
+	"OP_JNE",                                 
+
+	"OP_ARG",                                 
+	"OP_PROC",                                
+	"OP_CALL",                                
+	"OP_RET",                               
+	"OP_RETV"                    
+};
 
 void InterInst::init()
 {
@@ -48,6 +78,17 @@ InterInst::InterInst(Operator op,InterInst* tar,Var* arg1,Var* arg2)
 
 void InterInst::printSelf()
 {
+    if(!label.empty()){
+        printf("\t%s",label.c_str());
+    }
+    else{
+        printf("\t %s",OPNameTable[op]);
+        if(result) printf(" %s",result->getName().c_str());
+        if(arg1) printf(" %s", arg1->getName().c_str());
+        if(arg2) printf(" %s", arg2->getName().c_str());
+        if(fun) printf(" %s",fun->getName().c_str());   
+    }
+    printf("\n");
     //TODO: 打印指令
 }
 

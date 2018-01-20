@@ -19,8 +19,10 @@ int main()
 	return 0;
 }
 
-int f(int a)
+int f(int fra)
 {
-    int g;
-    char h;
+    int fi = 5,fj = 4,fk = 3;
+    int fsum;
+    fsum = fi+fj*fk;
+    return fsum;
 }

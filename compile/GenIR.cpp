@@ -175,7 +175,9 @@ Var* GenIR::genTwoOp(Var* lval,Symbol op,Var* rval)
     if(op == ASSIGN) return genAssign(lval,rval);
     if(lval->isRef()) lval = genAssign(lval);
     if(rval->isRef()) rval = genAssign(lval);
-
+    if(op == ADD) return genAdd(lval,rval);
+    if(op == SUB) return genSub(lval,rval);
+    if(op == MUL) return genMul(lval,rval);
     return lval;
 }
 
@@ -219,4 +221,28 @@ bool GenIR::typeCheck(Var* lval,Var* rval)
     }
 
     return false;
+}
+
+Var* GenIR::genAdd(Var* lval,Var* rval)
+{
+    Var* tmp = new Var(symtab.getScopePath(),lval->getType(),false);
+    symtab.addVar(tmp);
+    symtab.addInst(new InterInst(OP_ADD,tmp,lval,rval));
+    return tmp;
+}
+
+Var* GenIR::genSub(Var* lval,Var* rval)
+{
+    Var* tmp = new Var(symtab.getScopePath(),lval->getType(),false);
+    symtab.addVar(tmp);
+    symtab.addInst(new InterInst(OP_SUB,tmp,lval,rval));
+    return tmp;
+}
+
+Var* GenIR::genMul(Var* lval,Var* rval)
+{
+    Var* tmp = new Var(symtab.getScopePath(),lval->getType(),false);
+    symtab.addVar(tmp);
+    symtab.addInst(new InterInst(OP_MUL,tmp,lval,rval));
+    return tmp;
 }
