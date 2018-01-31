@@ -9,7 +9,7 @@ all: $(OBJ)
 	$(CC) $(OBJ) -o lscc 
 test: $(OBJ)
 	$(CC) $(OBJ) -o lscc 
-	./lscc /home/lizec/CWorkSpace/lsc/test/baseTest.c
+	./lscc ../test/baseTest.c
 main.o:main.cpp common.h Scanner.h Lexer.h Parser.h
 	$(CC) main.cpp -c -o main.o 
 Error.o: Error.cpp Error.h Scanner.h Token.h
