@@ -6,10 +6,18 @@
 #include "Error.h"
 
 
-int main()
+int main(int argc,char* argv[])
 {
-    //const char* filename = "/home/lizec/CWorkSpace/lsc/test/baseTest.c";
-    const char* filename = "/home/lizec/CWorkSpace/lsc/test/baseLostTest.c";
+    // 读取需要编译的文件名
+    const char* filename;
+    if(argc == 2){
+        filename = argv[1];
+    }
+    else{
+        return 0;
+    }
+    
+    // 初始化模块
     Scanner scanner = Scanner(filename);
     Error err       = Error(&scanner);
     Lexer lex       = Lexer(scanner);
@@ -18,6 +26,7 @@ int main()
     Parser parser   = Parser(lex,tab,ir);
 
     parser.analyse();
+    
     printf("\n变量表内容如下:\n");
     tab.printValTab();
     printf("\n");
