@@ -1,5 +1,7 @@
 Lsc(Lsc iS Compile)
 ==========================
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/LiZeC123/LSC/blob/master/LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com) 
 [![Build Status](https://api.travis-ci.org/LiZeC123/LSC.svg?branch=master)](https://travis-ci.org/LiZeC123/LSC)
 
 Lsc是与其同名的Lsc语言的编译系统,此编译系统的目标是接受一个Lsc语言的源文件,编译产生可以在Linux系统上执行的二进制文件.
