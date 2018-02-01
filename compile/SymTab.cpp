@@ -90,8 +90,40 @@ Var::Var(std::vector<int> scopePath, Var* val) : Var(scopePath,val->type,val->is
 
 bool Var::setInit()
 {
-    // TODO: 完善变量初始化代码
-    return true;
+    if(!initData){
+        return false;
+    }
+    inited = false;
+
+    if(externed){
+        Error::semError(DEC_INIT_DENY,name);
+    }
+    else if(!GenIR::checkTypeMatch(this,initData)){
+        Error::semError(VAR_INIT_ERR,name);
+    }
+    else if(initData->literal){
+        // 如果是常量,直接进行初始化
+        inited = true;
+        if(initData->isArray){
+            // 如果既是常量又是数组,则必定为字符串
+            // 字符串指针初始值等于常量串名(eg .L2)
+            ptrVal = initData->name;
+        }
+        else{
+            intVal = initData->intVal;
+        }
+    }
+    else{
+        // 否在说明是表达式,需要生成代码进行计算
+        if(scopePath.size() == 1){
+            Error::semError(GLB_INIT_ERR,name);
+        }
+        else{
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void Var::baseInit()
