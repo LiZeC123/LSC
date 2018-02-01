@@ -33,12 +33,15 @@ public:
     int getSize();
     bool getLeft();
     Symbol getType();
+    Var* getInitData();
+    int getOffset();
     Var* getPointer();      // 获得当前变量对应的指针
     bool isBase();          // 是否是基本类型
     bool isVoid();          // 是否是Void,特殊类型,表示空
     bool isRef();           // 是否是引用
  
 
+    bool setInit();         // 生成器调用的初始化方法
     // 注意:由于每个函数并不只初始化一个属性,且部分属性相互依赖
     // 所以必须按照下面的顺序依次使用以下函数(不需要的函数不用调用)
     void baseInit();                            // 默认初始化
@@ -49,6 +52,7 @@ public:
     void setArray(int len);
     void setLeft(bool isLeft);
     void setPoint(Var* ptr);
+    void setOffset(int offset);
 
     void printSelf();
                
@@ -93,6 +97,7 @@ public:
     bool match(Fun* f);                     // 比较两个函数是否匹配(函数声明和函数定义)
     bool match(std::vector<Var*>& paraVar); // 比较参数列表是否匹配
     void define(Fun* f);                    // 将函数声明转化为函数定义
+    void locate(Var* var);                  // 根据变量更新栈帧偏移值
 
     void addInst(InterInst* inst);  // 添加一条中间代码
     

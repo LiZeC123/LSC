@@ -88,6 +88,12 @@ Var::Var(std::vector<int> scopePath,Symbol s,bool isPtr)
 
 Var::Var(std::vector<int> scopePath, Var* val) : Var(scopePath,val->type,val->isPtr) { }
 
+bool Var::setInit()
+{
+    // TODO: 完善变量初始化代码
+    return true;
+}
+
 void Var::baseInit()
 {
     literal = false;
@@ -122,6 +128,16 @@ int Var::getSize()
 Symbol Var::getType()
 {
     return type;
+}
+
+Var* Var::getInitData()
+{
+    return initData;
+}
+
+int Var::getOffset()
+{
+    return offset;
 }
 
 Var* Var::getPointer()
@@ -218,6 +234,11 @@ void Var::setPoint(Var* ptr)
     this->ptr = ptr;
 }
 
+void Var::setOffset(int offset)
+{
+    this->offset = offset;
+}
+
 void Var::printSelf()
 {
 	if(externed)printf("externed ");
@@ -246,15 +267,15 @@ void Var::printSelf()
 	for(unsigned int i=0;i<scopePath.size();i++){
 		printf("/%d",scopePath[i]);
 	}
-	// printf("\" ");
-	// if(offset>0)
-	// 	printf("addr=[ebp+%d]",offset);
-	// else if(offset<0)
-	// 	printf("addr=[ebp%d]",offset);
-	// else if(name[0]!='<')
-	// 	printf("addr=<%s>",name.c_str());
-	// else
-	// 	printf("value='%d'",this->intVal);
+	printf("\" ");
+	if(offset>0)
+		printf("addr=[ebp+%d]",offset);
+	else if(offset<0)
+		printf("addr=[ebp%d]",offset);
+	else if(name[0]!='<')
+		printf("addr=<%s>",name.c_str());
+	else
+		printf("value='%d'",this->intVal);
     
     printf("\n");
 }
@@ -344,6 +365,15 @@ void Fun::define(Fun* f)
     paraVar  = f->paraVar;
 }
 
+void Fun::locate(Var* var)
+{
+    int size = var->getSize();
+    size = size + ((4 - size % 4) % 4); // 使size变为4的倍数(对齐)
+    scopeEsp.back() += size;
+    curEsp += size;
+    var->setOffset(-curEsp);    // 局部变量的偏移地址为负数
+}
+
 void Fun::addInst(InterInst* inst)
 {
     intercode.addInst(inst);
@@ -371,18 +401,19 @@ void Fun::printSelf()
 		printf("<%s>",paraVar[i]->getName().c_str());
 		if(i!=paraVar.size()-1)printf(",");
 	}
-	printf(")\n");
-    auto v = intercode.getCode();
+	printf(")");
 
+	if(externed)printf(";\n");
+	else{
+		printf(": maxDepth=%d\n",maxDepth);
+	}
+
+    auto v = intercode.getCode();
     for(auto& i:v){
         i->printSelf();
     }
 
-	// if(externed)printf(";\n");
-	// else{
-	// 	printf(":\n");
-	// 	printf("\t\tmaxDepth=%d\n",maxDepth);
-	// }
+
 }
 
 SymTab::SymTab()
@@ -437,7 +468,7 @@ void SymTab::addVar(Var* var)
                 break;
             }
         }
-
+        // 如果没有同作用域的同名变量或者是常量,则存入符号表中
         if(i==list.size() || var->getName()[0] == '<'){
             list.push_back(var);
         }
@@ -447,6 +478,18 @@ void SymTab::addVar(Var* var)
             delete var;
             return;
         }
+    }
+
+    if(ir){
+        bool flag = ir->genVarInit(var);
+        if(currFun && flag){
+            currFun->locate(var);
+        }
+    }
+    else{
+        // 调用此函数添加变量并生成中间代码
+        // 但此时中间代码生成器未初始化,是代码逻辑错误,因此直接抛出异常,中止程序
+        throw runtime_error("addVar without GenIR");
     }
 }
 
@@ -592,10 +635,12 @@ void SymTab::addInst(InterInst* interInst)
         currFun->addInst(interInst);
     }
     else{
+        /*
+         * 由于添加变量时会无差别的产生添加赋值语句的操作
+         * 因此读入函数声明时的函数参数也会产生空的赋值语句操作
+         * 而此时并未进入函数,因此currFun为nullptr,因此可以直接忽略此请求并释放有关内存
+         */
         delete interInst;
-        // 调用此函数添加中间代码,但是此时没有函数,是程序的逻辑错误
-        // 直接抛出异常使程序中止
-        throw runtime_error("InterInst without function");
     }
 }
 

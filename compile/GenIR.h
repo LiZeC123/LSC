@@ -16,6 +16,8 @@ public:
     void genFunTail(Fun* fun);
     void genReturn(Var* result);
 
+    bool genVarInit(Var* var);
+
     Var* genPtr(Var* val);          // 生成指针,例如*p
     Var* genLea(Var* val);          // 生成地址,例如&a
     

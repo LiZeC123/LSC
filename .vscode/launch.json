@@ -7,7 +7,7 @@
                 "request": "launch",
                 "preLaunchTask": "make",
                 "program": "${workspaceRoot}/compile/lscc",
-                "args": [],
+                "args": ["${workspaceRoot}/test/baseTest.c"],
                 "stopAtEntry": false,
                 "cwd": "${workspaceRoot}",
                 "environment": [],

@@ -85,6 +85,19 @@ void GenIR::genReturn(Var* result)
     
 }
 
+bool GenIR::genVarInit(Var* var)
+{
+    if(var->getName()[0] == '<'){
+        return false;
+    }
+
+    symtab.addInst(new InterInst(OP_DEC,var,nullptr));
+    if(var->setInit()){
+        genTwoOp(var,ASSIGN,var->getInitData());
+    }
+
+    return true;
+}
 
 Var* GenIR::genPtr(Var* val)
 {
