@@ -835,7 +835,7 @@ Var* Parser::literal()
     return val;
 }
 
-//TODO: 检查各个错误恢复部分能否正确的执行后续递归调用
+
 void Parser::recovery(bool cond,SynError lost,SynError wrong)
 {
     if(cond){

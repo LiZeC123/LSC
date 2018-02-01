@@ -27,6 +27,9 @@ public:
 
     // 变量拷贝
     Var(std::vector<int> scopePath, Var* val);
+
+    // 特殊整数常量
+    Var(int val);
  
     std::string getName();
     std::vector<int>& getPath();
@@ -35,6 +38,7 @@ public:
     Symbol getType();
     Var* getInitData();
     int getOffset();
+    Var* getStep();         // 获得相应的变量长度,并返回一个表示该长度的特殊整数变量
     Var* getPointer();      // 获得当前变量对应的指针
     bool isBase();          // 是否是基本类型
     bool isVoid();          // 是否是Void,特殊类型,表示空
@@ -164,6 +168,8 @@ public:
 
 public:
     static Var* varVoid;
+    static Var* one;
+    static Var* four;
     
     // 获得一个共用的表示Void的符号
     static Var* getVoid();

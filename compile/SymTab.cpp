@@ -11,6 +11,8 @@ using namespace std;
 extern const char * tokenName[];
 
 Var* SymTab::varVoid = nullptr;
+Var* SymTab::one = nullptr;
+Var* SymTab::four = nullptr;
 
 Var::Var()
 {
@@ -87,6 +89,16 @@ Var::Var(std::vector<int> scopePath,Symbol s,bool isPtr)
 }
 
 Var::Var(std::vector<int> scopePath, Var* val) : Var(scopePath,val->type,val->isPtr) { }
+
+Var::Var(int val)
+{
+	baseInit();
+	setName("<int>");//特殊变量名字
+	literal=true;
+	setLeft(false);
+	setType(KW_INT);
+	intVal=val;//记录数字数值
+}
 
 bool Var::setInit()
 {
@@ -170,6 +182,22 @@ Var* Var::getInitData()
 int Var::getOffset()
 {
     return offset;
+}
+
+Var* Var::getStep()
+{
+    if(this->isBase()){
+        return SymTab::one;
+    }
+    else if(this->type == KW_CHAR){
+        return SymTab::one;
+    }
+    else if(this->type==KW_INT){
+        return SymTab::four;
+    }
+    else{
+        return nullptr;
+    }
 }
 
 Var* Var::getPointer()
@@ -451,6 +479,8 @@ void Fun::printSelf()
 SymTab::SymTab()
 {
     varVoid = new Var();
+    one = new Var(1);
+    four = new Var(4);
     scopeId = 0;
     currFun = nullptr;
     scopePath.push_back(0); // 初始为全局作用域
