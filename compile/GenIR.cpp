@@ -77,8 +77,8 @@ void GenIR::genReturn(Var* result)
         symtab.addInst(new InterInst(OP_RET,returnPoint));
     }
     else{
-        if(result->isBase()){
-            //TODO: 处理ret是*p的情况
+        if(result->isRef()){
+            result = genAssign(result);
         }
         symtab.addInst(new InterInst(OP_RETV,returnPoint,result));
     }

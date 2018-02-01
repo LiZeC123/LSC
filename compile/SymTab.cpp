@@ -5,7 +5,6 @@
 #include <sstream>
 using namespace std;
 
-//TODO: 表达式部分符号管理
 
 // 引用Token.cpp中的符号数组,用于打印符号名
 extern const char * tokenName[];
