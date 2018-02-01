@@ -12,4 +12,13 @@ int main()
     return fsum;
 }
 
+int testAssgin()
+{
+    int tAs = 10;
+    int* ptAs = &tAs;
 
+    int re = *ptAs;
+    int* pother = &re;
+
+    *pother = re;
+}
