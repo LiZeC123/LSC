@@ -91,7 +91,7 @@ bool GenIR::genVarInit(Var* var)
         return false;
     }
 
-    symtab.addInst(new InterInst(OP_DEC,var,nullptr));
+    symtab.addInst(new InterInst(OP_DEC,var));
     if(var->setInit()){
         genTwoOp(var,ASSIGN,var->getInitData());
     }
@@ -400,18 +400,47 @@ Var* GenIR::genOneRightOp(Var* val,Symbol op)
     }
 }
 
-Var* GenIR::genArray(Var* val,Var* index)
+Var* GenIR::genArray(Var* array,Var* index)
 {
-    //TODO: 数组代码
-    return val;
+    if(!array || ! index) {
+        return nullptr;
+    }
+
+    if(array->isVoid() || index->isVoid()){
+        Error::semError(EXPR_IS_VOID,"");
+        return nullptr;
+    }
+
+    if(array->isBase() || !index->isBase()){
+        Error::semError(ARR_TYPE_ERR,"");
+        return index;
+    }
+
+    return genPtr(genAdd(array,index));
 }
 
 
 
 Var* GenIR::genCall(Fun* fun, std::vector<Var*>& args)
 {
-    //TODO: 函数调用代码
-    return nullptr;
+    if(!fun){
+        return nullptr;
+    }
+
+    for(auto& arg:args){
+        genPara(arg);
+    }
+
+    if(fun->getType() == KW_VOID){
+        symtab.addInst(new InterInst(OP_PROC,fun));
+        return SymTab::getVoid();
+    }
+    else{
+        Var* ret = new Var(symtab.getScopePath(),fun->getType(),false);
+        symtab.addInst(new InterInst(OP_CALL,fun,ret));
+        symtab.addVar(ret);
+        return ret;
+    }
 }
 
 
@@ -560,6 +589,15 @@ Var* GenIR::genMod(Var* lval,Var* rval)
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_MOD,tmp,lval,rval));
     return tmp;
+}
+
+void GenIR::genPara(Var* arg)
+{
+    if(arg->isRef()){
+        arg = genAssign(arg);
+    }
+
+    symtab.addInst(new InterInst(OP_ARG,arg));
 }
 
 

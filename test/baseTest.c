@@ -22,3 +22,15 @@ int testAssgin()
 
     *pother = re;
 }
+
+int testArray()
+{
+    int array[10];
+
+    array[1] = 5;
+    array[2] = 0;
+
+    int arrayRec;
+    arrayRec = array[1] + array[2];
+
+}

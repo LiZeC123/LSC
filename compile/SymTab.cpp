@@ -87,7 +87,15 @@ Var::Var(std::vector<int> scopePath,Symbol s,bool isPtr)
     setLeft(false);         // 临时变量默认是右值
 }
 
-Var::Var(std::vector<int> scopePath, Var* val) : Var(scopePath,val->type,val->isPtr) { }
+Var::Var(std::vector<int> scopePath, Var* val)  
+{
+    baseInit();
+    this->scopePath = scopePath;
+    setType(val->getType());
+    setPtr(val->isArray || val->isPtr);
+    setName(GenIR::genLb());
+    setLeft(false);
+}
 
 Var::Var(int val)
 {
@@ -296,6 +304,26 @@ void Var::setPoint(Var* ptr)
 void Var::setOffset(int offset)
 {
     this->offset = offset;
+}
+
+void Var::value()
+{
+    if(literal){
+        if(type == KW_INT){
+            printf("%d",intVal);
+        }
+        else if(type == KW_CASE){
+            if(isArray){
+                printf("%s",name.c_str());
+            }
+            else{
+                printf("%d",charVal);
+            }
+        }
+    }
+    else{
+        printf("%s",name.c_str());
+    }
 }
 
 void Var::printSelf()

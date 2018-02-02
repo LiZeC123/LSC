@@ -22,7 +22,7 @@ public:
     Var* genTwoOp(Var* lval,Symbol op,Var* rval);
     Var* genOneLeftOp(Symbol op,Var* val);
     Var* genOneRightOp(Var* val,Symbol op);
-    Var* genArray(Var* val,Var* index);
+    Var* genArray(Var* array,Var* index);
     Var* genCall(Fun* fun, std::vector<Var*>& args);
 
     
@@ -32,6 +32,15 @@ public:
 
 private:
     bool typeCheck(Var* lval,Var* rval);
+
+    Var* genLea(Var* val);          // 生成地址,例如&a
+    Var* genPtr(Var* val);          // 生成指针,相当于执行 tmp = *p
+    Var* genIncL(Var* val);         // 前缀的++
+    Var* genDecL(Var* val);         // 前缀的--
+    Var* genIncR(Var* val);         // 后缀的++
+    Var* genDecR(Var* val);         // 后缀的--
+    Var* genNot(Var* val); 
+    Var* genMinus(Var* val); 
 
     Var* genAssign(Var* val);
     Var* genAssign(Var* lval,Var* rval);
@@ -51,14 +60,9 @@ private:
     Var* genDiv(Var* lval,Var* rval);
     Var* genMod(Var* lval,Var* rval);
 
-    Var* genLea(Var* val);          // 生成地址,例如&a
-    Var* genPtr(Var* val);          // 生成指针,相当于执行 tmp = *p
-    Var* genIncL(Var* val);         // 前缀的++
-    Var* genDecL(Var* val);         // 前缀的--
-    Var* genIncR(Var* val);         // 后缀的++
-    Var* genDecR(Var* val);         // 后缀的--
-    Var* genNot(Var* val); 
-    Var* genMinus(Var* val); 
+
+
+    void genPara(Var* arg);         // 生成函数参数入栈代码
 
 
 

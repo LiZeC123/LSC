@@ -61,6 +61,13 @@ InterInst::InterInst(Operator op, Fun* fun, Var* result)
     this->result = result;
 }
 
+InterInst::InterInst(Operator op,Var* arg1)
+{
+    init();
+    this->op = op;
+    this->arg1 = arg1;
+}
+
 InterInst::InterInst()
 {
     init();
@@ -78,18 +85,49 @@ InterInst::InterInst(Operator op,InterInst* tar,Var* arg1,Var* arg2)
 
 void InterInst::printSelf()
 {
-    if(!label.empty()){
-        printf("\t%s",label.c_str());
-    }
-    else{
-        printf("\t %s",OPNameTable[op]);
-        if(result) printf(" %s",result->getName().c_str());
-        if(arg1) printf(" %s", arg1->getName().c_str());
-        if(arg2) printf(" %s", arg2->getName().c_str());
-        if(fun) printf(" %s",fun->getName().c_str());   
-    }
-    printf("\n");
-    //TODO: 打印指令
+    printf("\t");
+	if(!label.empty()){
+		printf("%s:\n",label.c_str());
+		return;
+	}
+
+	switch(op)
+	{
+		case OP_NOP:printf("nop");break;
+		case OP_DEC:printf("dec ");arg1->value();break;
+		case OP_ENTRY:printf("entry");break;
+		case OP_EXIT:printf("exit");break;
+		case OP_AS:result->value();printf(" = ");arg1->value();break;
+		case OP_ADD:result->value();printf(" = ");arg1->value();printf(" + ");arg2->value();break;
+		case OP_SUB:result->value();printf(" = ");arg1->value();printf(" - ");arg2->value();break;
+		case OP_MUL:result->value();printf(" = ");arg1->value();printf(" * ");arg2->value();break;
+		case OP_DIV:result->value();printf(" = ");arg1->value();printf(" / ");arg2->value();break;
+		case OP_MOD:result->value();printf(" = ");arg1->value();printf(" %% ");arg2->value();break;
+		case OP_NEG:result->value();printf(" = ");printf("-");arg1->value();break;
+		case OP_GT:result->value();printf(" = ");arg1->value();printf(" > ");arg2->value();break;
+		case OP_GE:result->value();printf(" = ");arg1->value();printf(" >= ");arg2->value();break;
+		case OP_LT:result->value();printf(" = ");arg1->value();printf(" < ");arg2->value();break;
+		case OP_LE:result->value();printf(" = ");arg1->value();printf(" <= ");arg2->value();break;
+		case OP_EQU:result->value();printf(" = ");arg1->value();printf(" == ");arg2->value();break;
+		case OP_NE:result->value();printf(" = ");arg1->value();printf(" != ");arg2->value();break;
+		case OP_NOT:result->value();printf(" = ");printf("!");arg1->value();break;
+		case OP_AND:result->value();printf(" = ");arg1->value();printf(" && ");arg2->value();break;
+		case OP_OR:result->value();printf(" = ");arg1->value();printf(" || ");arg2->value();break;
+		case OP_JMP:printf("goto %s",target->label.c_str());break;
+		case OP_JT:printf("if( ");arg1->value();printf(" )goto %s",target->label.c_str());break;
+		case OP_JF:printf("if( !");arg1->value();printf(" )goto %s",target->label.c_str());break;
+		case OP_JNE:printf("if( ");arg1->value();printf(" != ");arg2->value();printf(" )goto %s",
+			target->label.c_str());break;
+		case OP_ARG:printf("arg ");arg1->value();break;
+		case OP_PROC:printf("%s()",fun->getName().c_str());break;
+		case OP_CALL:result->value();printf(" = %s()",fun->getName().c_str());break;
+		case OP_RET:printf("return goto %s",target->label.c_str());break;
+		case OP_RETV:printf("return ");arg1->value();printf(" goto %s",target->label.c_str());break;
+		case OP_LEA:result->value();printf(" = ");printf("&");arg1->value();break;
+		case OP_SET:printf("*");arg1->value();printf(" = ");result->value();break;
+		case OP_GET:result->value();printf(" = ");printf("*");arg1->value();break;
+	}
+	printf("\n");
 }
 
 void InterCode::addInst(InterInst* inst)

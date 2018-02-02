@@ -18,6 +18,7 @@ class InterInst
 public:
     InterInst(Operator op, Var* result, Var* arg1, Var* arg2 = nullptr);    // 一般函数指令
     InterInst(Operator op, Fun* fun, Var* result = nullptr);                // 函数调用
+    InterInst(Operator op,Var* arg1 = nullptr);                             // 声明,返回
     InterInst();                                                            // 构造唯一标签
     InterInst(Operator op,InterInst* tar,Var* arg1 = nullptr,Var* arg2 = nullptr); // 跳转,return
     void printSelf();

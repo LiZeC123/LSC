@@ -58,6 +58,7 @@ public:
     void setPoint(Var* ptr);
     void setOffset(int offset);
 
+    void value();
     void printSelf();
                
 private:
