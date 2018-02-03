@@ -55,3 +55,23 @@ void testWhile()
         i++;
     }
 }
+
+void testBreak()
+{
+    int i = 0;
+    while(i < 5){
+        int j = 0;
+        while(j < 5){
+            if(j != 2){
+                int n = 0;
+                ++n;
+                continue;
+            }
+            else{
+                int m = 0;
+                ++m;
+                break;
+            }
+        }
+    }
+}

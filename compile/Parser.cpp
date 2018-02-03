@@ -354,10 +354,12 @@ void Parser::statement()
         break;
     case KW_BREAK:
         move();
+        ir.genBreak();
         statCheckSemicon();
         break;
     case KW_CONTINUE:
         move();
+        ir.genContinue();
         statCheckSemicon();
         break;
     case KW_RETURN:

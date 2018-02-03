@@ -500,6 +500,27 @@ void GenIR::genWhileTail(InterInst*& _while,InterInst*& _exit)
     pop();
 }
 
+void GenIR::genBreak()
+{
+    InterInst* tail = taillist.back();
+    if(tail){
+        symtab.addInst(new InterInst(OP_JMP,tail));
+    }
+    else{
+        Error::semError(BREAK_ERR,"");
+    }
+}
+
+void GenIR::genContinue()
+{
+    InterInst* head = headlist.back();
+    if(head){
+        symtab.addInst(new InterInst(OP_JMP,head));
+    }
+    else{
+        Error::semError(CONTINUE_ERR,"");
+    }
+}
 
 bool GenIR::typeCheck(Var* lval,Var* rval)
 {

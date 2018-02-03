@@ -32,6 +32,9 @@ public:
     void genWhileHead(InterInst*&_while,InterInst*& _exit);
     void genWhileCond(Var* cond,InterInst* _exit);
     void genWhileTail(InterInst*& _while,InterInst*& _exit);
+
+    void genBreak();
+    void genContinue();
     
     static std::string genLb();                         //生成唯一的字符串表示
     static bool checkTypeMatch(Var* lval,Var* rval);    // 检查两个变量类型是否匹配
