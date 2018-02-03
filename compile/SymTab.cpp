@@ -233,6 +233,11 @@ bool Var::isRef()
     return (ptr != nullptr);
 }
 
+bool Var::isChar()
+{
+    return (type == KW_CHAR) && isBase();
+}
+
 void Var::setExterned(bool isExtern)
 {
     if(isExtern){

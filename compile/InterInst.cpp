@@ -2,6 +2,7 @@
 #include "GenIR.h"
 #include "SymTab.h"
 
+#define emit(fmt,args...) fprintf(file,"\t"fmt"\n", ##args)
 using namespace std;
 
 const char* OPNameTable[] = 
@@ -81,6 +82,18 @@ InterInst::InterInst(Operator op,InterInst* tar,Var* arg1,Var* arg2)
     this->target = tar;
     this->arg1 = arg1;
     this->arg2 = arg2;
+}
+
+void InterInst::loadVar(string reg32,string reg8,Var* var)
+{
+	if(!var){
+		return;
+	}
+	const char* reg = var->isChar()?reg8.c_str():reg32.c_str();
+
+	if(var->isChar()){
+		//emit("mov %s 0",reg32.c_str());
+	}
 }
 
 void InterInst::printSelf()

@@ -43,6 +43,7 @@ public:
     bool isBase();          // 是否是基本类型
     bool isVoid();          // 是否是Void,特殊类型,表示空
     bool isRef();           // 是否是引用
+    bool isChar();          // 是否是字符类型
  
 
     bool setInit();         // 生成器调用的初始化方法

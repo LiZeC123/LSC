@@ -21,6 +21,9 @@ public:
     InterInst(Operator op,Var* arg1 = nullptr);                             // 声明,返回
     InterInst();                                                            // 构造唯一标签
     InterInst(Operator op,InterInst* tar,Var* arg1 = nullptr,Var* arg2 = nullptr); // 跳转,return
+
+    void loadVar(string reg32,string reg8,Var* var);
+
     void printSelf();
 private:
     std::string label;      // 用于表示是指令还是标签
