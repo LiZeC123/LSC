@@ -312,7 +312,7 @@ void Var::value()
         if(type == KW_INT){
             printf("%d",intVal);
         }
-        else if(type == KW_CASE){
+        else if(type == KW_CHAR){
             if(isArray){
                 printf("%s",name.c_str());
             }

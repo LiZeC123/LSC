@@ -375,15 +375,19 @@ void Parser::statement()
 void Parser::whilestat()
 {
     symtab.enter();
+    InterInst* _while,*_exit;
+    ir.genWhileHead(_while,_exit);
     match(KW_WHILE);
     if(!match(LPAREN)){
         recovery(FIRST_EXPR||firstIs(RPAREN),LPAREN_LOST,LPAREN_WRONG);
     }
-    altexpr();
+    Var* cond = altexpr();
+    ir.genWhileCond(cond,_exit);
     if(!match(RPAREN)){
         recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
     }
     block();
+    ir.genWhileTail(_while,_exit);
     symtab.leave();
 }
 
@@ -450,17 +454,29 @@ void Parser::dowhilestat()
 void Parser::ifstat()
 {
     symtab.enter();
+    
     match(KW_IF);
     if(!match(LPAREN)){
         recovery(FIRST_EXPR,LPAREN_LOST,LPAREN_WRONG);
     } 
-    expr();
+
+    Var* cond = expr();
+    InterInst* _else;
+    ir.genIfHead(cond,_else);
+
     if(!match(RPAREN)){
         recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
     }
     block();
     symtab.leave();
-    elsestat();
+
+    InterInst* _exit;
+    ir.genElseHead(_else,_exit);
+    if(firstIs(KW_ELSE)){
+        elsestat();
+    }
+    ir.genElseTail(_exit);
+    
 }
 
 // <elsestat>   -> else <block> | e
@@ -793,6 +809,11 @@ Var* Parser::idexpr(string name)
 
 void Parser::realarg(vector<Var*>& vec)
 {
+    // 如果读取到右括号,说明没有参数,直接返回即可
+    if(firstIs(RPAREN)){
+        return;
+    }
+
     Var* a = arg();
     vec.push_back(a);
     arglist(vec);

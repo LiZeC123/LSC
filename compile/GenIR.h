@@ -6,7 +6,7 @@
 class SymTab;
 class Var;
 class Fun;
-
+class InterInst;
 class GenIR
 {
 public:
@@ -25,6 +25,13 @@ public:
     Var* genArray(Var* array,Var* index);
     Var* genCall(Fun* fun, std::vector<Var*>& args);
 
+    void genIfHead(Var* cond,InterInst*& _else);
+    void genIfTail(InterInst*& _else);
+    void genElseHead(InterInst* _else,InterInst*& _exit);
+    void genElseTail(InterInst*& _exit);
+    void genWhileHead(InterInst*&_while,InterInst*& _exit);
+    void genWhileCond(Var* cond,InterInst* _exit);
+    void genWhileTail(InterInst*& _while,InterInst*& _exit);
     
     static std::string genLb();                         //生成唯一的字符串表示
     static bool checkTypeMatch(Var* lval,Var* rval);    // 检查两个变量类型是否匹配
@@ -60,9 +67,10 @@ private:
     Var* genDiv(Var* lval,Var* rval);
     Var* genMod(Var* lval,Var* rval);
 
-
-
     void genPara(Var* arg);         // 生成函数参数入栈代码
+
+    void push(InterInst* head,InterInst* tail);
+    void pop();
 
 
 
@@ -70,5 +78,7 @@ private:
     static int lbNum;
     SymTab& symtab;
 
+    std::vector<InterInst*> headlist;
+    std::vector<InterInst*> taillist;
 
 };

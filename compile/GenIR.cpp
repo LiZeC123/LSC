@@ -2,7 +2,7 @@
 #include "SymTab.h"
 #include <sstream>
 #include "Error.h"
-
+#include "InterInst.h"
 using namespace std;
 
 int GenIR::lbNum = 0;
@@ -438,9 +438,66 @@ Var* GenIR::genCall(Fun* fun, std::vector<Var*>& args)
     else{
         Var* ret = new Var(symtab.getScopePath(),fun->getType(),false);
         symtab.addInst(new InterInst(OP_CALL,fun,ret));
-        symtab.addVar(ret);
+        symtab.addVar(ret); // 将返回值的声明延迟到函数调用以后 TODO: why?
         return ret;
     }
+}
+
+void GenIR::genIfHead(Var* cond,InterInst*& _else)
+{
+    _else = new InterInst();
+    if(cond){
+        if(cond->isRef()){
+            cond = genAssign(cond);
+        }
+        symtab.addInst(new InterInst(OP_JF,_else,cond));
+    }
+}
+
+void GenIR::genIfTail(InterInst*& _else)
+{
+    symtab.addInst(_else);
+}
+
+void GenIR::genElseHead(InterInst* _else,InterInst*& _exit)
+{
+    _exit = new InterInst();
+    symtab.addInst(new InterInst(OP_JMP,_exit));
+    symtab.addInst(_else);
+}
+
+void GenIR::genElseTail(InterInst*& _exit)
+{
+    symtab.addInst(_exit);
+}
+
+void GenIR::genWhileHead(InterInst*&_while,InterInst*& _exit)
+{
+    _while = new InterInst();
+    symtab.addInst(_while);
+    _exit = new InterInst();
+    push(_while,_exit);
+}
+
+void GenIR::genWhileCond(Var* cond,InterInst* _exit)
+{
+    if(cond){
+        if(cond->isVoid()){
+            // TODO: getTrue();
+        }
+        else if(cond->isRef()){
+            cond = genAssign(cond);
+        }
+
+        symtab.addInst(new InterInst(OP_JF,_exit,cond));
+    }
+}
+
+void GenIR::genWhileTail(InterInst*& _while,InterInst*& _exit)
+{
+    symtab.addInst(new InterInst(OP_JMP,_while));
+    symtab.addInst(_exit);
+    pop();
 }
 
 
@@ -598,6 +655,18 @@ void GenIR::genPara(Var* arg)
     }
 
     symtab.addInst(new InterInst(OP_ARG,arg));
+}
+
+void GenIR::push(InterInst* head,InterInst* tail)
+{
+    headlist.push_back(head);
+    taillist.push_back(tail);
+}
+
+void GenIR::pop()
+{
+    headlist.pop_back();
+    taillist.pop_back();
 }
 
 
