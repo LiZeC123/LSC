@@ -286,7 +286,7 @@ Var* GenIR::genTwoOp(Var* lval,Symbol op,Var* rval)
 
     // 如果是引用类型,取出相应的值
     if(lval->isRef()) lval = genAssign(lval);
-    if(rval->isRef()) rval = genAssign(lval);
+    if(rval->isRef()) rval = genAssign(rval);
 
     switch (op)
     {
