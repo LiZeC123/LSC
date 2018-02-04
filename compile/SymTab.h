@@ -40,10 +40,17 @@ public:
     int getOffset();
     Var* getStep();         // 获得相应的变量长度,并返回一个表示该长度的特殊整数变量
     Var* getPointer();      // 获得当前变量对应的指针
+    string getPtrVal();       // 获得初始值变量
+    int getVal();
+    string getRawStr();
     bool isBase();          // 是否是基本类型
     bool isVoid();          // 是否是Void,特殊类型,表示空
     bool isRef();           // 是否是引用
     bool isChar();          // 是否是字符类型
+    //bool isConst();         // 是否是常量
+    bool notConst();        // 是否不是常量
+    bool getArray();        // 是否是数组
+    bool isInit();
  
 
     bool setInit();         // 生成器调用的初始化方法
@@ -116,6 +123,10 @@ public:
     void setExtern(bool isExtern);
     Symbol getType();
     std::string getName();
+    int getMaxDep();
+    int getParaValSize();           // 获得函数参数占用的空间大小
+
+    void toX86(FILE* file);
 
     void printSelf();
 
@@ -168,6 +179,8 @@ public:
     // 外部接口
     Fun* getCurrFun();
 
+    void toX86(FILE* file);
+
 public:
     static Var* varVoid;
     static Var* one;
@@ -175,6 +188,10 @@ public:
     
     // 获得一个共用的表示Void的符号
     static Var* getVoid();
+
+    std::vector<Var*> getGlobalVars();
+    void genData(FILE* file);
+
 private:
     std::map<std::string,std::vector<Var*>*> varTab;    // 变量表
     std::map<std::string,Var*> strTab;                  // 字符串表

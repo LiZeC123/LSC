@@ -212,9 +212,19 @@ Var* Var::getPointer()
     return ptr;
 }
 
+string Var::getPtrVal()
+{
+    return ptrVal;
+}
+
 bool Var::getLeft()
 {
     return isLeft;
+}
+
+int Var::getVal()
+{
+    return intVal;
 }
 
 bool Var::isBase()
@@ -236,6 +246,26 @@ bool Var::isRef()
 bool Var::isChar()
 {
     return (type == KW_CHAR) && isBase();
+}
+
+// bool Var::isConst()
+// {
+//     return literal && isBase();
+// }
+
+bool Var::notConst()
+{
+    return !literal;
+}
+
+bool Var::getArray()
+{
+    return isArray;
+}
+
+bool Var::isInit()
+{
+    return inited;
 }
 
 void Var::setExterned(bool isExtern)
@@ -331,6 +361,24 @@ void Var::value()
     }
 }
 
+string Var::getRawStr()
+{
+	string raw;
+	for(unsigned int i=0;i<strVal.size();i++){
+		switch(strVal[i])
+		{
+			case '\n':raw.append("\\n");break;
+			case '\t':raw.append("\\t");break;
+			case '\0':raw.append("\\000");break;
+			case '\\':raw.append("\\\\");break;
+			case '\"':raw.append("\\\"");break;
+			default:raw.push_back(strVal[i]);
+		}
+	}
+	raw.append("\\000");//结束标记
+	return raw;
+}
+
 void Var::printSelf()
 {
 	if(externed)printf("externed ");
@@ -372,7 +420,8 @@ void Var::printSelf()
     printf("\n");
 }
 
-Fun::Fun(bool isExtern,Symbol type,std::string name,std::vector<Var*> para)
+Fun::Fun(bool isExtern,Symbol type,std::string name,std::vector<Var*> para) :
+    intercode(this)
 {
     externed = isExtern;
     this->type = type;
@@ -412,6 +461,16 @@ void Fun::leaveScope()
 string Fun::getName()
 {
     return name;
+}
+
+int Fun::getMaxDep()
+{
+    return maxDepth;
+}
+
+int Fun::getParaValSize()
+{
+    return paraVar.size() * 4;
 }
 
 bool Fun::match(Fun* f)
@@ -479,6 +538,14 @@ void Fun::setReturnPoint(InterInst* inst)
 InterInst* Fun::getReturnPoint()
 {
     return returnPoint;
+}
+
+void Fun::toX86(FILE* file)
+{
+    auto v = intercode.getCode();
+    for(auto& i:v){
+        i->toX86(&intercode,file);
+    }
 }
 
 void Fun::printSelf()
@@ -741,4 +808,70 @@ void SymTab::addInst(InterInst* interInst)
 Fun* SymTab::getCurrFun()
 {
     return currFun;
+}
+
+void SymTab::toX86(FILE* file)
+{
+    fprintf(file,"section .data\n");
+    genData(file);
+    fprintf(file,"section .text\n");
+    for(auto it = funTab.begin();it!=funTab.end();it++){
+        Fun* fun = it->second;
+        fprintf(file,"global %s\n",fun->getName().c_str());
+        fprintf(file,"%s:\n",fun->getName().c_str());
+        it->second->toX86(file);
+    }
+}
+
+std::vector<Var*> SymTab::getGlobalVars()
+{
+    vector<Var*> glbVars;;
+    for(auto it = varTab.begin();it!=varTab.end();it++){
+        string varName = it->first;
+        if(varName[0]=='<'){
+            continue;
+        }
+
+        for(const auto&i:*(it->second)){
+            if(i->getPath().size() == 1){
+                glbVars.push_back(i);
+                break;
+            }
+        }
+    }
+
+    return glbVars;
+}
+
+
+void SymTab::genData(FILE* file)
+{
+    vector<Var*> glbVars = getGlobalVars();
+    for(Var* var:glbVars){
+        fprintf(file,"global %s\n",var->getName().c_str());
+        fprintf(file,"\t%s " ,var->getName().c_str());
+        int typeSize = var->getType() == KW_CHAR ? 1 : 4;
+        if(var->getArray()){
+            fprintf(file,"times %d",var->getSize()/typeSize);
+        }
+        const char* type = var->getType() == KW_CHAR ? "db" : "dd";
+        fprintf(file,"%s " ,type);
+
+        if(var->isInit()){
+            if(var->isBase()){
+                fprintf(file,"%d\n",var->getVal());
+            }
+            else{
+                fprintf(file,"%s\n",var->getPtrVal().c_str());
+            }
+        }
+        else{
+            fprintf(file,"0\n");
+        }
+    }
+
+    for(auto it = strTab.begin();it!=strTab.end();it++){
+        Var* str = it->second;
+        fprintf(file,"\t%s db %s\n",str->getName().c_str(),str->getRawStr().c_str());
+    }
 }

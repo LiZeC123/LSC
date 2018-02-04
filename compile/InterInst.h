@@ -6,7 +6,8 @@
 // 直接声明,避免两个头文件相互引用导致编译错误
 class Var;
 class Fun;
-
+class InterCode;
+using std::string;
 
 /**
  * 表示一条中间指令的类
@@ -22,7 +23,11 @@ public:
     InterInst();                                                            // 构造唯一标签
     InterInst(Operator op,InterInst* tar,Var* arg1 = nullptr,Var* arg2 = nullptr); // 跳转,return
 
-    void loadVar(string reg32,string reg8,Var* var);
+    void loadVar(string reg32,string reg8,Var* var,FILE* file);
+    void leaVar(string reg32,Var* var,FILE* file);
+    void storeVar(string reg32,string reg8,Var* var,FILE* file);
+    void initVar(Var* var,FILE* file);
+    void toX86(InterCode* inst,FILE* file);
 
     void printSelf();
 private:
@@ -41,9 +46,11 @@ private:
 
 class InterCode
 {
-
 public:
+    InterCode(Fun* currFun);
+
     void addInst(InterInst* inst);
+    Fun* getFun();
 
     void printSelf();
 
@@ -54,4 +61,5 @@ public:
 
 private:
 	std::vector<InterInst*>code;
+    Fun* fun;
 };
