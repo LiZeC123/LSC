@@ -40,7 +40,8 @@ public:
     int getOffset();
     Var* getStep();         // 获得相应的变量长度,并返回一个表示该长度的特殊整数变量
     Var* getPointer();      // 获得当前变量对应的指针
-    string getPtrVal();       // 获得初始值变量
+    string getPtrVal();     // 获得初始值变量
+    string getStrVal();     // 获得初始字符串的值
     int getVal();
     string getRawStr();
     bool isBase();          // 是否是基本类型
@@ -156,7 +157,7 @@ public:
 
     // 变量管理
     void addVar(Var* var);
-    void addStr(Var* var);
+    void addStr(Var*& var);
     Var* getVal(std::string name);
 
     // 函数管理

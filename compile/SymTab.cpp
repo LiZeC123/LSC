@@ -217,6 +217,11 @@ string Var::getPtrVal()
     return ptrVal;
 }
 
+string Var::getStrVal()
+{
+    return strVal;
+}
+
 bool Var::getLeft()
 {
     return isLeft;
@@ -654,9 +659,16 @@ void SymTab::addVar(Var* var)
     }
 }
 
-void SymTab::addStr(Var* var)
+void SymTab::addStr(Var*& var)
 {
-    strTab[var->getName()] = var;
+    if(strTab.find(var->getStrVal()) != strTab.end()){
+        Var* str = strTab[var->getStrVal()];
+        delete var;
+        var = str;  //由于var是引用,从而可以直接修改
+    }
+    else{
+        strTab[var->getName()] = var;
+    }
 }
 
 
