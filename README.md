@@ -1,6 +1,6 @@
 Lsc(Lsc iS Compile)
 ==========================
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/LiZeC123/LSC/blob/master/LICENSE)
+[![AUR](https://img.shields.io/aur/license/yaourt.svg)](https://github.com/LiZeC123/LSC/blob/master/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com) 
 [![Build Status](https://api.travis-ci.org/LiZeC123/LSC.svg?branch=master)](https://travis-ci.org/LiZeC123/LSC)
 
