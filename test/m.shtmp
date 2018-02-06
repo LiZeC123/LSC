@@ -1,0 +1,5 @@
+#! /bin/bash
+nasm baseTest.s -f elf32
+gcc baseTest.o -m32
+./a.out
+
