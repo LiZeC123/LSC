@@ -5,10 +5,11 @@ int printf(char* s);
 int main()
 {
     char* str = "Hello World!\n";
-    int n = printf(str);
     int fi = 5,fj = 4,fk = 3;
     int fsum;
     fsum = fi+fj*fk;
+    int2str(str,fsum);
+    printf(str);
     return fsum;
 }
 
@@ -73,5 +74,16 @@ void testBreak()
                 break;
             }
         }
+    }
+}
+
+void int2str(char* buf,int i)
+{
+    int count = 0;
+    while(i != 0){
+        int d = i % 10;
+        *(buf+count) = d + 48;
+        count++;
+        i = i / 10;
     }
 }
