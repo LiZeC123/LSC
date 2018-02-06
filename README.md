@@ -1,6 +1,6 @@
 Lsc(Lsc iS Compile)
 ==========================
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/LiZeC123/LSC/blob/master/LICENSE)
+[![AUR](https://img.shields.io/aur/license/yaourt.svg)](https://github.com/LiZeC123/LSC/blob/master/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com) 
 [![Build Status](https://api.travis-ci.org/LiZeC123/LSC.svg?branch=master)](https://travis-ci.org/LiZeC123/LSC)
 
@@ -13,7 +13,6 @@ Lsc语言目前定义为一个在C语言的子集上扩展的语言.希望通过
 ------------
 - [中文文档](./docs/index.md)
 
-------------------------------------------------------------------------------------------------
 
 开发阶段
 -------------------
@@ -29,7 +28,11 @@ Lsc语言目前定义为一个在C语言的子集上扩展的语言.希望通过
 3. 链接器阶段
 
 
----------------------------------------------------------------------------------------------
-
-#### 编译方法
+编译方法
+------------
 - 在根目录下执行`./makeProject`
+
+
+参考文献
+-------------
+[1] 范志东, 张琼声. 自己动手构造编译系统:编译、汇编与链接[M]. 机械工业出版社, 2016.
