@@ -368,20 +368,41 @@ void Var::value()
 
 string Var::getRawStr()
 {
-	string raw;
-	for(unsigned int i=0;i<strVal.size();i++){
-		switch(strVal[i])
-		{
-			case '\n':raw.append("\\n");break;
-			case '\t':raw.append("\\t");break;
-			case '\0':raw.append("\\000");break;
-			case '\\':raw.append("\\\\");break;
-			case '\"':raw.append("\\\"");break;
-			default:raw.push_back(strVal[i]);
-		}
-	}
-	raw.append("\\000");//结束标记
-	return raw;
+    stringstream ss;
+    int len = strVal.size();
+    for(int i=0,chpass=0;i<len;i++){
+        if(strVal[i] == 10 || strVal[i] == 9 || strVal[i] == '\t' || strVal[i] == '\n'){
+            if(chpass == 0){
+                if(i != 0){
+                    ss << ",";
+                }
+                ss << (int)strVal[i];
+            }
+            else{
+                ss << "\"," << (int)strVal[i];
+            }
+            chpass = 0;
+        }
+        else{
+            if(chpass == 0){
+                if(i != 0){
+                    ss << ",";
+                }
+                ss << "\"" << strVal[i];
+            }
+            else{
+                ss << strVal[i];
+            }
+
+            if(i == len - 1){
+                ss << "\"";
+            }
+            chpass = 1;
+        }
+    }
+    ss << ",0";
+
+    return ss.str();
 }
 
 void Var::printSelf()

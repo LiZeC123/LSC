@@ -92,7 +92,7 @@ void InterInst::loadVar(string reg32,string reg8,Var* var,FILE* file)
 	const char* reg = var->isChar()?reg8.c_str():reg32.c_str();
 
 	if(var->isChar()){
-		emit("mov %s 0",reg32.c_str());			// 寄存器清零
+		emit("mov %s,0",reg32.c_str());			// 寄存器清零
 	}
 	const char* name = var->getName().c_str();
 
@@ -120,7 +120,7 @@ void InterInst::loadVar(string reg32,string reg8,Var* var,FILE* file)
 			emit("mov %s,%d",reg,var->getVal());	// 基本类型,例如 mov eax,10
 		}
 		else{
-			emit("mov %s,%s",reg,name);				//字符串,直接使用名称,例如 mov eax,str
+			emit("mov %s,[%s]",reg,name);				//字符串,直接使用名称,例如 mov eax,str
 		}
 	}
 }
@@ -139,7 +139,7 @@ void InterInst::leaVar(string reg32,Var* var,FILE* file)
 		emit("mov %s,%s",reg,name);	
 	}
 	else{
-		emit("lea %s [ebp%+d]",reg,offset);
+		emit("lea %s,[ebp%+d]",reg,offset);
 	}
 }
 
@@ -157,7 +157,7 @@ void InterInst::storeVar(string reg32,string reg8,Var* var,FILE* file)
 		emit("mov [%s],%s",name,reg);	
 	}
 	else{
-		emit("mov [ebp%+d] %s",offset,reg);
+		emit("mov [ebp%+d],%s",offset,reg);
 	}
 }
 
@@ -372,7 +372,6 @@ void InterInst::toX86(InterCode* inst,FILE* file)
 		storeVar("eax","al",result,file);
 		break;
 	}
-	// 先不加default,使编译器检查是否有遗漏
 }
 
 void InterInst::printSelf()
