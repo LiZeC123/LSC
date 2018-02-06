@@ -75,3 +75,4 @@ Thumbs.db
 # Others
 *.out
 lscc
+*.shtmp     # temp shell
