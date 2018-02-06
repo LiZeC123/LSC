@@ -14,18 +14,11 @@ GenIR::GenIR(SymTab& tab): symtab(tab)
 
 string GenIR::genLb(bool isStr)
 {
-     lbNum++;
-     string lb = isStr?"@L":".L";
-    if(isStr){
-        string lb = "@L";
-    }
-    else{
-        string lb=".L"; // .开始的标号是局部变量
-    }
-   
-	stringstream ss;
-	ss<<lbNum;
-	return lb+ss.str();
+    lbNum++;
+    string lb = isStr ? "@L" : ".L";
+    stringstream ss;
+    ss << lbNum;
+    return lb + ss.str();
 }
 
 bool GenIR::checkTypeMatch(Var* lval,Var* rval)
