@@ -7,5 +7,9 @@ Lsc项目文档
     - [词法分析](./compile/LexicalAnalysis.md)
     - [语法分析](./compile/GrammaticalAnalysis.md)
     - [语义分析](./compile/SemanticAnalysis.md)
-- 汇编阶段(待补充)
+    - [中间代码生成](./compile/InterCodeGenerate.md)
+    - 代码优化
+    - 中间代码转X86汇编
+- 汇编阶段
+    - [工具准备](./ass/tools.md)
 - 链接阶段(待补充)
