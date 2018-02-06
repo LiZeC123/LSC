@@ -120,7 +120,7 @@ void InterInst::loadVar(string reg32,string reg8,Var* var,FILE* file)
 			emit("mov %s,%d",reg,var->getVal());	// 基本类型,例如 mov eax,10
 		}
 		else{
-			emit("mov %s,[%s]",reg,name);				//字符串,直接使用名称,例如 mov eax,str
+			emit("mov %s,%s",reg,name);				//字符串,直接使用名称,例如 mov eax,str
 		}
 	}
 }

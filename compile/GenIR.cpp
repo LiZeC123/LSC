@@ -12,10 +12,17 @@ GenIR::GenIR(SymTab& tab): symtab(tab)
     symtab.setGenIR(this);
 }
 
-string GenIR::genLb()
+string GenIR::genLb(bool isStr)
 {
-    lbNum++;
-	string lb=".L";//为了和汇编保持一致！
+     lbNum++;
+     string lb = isStr?"@L":".L";
+    if(isStr){
+        string lb = "@L";
+    }
+    else{
+        string lb=".L"; // .开始的标号是局部变量
+    }
+   
 	stringstream ss;
 	ss<<lbNum;
 	return lb+ss.str();

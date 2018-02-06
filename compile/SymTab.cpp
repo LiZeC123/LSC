@@ -44,7 +44,7 @@ Var::Var(Token *literal)
         break;
     case STR:
         setType(KW_CHAR);
-        name = GenIR::genLb();
+        name = GenIR::genLb(true);
         strVal = ((Str*)literal)->str;
         setArray(strVal.size()+1);
         break;

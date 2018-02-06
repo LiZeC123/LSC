@@ -1,16 +1,16 @@
 section .data
 global globalChar
 	globalChar db 0
-	.L2: db "Hello World!",10,0
-	.L31: db "true",0
-	.L34: db "false",0
+	@L2 db "Hello World!",10,0
+	@L31 db "true",0
+	@L34 db "false",0
 section .text
 global main
 main:
 	push ebp
 	mov ebp,esp
 	sub esp,36
-	mov eax,.L2
+	mov eax,@L2
 	mov [ebp-4],eax
 	mov eax,[ebp-4]
 	push eax
@@ -208,14 +208,14 @@ testIf:
 	mov eax,[ebp-8]
 	cmp eax,0
 	je .L30
-	mov eax,.L31
+	mov eax,@L31
 	push eax
 	call printf
 	add esp,4
 	mov [ebp-12],eax
 	jmp .L33
 .L30:
-	mov eax,.L34
+	mov eax,@L34
 	push eax
 	call printf
 	add esp,4
