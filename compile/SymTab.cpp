@@ -455,6 +455,9 @@ Fun::Fun(bool isExtern,Symbol type,std::string name,std::vector<Var*> para) :
     this->paraVar = para;
     curEsp = 0;
     maxDepth = 0;
+    for(unsigned int i=0,argOff=8;i<para.size();i++,argOff+=4){
+        paraVar[i]->setOffset(argOff);
+    }
 }
 
 bool Fun::getExtern()

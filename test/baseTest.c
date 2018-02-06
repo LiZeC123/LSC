@@ -1,10 +1,11 @@
 char* globalChar;
 
 int printf(char* s);
+void int2str(char* buf,int i);
 
 int main()
 {
-    char* str = "Hello World!\n";
+    char str[20];
     int fi = 5,fj = 4,fk = 3;
     int fsum;
     fsum = fi+fj*fk;
