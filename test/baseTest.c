@@ -1,6 +1,7 @@
 char* globalChar;
 
-int printf(char* s);
+void printf(char* str);
+int lscPrints(char* str,int n);
 void int2str(char* buf,int i);
 
 int main()
@@ -10,7 +11,7 @@ int main()
     int fsum;
     fsum = fi+fj*fk;
     int2str(str,fsum);
-    printf(str);
+    lscPrints(str,2);
     return fsum;
 }
 

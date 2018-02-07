@@ -2,7 +2,7 @@ section .data
 global globalChar
 	globalChar db 0
 	@L30 db "true",0
-	@L33 db "false",0
+	@L32 db "false",0
 section .text
 global int2str
 int2str:
@@ -11,7 +11,7 @@ int2str:
 	sub esp,40
 	mov eax,0
 	mov [ebp-4],eax
-.L51:
+.L49:
 	mov eax,[ebp+12]
 	mov ebx,0
 	mov ecx,0
@@ -20,7 +20,7 @@ int2str:
 	mov [ebp-8],ecx
 	mov eax,[ebp-8]
 	cmp eax,0
-	je .L52
+	je .L50
 	mov eax,[ebp+12]
 	mov ebx,10
 	mov edx,0
@@ -56,12 +56,14 @@ int2str:
 	mov [ebp-40],eax
 	mov eax,[ebp-40]
 	mov [ebp+12],eax
-	jmp .L51
-.L52:
+	jmp .L49
 .L50:
+.L48:
 	mov esp,ebp
 	pop ebp
 	ret
+global lscPrints
+lscPrints:
 global main
 main:
 	push ebp
@@ -89,10 +91,12 @@ main:
 	push eax
 	call int2str
 	add esp,8
+	mov eax,2
+	push eax
 	lea eax,[ebp-20]
 	push eax
-	call printf
-	add esp,4
+	call lscPrints
+	add esp,8
 	mov [ebp-48],eax
 	mov eax,[ebp-36]
 	jmp .L1
@@ -102,16 +106,6 @@ main:
 	ret
 global printf
 printf:
-	push ebp
-	mov ebp,esp
-	mov eax,4
-	mov ebx,1
-	mov ecx,[ebp+8]
-	mov edx,2
-	int 128
-	mov esp,ebp
-	pop ebp
-	ret
 global testArray
 testArray:
 	push ebp
@@ -205,7 +199,7 @@ testBreak:
 	sub esp,24
 	mov eax,0
 	mov [ebp-4],eax
-.L41:
+.L39:
 	mov eax,[ebp-4]
 	mov ebx,5
 	mov ecx,0
@@ -214,10 +208,10 @@ testBreak:
 	mov [ebp-8],ecx
 	mov eax,[ebp-8]
 	cmp eax,0
-	je .L42
+	je .L40
 	mov eax,0
 	mov [ebp-12],eax
-.L44:
+.L42:
 	mov eax,[ebp-12]
 	mov ebx,5
 	mov ecx,0
@@ -226,7 +220,7 @@ testBreak:
 	mov [ebp-16],ecx
 	mov eax,[ebp-16]
 	cmp eax,0
-	je .L45
+	je .L43
 	mov eax,[ebp-12]
 	mov ebx,2
 	mov ecx,0
@@ -235,29 +229,29 @@ testBreak:
 	mov [ebp-20],ecx
 	mov eax,[ebp-20]
 	cmp eax,0
-	je .L48
+	je .L46
 	mov eax,0
 	mov [ebp-24],eax
 	mov eax,[ebp-24]
 	mov ebx,1
 	add eax,ebx
 	mov [ebp-24],eax
-	jmp .L44
-	jmp .L49
-.L48:
+	jmp .L42
+	jmp .L47
+.L46:
 	mov eax,0
 	mov [ebp-20],eax
 	mov eax,[ebp-20]
 	mov ebx,1
 	add eax,ebx
 	mov [ebp-20],eax
-	jmp .L45
-.L49:
-	jmp .L44
-.L45:
-	jmp .L41
-.L42:
+	jmp .L43
+.L47:
+	jmp .L42
+.L43:
+	jmp .L39
 .L40:
+.L38:
 	mov esp,ebp
 	pop ebp
 	ret
@@ -265,7 +259,7 @@ global testIf
 testIf:
 	push ebp
 	mov ebp,esp
-	sub esp,12
+	sub esp,8
 	mov eax,5
 	mov [ebp-4],eax
 	mov eax,[ebp-4]
@@ -281,15 +275,13 @@ testIf:
 	push eax
 	call printf
 	add esp,4
-	mov [ebp-12],eax
-	jmp .L32
+	jmp .L31
 .L29:
-	mov eax,@L33
+	mov eax,@L32
 	push eax
 	call printf
 	add esp,4
-	mov [ebp-8],eax
-.L32:
+.L31:
 .L27:
 	mov esp,ebp
 	pop ebp
@@ -301,7 +293,7 @@ testWhile:
 	sub esp,12
 	mov eax,0
 	mov [ebp-4],eax
-.L36:
+.L34:
 	mov eax,[ebp-4]
 	mov ebx,5
 	mov ecx,0
@@ -310,7 +302,7 @@ testWhile:
 	mov [ebp-8],ecx
 	mov eax,[ebp-8]
 	cmp eax,0
-	je .L37
+	je .L35
 	call testIf
 	add esp,0
 	mov eax,[ebp-4]
@@ -319,9 +311,9 @@ testWhile:
 	mov ebx,1
 	add eax,ebx
 	mov [ebp-4],eax
-	jmp .L36
-.L37:
+	jmp .L34
 .L35:
+.L33:
 	mov esp,ebp
 	pop ebp
 	ret
