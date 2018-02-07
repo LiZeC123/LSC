@@ -4,12 +4,29 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "make",
+            "label": "makeCompile",
             "type": "shell",
-            "command": "./makeProject",
+            "command": "./makeProject compile",
             "problemMatcher": {
                 "owner": "cpp",
                 "fileLocation": ["relative", "${workspaceRoot}/compile"],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "makeAss",
+            "type": "shell",
+            "command": "./makeProject ass",
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceRoot}/ass"],
                 "pattern": {
                     "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
                     "file": 1,

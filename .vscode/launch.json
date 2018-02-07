@@ -2,10 +2,30 @@
         "version": "0.2.0",
         "configurations": [
             {
-                "name": "(gdb) Launch",
+                "name": "Ass Launch",
                 "type": "cppdbg",
                 "request": "launch",
-                "preLaunchTask": "make",
+                "preLaunchTask": "makeAss",
+                "program": "${workspaceRoot}/ass/lsca",
+                "args": ["${workspaceRoot}/test/baseTest.s"],
+                "stopAtEntry": false,
+                "cwd": "${workspaceFolder}",
+                "environment": [],
+                "externalConsole": true,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Compile Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "preLaunchTask": "makeCompile",
                 "program": "${workspaceRoot}/compile/lscc",
                 "args": ["${workspaceRoot}/test/baseTest.c"],
                 "stopAtEntry": false,

@@ -1,5 +1,13 @@
 #! /bin/bash
 
-cd ./compile
-make
-
+if [ $1 == "ass" ]
+then
+	cd ./ass
+    make
+elif [ $1 == "compile" ]
+then
+	cd ./compile
+    make
+else
+	echo "unexcepted command"
+fi
