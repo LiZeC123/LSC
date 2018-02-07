@@ -9,5 +9,8 @@ then
 	cd ./compile
     make
 else
-	echo "unexcepted command"
+	cd ./compile
+	make
+	cd ../ass
+	make
 fi
