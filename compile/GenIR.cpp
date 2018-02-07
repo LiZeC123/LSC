@@ -427,8 +427,8 @@ Var* GenIR::genCall(Fun* fun, std::vector<Var*>& args)
         return nullptr;
     }
 
-    for(auto& arg:args){
-        genPara(arg);
+    for(int i=args.size()-1;i>=0;i--){
+        genPara(args[i]); //反向压入函数参数
     }
 
     if(fun->getType() == KW_VOID){

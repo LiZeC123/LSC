@@ -228,12 +228,14 @@ void InterInst::toX86(InterCode* inst,FILE* file)
 	case OP_DIV:
 		loadVar("eax","al",arg1,file);
 		loadVar("ebx","bl",arg2,file);
+		emit("mov edx,0");	// 除法使用edx与eax,因此需要将edx清空
 		emit("idiv ebx");
 		storeVar("eax","al",result,file);
 		break;
 	case OP_MOD:
 		loadVar("eax","al",arg1,file);
 		loadVar("ebx","bl",arg2,file);
+		emit("mov edx,0");
 		emit("idiv ebx");
 		storeVar("edx","dl",result,file);
 		break;
