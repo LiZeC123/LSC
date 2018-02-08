@@ -7,6 +7,7 @@ KeyWords::KeyWords()
     keywords["section"] = KW_SEC;
     keywords["global"]  = KW_GLB;
     keywords["times"]   = KW_TIMES;
+    keywords["equ"]= KW_EQU;
     keywords["db"] = KW_DB;
     keywords["dw"] = KW_DW;
     keywords["dd"] = KW_DD;
