@@ -52,7 +52,7 @@
 <basetail> -> <len> <value>
 <len> -> db | dw | dd
 <value> -> <type> <valtail>
-<valtail> -> , <type><caltail> | e
+<valtail> -> , <type><valtail> | e
 ```
 
 对于其中的常量,可以是数字,字符串和标号,且数字前可以由一个符号引导,例如`+5`或`-2`,即
