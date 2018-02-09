@@ -39,21 +39,21 @@ int Scanner::scan()
     if (ch == -1)
     {
         if(ScanLoop == 1){
-            // 重置所有变量状态
             ++ScanLoop;
+
+            // 重置所有变量状态
             rewind(fin);
             lineNum = 1; // 行号
             colNum = 0;  // 列号
             lineLen = 0;  // 当前行长度
-            readPos = -1; // 但前字符的位置
-            return scan();
+            readPos = -1; // 当前字符的位置
 
+            return scan();
         }
         else{
             fclose(fin);
             fin = NULL;
         }
-
     }
     else if (ch != '\n')
     {

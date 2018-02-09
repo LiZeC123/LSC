@@ -22,7 +22,7 @@ private:
     int colNum = 0;       // 列号
 
     int lineLen = 0;                // 当前行长度
-    int readPos = -1;               // 但前字符的位置
+    int readPos = -1;               // 当前字符的位置
     static const int BUF_LEN= 80;   // 缓冲区最大长度
     char line[BUF_LEN];             // 字符缓冲区
     
