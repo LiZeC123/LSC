@@ -1,7 +1,7 @@
 #include "SymTab.h"
+#include "Scanner.h"
 using namespace std;
 
-int SymTab::scanLop = 0; // TODO: 设置初始值
 
 bool SymTab::hasName(std::string name)
 {
@@ -10,7 +10,7 @@ bool SymTab::hasName(std::string name)
 
 void SymTab::addLabel(Label* label)
 {
-    if(scanLop != 1){
+    if(Scanner::ScanLoop != 1){
         // 第一次扫描才添加符号,否则直接退出
         return;
     }

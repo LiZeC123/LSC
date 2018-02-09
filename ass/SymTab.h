@@ -8,7 +8,6 @@
 class SymTab
 {
 public:
-    static int scanLop;
     // SymTab();
     bool hasName(std::string name);
     void addLabel(Label* label);

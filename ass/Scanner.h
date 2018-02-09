@@ -6,6 +6,7 @@
 class Scanner
 {
 public:
+    static int ScanLoop;
     Scanner(const char* name);
 
     int scan();                 // 扫描获得一个字符 
