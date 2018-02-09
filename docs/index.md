@@ -13,6 +13,7 @@ Lsc项目文档
 - 汇编阶段
     - [工具准备](./ass/tools.md)
     - [GDB调试](./ass/gdb.md)
+    - [X86指令结构](./ass/X86.md)
     - [词法分析](./ass/LexicalAnalysis.md)
     - [语法分析](./ass/GrammaticalAnalysis.md)
 - 链接阶段(待补充)
