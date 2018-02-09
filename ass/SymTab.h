@@ -13,7 +13,7 @@ public:
     void addLabel(Label* label);
     Label* getLabel(std::string name);
 
-
+    void printSymbolTable();
 private:
     std::map<std::string,Label*> symTab;
     std::vector<Label*> defTab;

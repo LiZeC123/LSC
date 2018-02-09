@@ -10,7 +10,7 @@ all: $(OBJ)
 test: $(OBJ)
 	$(CC) $(OBJ) -o lsca 
 	./lsca ../test/baseTest.s
-main.o:main.cpp common.h Scanner.h Lexer.h Token.h
+main.o:main.cpp common.h Scanner.h Lexer.h Parser.h Token.h
 	$(CC) main.cpp -c -o main.o 
 Label.o: Label.cpp Label.h 
 	$(CC) Label.cpp -c -o Label.o

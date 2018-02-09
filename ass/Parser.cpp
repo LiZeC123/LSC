@@ -40,25 +40,27 @@ bool Parser::match(Symbol need)
 // <program> -> e
 void Parser::program()
 {
-    switch (look->sym){
-    case END:
-        return;
-    case KW_SEC:
-        move();
-        match(IDENT);
-        break;
-    case KW_GLB:
-        move();
-        match(IDENT);
-        break;
-    case IDENT:
-        lbtail( ((ID *)look)->name );
-        break;
-    default:
-        inst();
+    while (true)
+    {
+        switch (look->sym)
+        {
+        case END:
+            return;
+        case KW_SEC:
+            move();
+            match(IDENT);
+            break;
+        case KW_GLB:
+            move();
+            match(IDENT);
+            break;
+        case IDENT:
+            lbtail(((ID *)look)->name);
+            break;
+        default:
+            inst();
+        }
     }
-
-    program();
 }
 
 
@@ -91,7 +93,6 @@ void Parser::lbtail(string name)
 // <basetail> -> <len> <value>
 void Parser::basetail(string name,int times)
 {
-    move();
     int size = len();
     value(name,times,size);
 }
@@ -129,7 +130,7 @@ void Parser::type(std::vector<int>& cont,int size)
         cont.push_back(((Num *)look)->val);
         break;
     case STR:
-        for(int i=0;i<((Str*)look)->str.size();i++){
+        for(unsigned int i=0;i<((Str*)look)->str.size();i++){
             cont.push_back(((Str*)look)->str[i]);
         }
         break;

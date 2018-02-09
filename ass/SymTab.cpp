@@ -40,3 +40,11 @@ Label* SymTab::getLabel(std::string name)
     }
     return label;
 }
+
+
+void SymTab::printSymbolTable()
+{
+    for(auto& i:symTab){
+        i.second->printSelf();
+    }
+}

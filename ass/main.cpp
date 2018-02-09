@@ -2,6 +2,7 @@
 #include "common.h"
 #include "Scanner.h"
 #include "Lexer.h"
+#include "Parser.h"
 #include <string>
 using namespace std;
 
@@ -19,17 +20,13 @@ int main(int argc,char* argv[])
     // 初始化模块
     Scanner scanner = Scanner(filename);
     Lexer lex       = Lexer(scanner);
+    SymTab tab      = SymTab();
+    Parser parser   = Parser(lex,tab);
 
-    Token* token = lex.nextToken();
-
-    while(token->sym != END){
-        cout << token->toString() << endl;
-        token = lex.nextToken();
-    }
-   
-
-
-    printf("\n汇编完成!\n");
+    parser.analyse();
+    cout << "符号表内容如下:" << endl;
+    tab.printSymbolTable();
+    cout << "\n汇编完成!" << endl;
     return 0;
 }
 
