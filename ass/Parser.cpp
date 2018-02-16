@@ -13,8 +13,10 @@ Parser::Parser(Lexer& lex,SymTab& tab) :
 
 void Parser::analyse()
 {
-    move();
-    program();
+    while(Scanner::ScanLoop < 2){
+        move();
+        program();
+    }
 }
 
 void Parser::move()
@@ -45,10 +47,13 @@ void Parser::program()
         switch (look->sym)
         {
         case END:
+            symtab.switchSeg("");
+            ++Scanner::ScanLoop;
             return;
         case KW_SEC:
             move();
-            match(IDENT);
+            symtab.switchSeg(((ID *)look)->name);
+            move();
             break;
         case KW_GLB:
             move();
