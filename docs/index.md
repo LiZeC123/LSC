@@ -8,8 +8,8 @@ Lsc项目文档
     - [语法分析](./compile/GrammaticalAnalysis.md)
     - [语义分析](./compile/SemanticAnalysis.md)
     - [中间代码生成](./compile/InterCodeGenerate.md)
+    - [中间代码转X86汇编](./compile/ToX86.md)
     - 代码优化
-    - 中间代码转X86汇编
 - 汇编阶段
     - [工具准备](./ass/tools.md)
     - [GDB调试](./ass/gdb.md)
