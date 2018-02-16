@@ -1,13 +1,19 @@
 #! /bin/bash
 
-if [ $1 == "ass" ]
+if [ $1x == "ass"x ]
 then
 	cd ./ass
     make
-elif [ $1 == "compile" ]
+elif [ $1x == "compile"x ]
 then
 	cd ./compile
     make
+elif [ $1x == "clear"x ]
+then
+	cd ./compile
+	make clear
+	cd ../ass
+	make clear
 else
 	cd ./compile
 	make
