@@ -54,5 +54,5 @@ public:
     int disp;
     int imm32;
     int dispLen;
-}
+};
 
