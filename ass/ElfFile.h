@@ -1,8 +1,8 @@
 #pragma once
-#include <elf.h>
 #include <string>
 #include <vector>
 #include <map>
+#include "elf.h"
 #include "Label.h"
 
 using std::string;
