@@ -43,17 +43,32 @@ Label* SymTab::getLabel(std::string name)
     return label;
 }
 
-void SymTab::switchSeg(std::string segName)
+void SymTab::begSeg(std::string segName)
 {
-    // TODO: 需要进一步检查边界条件的正确性
+    Label::currSegName = segName;
+    Label::currAddr = 0;
+}
+
+void SymTab::endSeg()
+{
     if(Scanner::ScanLoop == 1){
         dataLen += (4 - dataLen % 4) % 4;
         // TODO: 生成段
         dataLen += Label::currAddr;
     }
-    Label::currSegName = segName;
-    Label::currAddr = 0;
 }
+
+// void SymTab::switchSeg(std::string segName)
+// {
+//     // TODO: 需要进一步检查边界条件的正确性
+//     if(Scanner::ScanLoop == 1){
+//         dataLen += (4 - dataLen % 4) % 4;
+//         // TODO: 生成段
+//         dataLen += Label::currAddr;
+//     }
+//     Label::currSegName = segName;
+//     Label::currAddr = 0;
+// }
 
 void SymTab::printSymbolTable()
 {

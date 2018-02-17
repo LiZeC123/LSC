@@ -30,4 +30,10 @@ private:
     void type(std::vector<int>& cont,int size);
     void valtail(std::vector<int>& cont,int size);
     void inst();
+    void oprand(OpType& type,int& len,bool isDstReg);
+    void men();
+    int reg(int& len);
+    void addr();
+    void regaddr();
+    void regaddrtail();
 };

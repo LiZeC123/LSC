@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Parser.h"
 #include "Token.h"
 
@@ -42,29 +43,37 @@ bool Parser::match(Symbol need)
 // <program> -> e
 void Parser::program()
 {
+    int count = 0;
     while (true)
     {
         switch (look->sym)
         {
         case END:
-            symtab.switchSeg("");
+            std::cout << count << ": END"<< std::endl;
+            symtab.endSeg();
             ++Scanner::ScanLoop;
             return;
         case KW_SEC:
             move();
-            symtab.switchSeg(((ID *)look)->name);
+            std::cout << count << ": SEC "<< ((ID *)look)->name <<std::endl;
+            symtab.endSeg();
+            symtab.begSeg(((ID *)look)->name);
             move();
             break;
         case KW_GLB:
+            std::cout << count << ": GLB"<< std::endl;
             move();
             match(IDENT);
             break;
         case IDENT:
+            std::cout << count << ": IDENT"<< std::endl;
             lbtail(((ID *)look)->name);
             break;
         default:
+            std::cout << count << ": INST"<< std::endl;
             inst();
         }
+        count++;
     }
 }
 
@@ -161,7 +170,124 @@ void Parser::valtail(std::vector<int>& cont,int size)
     }
 }
 
+// <inst> -> <doubleop> <oprand> , <oprand>
+// <inst> -> <singleop> <oprand>
+// <inst> -> <noneop>
 void Parser::inst()
 {
-    // TODO:
+    //TODO: 代码生成
+    if(look->sym >= I_MOV && look->sym<=I_LEA){
+        int regNum; OpType dstType,srcType; int len;
+        move();
+        oprand(dstType,len,true);
+        match(COMMA);
+        oprand(srcType,len,false);
+    }
+    else if(look->sym >= I_CALL && look->sym <= I_POP){
+        int regNum; OpType type; int len;
+        move();
+        oprand(type,len,true);
+    }
+    else{
+        move();
+    }
+}
+
+// <oprand> -> <NUM> | <IDENT> | <reg> | <men>
+// 操作数类型,长度,已经识别的寄存器数量
+void Parser::oprand(OpType& type,int& len,bool isDstReg)
+{
+    int regCode;
+    switch (look->sym)
+    {
+    case NUM:
+        type = IMMEDIATE;
+        move();
+        break;
+    case IDENT:
+        type = IMMEDIATE;
+        //string name = ((ID*)look)->name;
+        move();
+        break;
+    case LBRAC:
+        type = MEMORY;      
+        men();
+        break;
+    case SUB:
+        type = IMMEDIATE;
+        move();
+        //((Num*)look)->val;
+        break;
+    default:
+        type = REGISTER;
+        regCode = reg(len); // 除了寄存器类型,其他类型都不涉及长度
+        if(isDstReg){
+            // 目标寄存器写入reg
+            break;
+        }
+        else{
+            // 源寄存器写入rm
+            break;
+        }
+        break;
+    }
+
+}
+
+// <men> -> [ <addr> ]
+void Parser::men()
+{
+    match(LBRAC);
+    addr();
+    match(RBRAC);
+}
+
+
+int Parser::reg(int& len)
+{
+    Symbol s = look->sym;
+    int code = 0;
+    if(s >= BR_AL && s <= BR_BH){
+        len = 1;
+        code =  s - BR_AL;
+    }
+    else if(s >= DR_EAX && s <= DR_EDI){
+        len = 4;
+        code = s - DR_EAX;
+    }
+
+    move();
+    return code;
+}
+
+// <addr> -> <NUM> | <ID> | <reg> <regaddr>
+void Parser::addr()
+{
+    if(look->sym == NUM){
+        move();
+    }
+    else if(look->sym == IDENT){
+        move();
+    }
+    else{
+        int len = 0;
+        int regCode = reg(len);
+        regaddr();
+    }
+}
+
+// <regaddr> -> <off> <regaddrtail> | e
+void Parser::regaddr()
+{
+    Symbol s = look->sym;
+    if(s == ADD || s == SUB){
+        move();
+        regaddrtail();
+    }
+}
+
+// <regaddrtail> -> <NUM> | <reg>
+void Parser::regaddrtail()
+{
+    move();
 }
