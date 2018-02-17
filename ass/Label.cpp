@@ -73,8 +73,9 @@ void Label::printSelf()
     if(global)  printf("global ");
     if(equed)   printf("equed ");
     printf("%5s/%11s ",segName.c_str(),lbName.c_str());
-    printf("len = %1d,times = %1d addr = 0x%-8x",len,times,addr);
+    printf("len = %1d times = %3d addr = 0x%-8x",len,times,addr);
     if(!cont.empty()){
+        printf("src = ");
         for(auto i:cont){
             printf("%c",i);
         }

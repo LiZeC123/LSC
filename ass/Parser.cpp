@@ -43,38 +43,31 @@ bool Parser::match(Symbol need)
 // <program> -> e
 void Parser::program()
 {
-    int count = 0;
     while (true)
     {
         switch (look->sym)
         {
         case END:
-            std::cout << count << ": END"<< std::endl;
             symtab.endSeg();
             lexer.reset();  // 重置词法分析器,进行第二次读取
             ++Scanner::ScanLoop;
             return;
         case KW_SEC:
             move();
-            std::cout << count << ": SEC "<< ((ID *)look)->name <<std::endl;
             symtab.endSeg();
             symtab.begSeg(((ID *)look)->name);
             move();
             break;
         case KW_GLB:
-            std::cout << count << ": GLB"<< std::endl;
             move();
             match(IDENT);
             break;
         case IDENT:
-            std::cout << count << ": IDENT"<< std::endl;
             lbtail(((ID *)look)->name);
             break;
         default:
-            std::cout << count << ": INST"<< std::endl;
             inst();
         }
-        count++;
     }
 }
 
