@@ -28,6 +28,7 @@
         "sstream": "cpp",
         "streambuf": "cpp",
         "system_error": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "vector": "cpp"
     }
 }

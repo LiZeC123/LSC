@@ -57,6 +57,21 @@ string Label::getName()
     return lbName;
 }
 
+bool Label::isEqu()
+{
+    return equed;
+}
+
+bool Label::isExterned()
+{
+    return externed;
+}
+
+bool Label::isGlobal()
+{
+    return global;
+}
+
 int Label::getAddr()
 {
     return addr;
@@ -66,6 +81,17 @@ int Label::getTimes()
 {
     return times;
 }
+
+int Label::getLen()
+{
+    return len;
+}
+
+const std::vector<int>& Label::getCont()
+{
+    return cont;
+}
+
 
 void Label::printSelf()
 {

@@ -27,8 +27,8 @@ private:
     void basetail(string name,int times);
     int len();
     void value(string name,int times,int size);
-    void type(std::vector<int>& cont,int size);
-    void valtail(std::vector<int>& cont,int size);
+    void type(string name,std::vector<int>& cont,int size);
+    void valtail(string name,std::vector<int>& cont,int size);
     void inst();
     void oprand(OpType& type,int& len,bool isDstReg);
     void men();

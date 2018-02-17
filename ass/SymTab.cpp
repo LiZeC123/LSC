@@ -3,6 +3,7 @@
 using namespace std;
 
 int SymTab::dataLen = 0;
+ElfFile SymTab::elfile;
 
 bool SymTab::hasName(std::string name)
 {
@@ -13,7 +14,7 @@ void SymTab::addLabel(Label* label)
 {
     if(Scanner::ScanLoop != 1){
         // 第一次扫描才添加符号,否则直接退出
-        // 考虑是否需要在此处释放内存
+        delete label;
         return;
     }
 
@@ -53,22 +54,20 @@ void SymTab::endSeg()
 {
     if(Scanner::ScanLoop == 1){
         dataLen += (4 - dataLen % 4) % 4;
-        // TODO: 生成段
+        elfile.addShdr(Label::currSegName,Label::currAddr,dataLen);
         dataLen += Label::currAddr;
     }
 }
 
-// void SymTab::switchSeg(std::string segName)
-// {
-//     // TODO: 需要进一步检查边界条件的正确性
-//     if(Scanner::ScanLoop == 1){
-//         dataLen += (4 - dataLen % 4) % 4;
-//         // TODO: 生成段
-//         dataLen += Label::currAddr;
-//     }
-//     Label::currSegName = segName;
-//     Label::currAddr = 0;
-// }
+void SymTab::exportSyms()
+{
+    for(auto it = symTab.begin();it != symTab.end();++it){
+        Label* label = it->second;
+        if(!label->isEqu()){
+            elfile.addSym(label);
+        }
+    }
+}
 
 void SymTab::printSymbolTable()
 {

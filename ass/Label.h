@@ -15,8 +15,14 @@ public:
     
     string getSegName();
     string getName(); 
+    bool isEqu();
+    bool isExterned();
+    bool isGlobal();
     int getAddr();
     int getTimes();
+    int getLen();
+    const std::vector<int>& getCont();
+    
 
     void printSelf();
 private:

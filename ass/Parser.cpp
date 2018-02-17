@@ -1,4 +1,5 @@
 #include <iostream>
+#include <elf.h>
 #include "Parser.h"
 #include "Token.h"
 
@@ -125,13 +126,13 @@ void Parser::value(string name,int times,int size)
 {
     move();
     vector<int> cont;
-    type(cont,size);
-    valtail(cont,size);
+    type(name,cont,size);
+    valtail(name,cont,size);
     symtab.addLabel(new Label(name,times,size,cont));
 }
 
 // <type> -> <NUM> | <off> <NUM> | STR | IDENT
-void Parser::type(std::vector<int>& cont,int size)
+void Parser::type(string name,std::vector<int>& cont,int size)
 {
     switch (look->sym){
     case NUM:
@@ -143,6 +144,14 @@ void Parser::type(std::vector<int>& cont,int size)
         }
         break;
     case IDENT:
+        if(Scanner::ScanLoop == 2){
+            Label* label = symtab.getLabel(name);
+            if(!label->isEqu()){
+                SymTab::elfile.addRel(
+                    Label::currSegName,Label::currAddr+cont.size()*label->getLen(),
+                    name,R_386_32);
+            }
+        }
         cont.push_back(
             symtab.getLabel(
                 ((Str*)look)->str
@@ -156,11 +165,11 @@ void Parser::type(std::vector<int>& cont,int size)
 }
 
 // <valtail> -> , <type><valtail> | e
-void Parser::valtail(std::vector<int>& cont,int size)
+void Parser::valtail(string name,std::vector<int>& cont,int size)
 {
     if (match(COMMA)){
-        type(cont, size);
-        valtail(cont, size);
+        type(name,cont, size);
+        valtail(name,cont, size);
     }
 }
 
