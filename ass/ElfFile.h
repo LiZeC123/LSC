@@ -37,6 +37,6 @@ public:
                  Elf32_Word sh_info,  Elf32_Word sh_addralign, Elf32_Word sh_entsize);
 
     void addSym(Label* label);
-    void addRel(string segName,int addr,string name,int type);
+    RelInfo* addRel(string segName,int addr,string name,int type);
     int getSegIndex(string name);
 };

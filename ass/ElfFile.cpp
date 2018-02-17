@@ -6,7 +6,7 @@ RelInfo::RelInfo(string segName,int addr,string name,int type)
 	this->segName = segName;
 	this->relName = name;
 	rel->r_offset = addr;
-	rel->r_info   = type;
+	rel->r_info   = ELF32_R_INFO(0,type);   // 目标文件生成阶段会自动填充重定位信息
 }
 
 void ElfFile::addShdr(string shName,int size,int dataLen)
@@ -74,9 +74,11 @@ void ElfFile::addSym(Label* label)
 
 }
 
-void ElfFile::addRel(string segName,int addr,string name,int type)
+RelInfo* ElfFile::addRel(string segName,int addr,string name,int type)
 {
     RelInfo* rel = new RelInfo(segName,addr,name,type);
+    relTab.push_back(rel);
+    return rel;
 }
 
 int ElfFile::getSegIndex(string name)

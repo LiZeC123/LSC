@@ -8,9 +8,7 @@
 class SymTab
 {
 public:
-    static int dataLen;
-    static ElfFile elfile;
-    // SymTab();
+    SymTab();
     bool hasName(std::string name);
     void addLabel(Label* label);
     Label* getLabel(std::string name);
@@ -18,7 +16,15 @@ public:
     void endSeg();
     void exportSyms();
     void printSymbolTable();
+
+    ElfFile& getFile();
+    void setRelLabel(Label* label);
+    Label* getRelLabel();
 private:
     std::map<std::string,Label*> symTab;
     std::vector<Label*> defTab; 
+
+    int dataLen;
+    ElfFile elfile;
+    Label* relLabel;    // 临时保存可能的重定位项
 };

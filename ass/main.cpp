@@ -3,6 +3,7 @@
 #include "Scanner.h"
 #include "Lexer.h"
 #include "Parser.h"
+#include "Generator.h"
 #include <string>
 using namespace std;
 
@@ -22,6 +23,7 @@ int main(int argc,char* argv[])
     Lexer lex       = Lexer(scanner);
     SymTab tab      = SymTab();
     Parser parser   = Parser(lex,tab);
+    Generator gen   = Generator(tab);
 
     parser.analyse();
     cout << "符号表内容如下:" << endl;

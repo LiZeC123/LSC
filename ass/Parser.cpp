@@ -1,12 +1,13 @@
 #include <iostream>
-#include <elf.h>
 #include "Parser.h"
 #include "Token.h"
+#include "OpInfo.h"
 
 #define firstIs(C) look->sym == C       // 判断向前读取的一个符号是不是指定的符号
 #define _OR_(T) || look->sym == T       // 与上面的宏连用,组成更复杂的条件语句
 
 using namespace std;
+
 
 Parser::Parser(Lexer& lex,SymTab& tab) : 
     lexer(lex),
@@ -147,7 +148,7 @@ void Parser::type(string name,std::vector<int>& cont,int size)
         if(Scanner::ScanLoop == 2){
             Label* label = symtab.getLabel(name);
             if(!label->isEqu()){
-                SymTab::elfile.addRel(
+                symtab.getFile().addRel(
                     Label::currSegName,Label::currAddr+cont.size()*label->getLen(),
                     name,R_386_32);
             }
@@ -180,14 +181,14 @@ void Parser::inst()
 {
     //TODO: 代码生成
     if(look->sym >= I_MOV && look->sym<=I_LEA){
-        int regNum; OpType dstType,srcType; int len;
+        OpType dstType,srcType; int len;
         move();
         oprand(dstType,len,true);
         match(COMMA);
         oprand(srcType,len,false);
     }
     else if(look->sym >= I_CALL && look->sym <= I_POP){
-        int regNum; OpType type; int len;
+        OpType type; int len;
         move();
         oprand(type,len,true);
     }
@@ -200,16 +201,20 @@ void Parser::inst()
 // 操作数类型,长度,已经识别的寄存器数量
 void Parser::oprand(OpType& type,int& len,bool isDstReg)
 {
-    int regCode;
+    int regCode;string name;Label* label;
     switch (look->sym)
     {
     case NUM:
         type = IMMEDIATE;
+        instr.imm32 = ((Num*)look)->val;
         move();
         break;
     case IDENT:
         type = IMMEDIATE;
-        //string name = ((ID*)look)->name;
+        name = ((ID*)look)->name;
+        label = symtab.getLabel(name);
+        instr.imm32 = label->getAddr();
+        tempSave(label);
         move();
         break;
     case LBRAC:
@@ -219,18 +224,19 @@ void Parser::oprand(OpType& type,int& len,bool isDstReg)
     case SUB:
         type = IMMEDIATE;
         move();
-        //((Num*)look)->val;
+        instr.imm32 = - ((Num*)look)->val;  // 取负数
         break;
     default:
         type = REGISTER;
         regCode = reg(len); // 除了寄存器类型,其他类型都不涉及长度
         if(isDstReg){
             // 目标寄存器写入reg
-            break;
+            modrm.reg = regCode;
         }
         else{
             // 源寄存器写入rm
-            break;
+            modrm.mod = 3;
+            modrm.rm = regCode;
         }
         break;
     }
@@ -267,12 +273,26 @@ int Parser::reg(int& len)
 void Parser::addr()
 {
     if(look->sym == NUM){
+        // 直接寻址
+        modrm.mod = 0;
+        modrm.rm = 5;
+        instr.disp = ((Num*)look)->val;
+        instr.dispLen = 4;
         move();
     }
     else if(look->sym == IDENT){
+        // 直接寻址
+        modrm.mod = 0;
+        modrm.rm = 5;
+        string name = ((ID *)look)->name;
+        Label *label = symtab.getLabel(name);
+        instr.disp = label->getAddr();
+        instr.dispLen = 4;
+        tempSave(label);
         move();
     }
     else{
+        // 寄存器寻址
         int len = 0;
         int regCode = reg(len);
         regaddr();
@@ -293,4 +313,13 @@ void Parser::regaddr()
 void Parser::regaddrtail()
 {
     move();
+}
+
+// 对符号的引用可能需要重定位,先保存
+// 在后续代码生成中,进行进一步的处理
+void Parser::tempSave(Label* label)
+{
+    if (Scanner::ScanLoop == 2 && !label->getLen()){
+        symtab.setRelLabel(label);
+    }
 }

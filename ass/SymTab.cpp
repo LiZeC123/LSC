@@ -2,8 +2,11 @@
 #include "Scanner.h"
 using namespace std;
 
-int SymTab::dataLen = 0;
-ElfFile SymTab::elfile;
+SymTab::SymTab()
+{
+    dataLen = 0;
+    relLabel = nullptr;
+}
 
 bool SymTab::hasName(std::string name)
 {
@@ -74,4 +77,19 @@ void SymTab::printSymbolTable()
     for(auto& i:symTab){
         i.second->printSelf();
     }
+}
+
+ElfFile& SymTab::getFile()
+{
+    return elfile;
+}
+
+void SymTab::setRelLabel(Label* label)
+{
+    relLabel = label;
+}
+
+Label* SymTab::getRelLabel()
+{
+    return relLabel;
 }

@@ -36,29 +36,3 @@ private:
     int len;                // 单位内存大小
     std::vector<int> cont;  // 符号内容
 };
-
-class ModRM
-{
-public:
-    int mod;
-    int reg;
-    int rm;
-};
-
-class SIB
-{
-public:
-    int scale;
-    int index;
-    int base;
-};
-
-class Inst
-{
-public:
-    unsigned char opcode;
-    int disp;
-    int imm32;
-    int dispLen;
-};
-
