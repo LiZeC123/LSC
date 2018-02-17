@@ -23,7 +23,7 @@ int main(int argc,char* argv[])
     Lexer lex       = Lexer(scanner);
     SymTab tab      = SymTab();
     Parser parser   = Parser(lex,tab);
-    Generator gen   = Generator(tab);
+    Generator gen   = Generator(tab,parser);
 
     parser.analyse();
     cout << "符号表内容如下:" << endl;

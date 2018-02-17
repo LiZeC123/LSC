@@ -3,9 +3,10 @@
 #include "Token.h"
 #include "Lexer.h"
 #include "SymTab.h"
-#include "OpInfo.h"
 #include <string>
 using std::string;
+
+class Generator;
 
 class Parser
 {
@@ -13,15 +14,12 @@ public:
     Parser(Lexer& lex,SymTab& tab);
     void analyse();
 
+    void setGen(Generator* g);
 private:
     Token* look;
     Lexer& lexer;
     SymTab& symtab;
-
-    Inst instr;
-    ModRM modrm;
-    SIB sib;
-    
+    Generator* gen;    
 private:
     void move();
     bool match(Symbol need);

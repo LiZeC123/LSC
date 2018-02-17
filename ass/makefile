@@ -20,11 +20,11 @@ Label.o: Label.cpp Label.h
 	$(CC) Label.cpp -c -o Label.o
 Lexer.o: Lexer.cpp Lexer.h common.h Scanner.h Token.h 
 	$(CC) Lexer.cpp -c -o Lexer.o 
-Parser.o: Parser.cpp Parser.h common.h Token.h Lexer.h SymTab.h OpInfo.h
+Parser.o: Parser.cpp Parser.h common.h Token.h Lexer.h SymTab.h Generator.h
 	$(CC) Parser.cpp -c -o Parser.o
 Scanner.o: Scanner.cpp Scanner.h common.h
 	$(CC) Scanner.cpp -c -o Scanner.o
-SymTab.o: SymTab.cpp SymTab.h Label.h ElfFile.h
+SymTab.o: SymTab.cpp SymTab.h Label.h ElfFile.h OpInfo.h
 	$(CC) SymTab.cpp -c -o SymTab.o
 Token.o: Token.cpp Token.h common.h
 	$(CC) Token.cpp -c -o Token.o 

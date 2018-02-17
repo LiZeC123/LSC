@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Parser.h"
 #include "Token.h"
-#include "OpInfo.h"
-
+#include "Generator.h"
+ 
 #define firstIs(C) look->sym == C       // 判断向前读取的一个符号是不是指定的符号
 #define _OR_(T) || look->sym == T       // 与上面的宏连用,组成更复杂的条件语句
 
@@ -20,6 +20,11 @@ void Parser::analyse()
         move();
         program();
     }
+}
+
+void Parser::setGen(Generator* g)
+{
+    gen = g;
 }
 
 void Parser::move()
@@ -181,18 +186,24 @@ void Parser::inst()
 {
     //TODO: 代码生成
     if(look->sym >= I_MOV && look->sym<=I_LEA){
+        Symbol s = look->sym;
         OpType dstType,srcType; int len;
         move();
         oprand(dstType,len,true);
         match(COMMA);
         oprand(srcType,len,false);
+        gen->genTwoOp(s,dstType,srcType,len);
     }
     else if(look->sym >= I_CALL && look->sym <= I_POP){
+        Symbol s = look->sym;
         OpType type; int len;
         move();
         oprand(type,len,true);
+        gen->genOneOp(s,type,len);
     }
     else{
+        Symbol s = look->sym;
+        gen->genNonOp(s);
         move();
     }
 }
