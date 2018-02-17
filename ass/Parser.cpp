@@ -14,7 +14,7 @@ Parser::Parser(Lexer& lex,SymTab& tab) :
 
 void Parser::analyse()
 {
-    while(Scanner::ScanLoop < 2){
+    while(Scanner::ScanLoop <= 2){
         move();
         program();
     }
@@ -51,6 +51,7 @@ void Parser::program()
         case END:
             std::cout << count << ": END"<< std::endl;
             symtab.endSeg();
+            lexer.reset();  // 重置词法分析器,进行第二次读取
             ++Scanner::ScanLoop;
             return;
         case KW_SEC:

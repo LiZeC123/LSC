@@ -146,8 +146,7 @@ Token* Lexer::nextToken()
     if(token){
         delete token;
     }
-    // 由于需要读取源文件两次,因此第一次到达末尾后,将状态恢复
-    ch = ' '; 
+
     // 最后一个符号在析构函数中释放内存
     return token = new Token(END);
 }
@@ -191,6 +190,13 @@ Token* Lexer::getNum()
         scan();
     } while (ch >= '0' && ch <= '9');
     return new Num(val);
+}
+
+void Lexer::reset()
+{
+    // 将状态恢复
+    ch = ' '; 
+    scanner.reset();
 }
 
 Lexer::~Lexer()

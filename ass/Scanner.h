@@ -13,7 +13,8 @@ public:
     const char* getFilename();  // 获得当前文件名
     int getRow();               // 获得当前行号
     int getCol();               // 获得当前列号
-
+    void reset();               // 恢复初始状态,从而可进行第二次读取
+    ~Scanner();
 private:
     const char * filename;
     FILE* fin;

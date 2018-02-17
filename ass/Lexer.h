@@ -27,6 +27,7 @@ class Lexer
 public:
     Lexer(Scanner& scanner);
     Token* nextToken();
+    void reset();
     ~Lexer();
 
 private:

@@ -36,22 +36,7 @@ int Scanner::scan()
         colNum = 0;
     }
 
-    if (ch == -1)
-    {
-        if(ScanLoop == 1){
-            // 重置所有变量状态
-            rewind(fin);
-            lineNum = 1; // 行号
-            colNum = 0;  // 列号
-            lineLen = 0;  // 当前行长度
-            readPos = -1; // 当前字符的位置
-        }
-        else{
-            fclose(fin);
-            fin = NULL;
-        }
-    }
-    else if (ch != '\n')
+    if (ch != '\n')
     {
         colNum++;
     }
@@ -75,6 +60,14 @@ int Scanner::getCol()
     return colNum;
 }
 
+void Scanner::reset()
+{
+    rewind(fin);
+    lineNum = 1; // 行号
+    colNum = 0;  // 列号
+    lineLen = 0;  // 当前行长度
+    readPos = -1; // 当前字符的位置
+}
 
 void Scanner::showChar()
 {
@@ -84,4 +77,10 @@ void Scanner::showChar()
 	else if(ch==' ')printf("<blank>");
 	else printf("%c",ch);	
 	printf("\t\t<%d>\n",ch);
+}
+
+Scanner::~Scanner()
+{
+    fclose(fin);
+    fin = NULL;
 }
