@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 #include "Parser.h"
 #include "Token.h"
 #include "Generator.h"
@@ -132,13 +133,13 @@ void Parser::value(string name,int times,int size)
 {
     move();
     vector<int> cont;
-    type(name,cont,size);
+    type(name,cont);
     valtail(name,cont,size);
     symtab.addLabel(new Label(name,times,size,cont));
 }
 
 // <type> -> <NUM> | <off> <NUM> | STR | IDENT
-void Parser::type(string name,std::vector<int>& cont,int size)
+void Parser::type(string name,std::vector<int>& cont)
 {
     switch (look->sym){
     case NUM:
@@ -174,7 +175,7 @@ void Parser::type(string name,std::vector<int>& cont,int size)
 void Parser::valtail(string name,std::vector<int>& cont,int size)
 {
     if (match(COMMA)){
-        type(name,cont, size);
+        type(name,cont);
         valtail(name,cont, size);
     }
 }
@@ -229,7 +230,7 @@ void Parser::oprand(OpType& type,int& len,bool isDstReg)
         move();
         break;
     case LBRAC:
-        type = MEMORY;      
+        type = MEMORY;      // 由于不能同时操作两个内存地址,因此长度由另一个参数决定
         men();
         break;
     case SUB:
@@ -306,23 +307,88 @@ void Parser::addr()
         // 寄存器寻址
         int len = 0;
         int regCode = reg(len);
-        regaddr();
+        regaddr(regCode,len);
     }
 }
 
 // <regaddr> -> <off> <regaddrtail> | e
-void Parser::regaddr()
+void Parser::regaddr(int regCode,int len)
 {
     Symbol s = look->sym;
     if(s == ADD || s == SUB){
-        move();
-        regaddrtail();
+        bool isSub = off();
+        regaddrtail(regCode,isSub);
+    }
+    else{
+        if(regCode == 4 && len == 4) {  //特殊寄存器 esp
+            modrm.mod = 0;
+            modrm.rm = 4;               //引导SIB
+            sib.scale = 0;
+            sib.index = 4;
+            sib.base = 4;
+        }
+        else if(regCode == 5 && len == 4) { //特殊寄存器 ebp
+            modrm.mod = 1;                  //8-bit 0 disp
+            modrm.rm = 5;
+            instr.disp = 0;
+            instr.dispLen = 1;
+        }
+        else {                              // 普通寄存器寻址
+            modrm.mod = 0;
+            modrm.rm = regCode;
+        }
     }
 }
 
-// <regaddrtail> -> <NUM> | <reg>
-void Parser::regaddrtail()
+bool Parser::off()
 {
+    Symbol s = look->sym;
+    bool isSub = false;
+    if(s == ADD){
+        isSub = false;
+        move();
+    }
+    else if(s == SUB){
+        isSub = true;
+        move();
+    }
+
+    return isSub;
+}
+
+
+// <regaddrtail> -> <NUM> | <reg>
+void Parser::regaddrtail(int regCode,bool isSub)
+{
+    if(look->sym == NUM){
+        int num = ((Num*)look)->val;
+        if(isSub){
+            num = - num;
+        }
+
+        if(num >= -128 && num <= 127){
+            modrm.mod = 1;
+            instr.disp = num;
+            instr.dispLen = 1;
+        }
+        else{
+            modrm.mod = 2;
+            instr.disp = num;
+            instr.dispLen = 4;
+        }
+        modrm.rm = regCode;
+
+        if(regCode == 4){   // 特殊寄存器 [esp+8bit] [esp+32bit]需要特殊处理
+            modrm.rm = 4; //引导SIB
+            sib.scale = 0;      // 指数为0
+            sib.index = 4;      // index为4表示不存在index项
+            sib.base = 4;       // base为4表示esp
+        }
+    }
+    else{
+        // 编译器不生成此类型代码
+        throw std::logic_error("不支持的寻址类型!");
+    }
     move();
 }
 

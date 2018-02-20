@@ -18,12 +18,16 @@ int main(int argc,char* argv[])
         return 0;
     }
     
+
+    string objFile = "tempobj.o";
+    FILE* fpObj = fopen(objFile.c_str(),"w");
+
     // 初始化模块
     Scanner scanner = Scanner(filename);
     Lexer lex       = Lexer(scanner);
     SymTab tab      = SymTab();
     Parser parser   = Parser(lex,tab);
-    Generator gen   = Generator(tab,parser);
+    Generator gen   = Generator(tab,parser,fpObj);
 
     parser.analyse();
     cout << "符号表内容如下:" << endl;
