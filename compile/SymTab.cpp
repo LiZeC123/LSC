@@ -853,9 +853,11 @@ void SymTab::toX86(FILE* file)
     fprintf(file,"section .text\n");
     for(auto it = funTab.begin();it!=funTab.end();it++){
         Fun* fun = it->second;
-        fprintf(file,"global %s\n",fun->getName().c_str());
-        fprintf(file,"%s:\n",fun->getName().c_str());
-        it->second->toX86(file);
+        if (!fun->getExtern()){
+            fprintf(file, "global %s\n", fun->getName().c_str());
+            fprintf(file, "%s:\n", fun->getName().c_str());
+            it->second->toX86(file);
+        }
     }
 }
 
