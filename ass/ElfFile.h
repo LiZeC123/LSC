@@ -11,9 +11,9 @@ class RelInfo
 {
 public:
 	RelInfo(string segName,int size,string name,int type);
-	string segName;       // 重定位目标段
-	Elf32_Rel * rel;      // 重定位信息
-	string relName;       // 重定位符号名
+	string segName;      // 重定位目标段
+	Elf32_Rel  rel;      // 重定位信息
+	string relName;      // 重定位符号名
 };
 
 
