@@ -1,10 +1,30 @@
 char* globalChar;
 
-void printf(char* str);
+
 int lscPrints(char* str,int n);
 void int2str(char* buf,int i);
 
 int main()
+{
+    globalChar = "Hello World!";
+    lscPrints(globalChar,12);
+
+    return 0;
+}
+
+int testAssgin()
+{
+    int tAs = 8;
+    int* ptAs = &tAs;
+
+    int re = *ptAs;
+    re = re + 2010;
+    *ptAs = re;
+
+    return tAs;
+}
+
+int testPrintNum()
 {
     char str[20];
     int fi = 5,fj = 4,fk = 3;
@@ -12,71 +32,6 @@ int main()
     fsum = fi+fj*fk;
     int2str(str,fsum);
     lscPrints(str,2);
-    return fsum;
-}
-
-int testAssgin()
-{
-    int tAs = 10;
-    int* ptAs = &tAs;
-
-    int re = *ptAs;
-    int* pother = &re;
-
-    *pother = re;
-}
-
-int testArray()
-{
-    int array[10];
-
-    array[1] = 5;
-    array[2] = 0;
-
-    int arrayRec;
-    arrayRec = array[1] + array[2];
-
-}
-
-void testIf()
-{
-    int n = 5;
-
-    if(n == 5){
-        printf("true");
-    }
-    else{
-        printf("false");
-    }
-}
-
-void testWhile()
-{
-    int i = 0;
-    while(i < 5){
-        testIf();
-        i++;
-    }
-}
-
-void testBreak()
-{
-    int i = 0;
-    while(i < 5){
-        int j = 0;
-        while(j < 5){
-            if(j != 2){
-                int n = 0;
-                ++n;
-                continue;
-            }
-            else{
-                int m = 0;
-                ++m;
-                break;
-            }
-        }
-    }
 }
 
 void int2str(char* buf,int i)
