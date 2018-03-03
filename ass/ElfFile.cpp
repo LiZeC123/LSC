@@ -211,27 +211,32 @@ void ElfFile::writeElfHead(FILE* fin,FILE* fout)
     char pad[1] = {0};
 
     fwrite(&ehdr,ehdr.e_ehsize,1,fout);
-
-    // .text
-    char buffer[1024] = {0};
-    int count = -1;
-    while(count){
-        count = fread(buffer,1,1024,fin);
-        fwrite(buffer,1,count,fout);
-    }
-
-    // .data
-    padNum = shdrTab[".data"]->sh_offset - shdrTab[".text"]->sh_offset - shdrTab[".text"]->sh_size;
-    fwrite(pad,sizeof(pad),padNum,fout);
 }
 
-void ElfFile::writeElfTail(FILE* fout)
+void ElfFile::writeElfTail(FILE* fin,FILE* fout)
 {
     int padNum = 0;
     char pad[1] = {0};
 
+    // 由于编译器输出的时候,先输出的data段,再输出的text段
+    // 所以实际上应该,汇编的时候页应该先输出data段,再输出text段
+    
+    // 填补data段和text段之间的空隙
+    padNum = shdrTab[".text"]->sh_offset - shdrTab[".data"]->sh_offset - shdrTab[".data"]->sh_size;
+    fwrite(pad,sizeof(pad),padNum,fout);
+    
+    // .text
+    char buffer[1024] = {0};
+    int count = -1;
+    //int addLen = 0;
+    while(count){
+        count = fread(buffer,1,1024,fin);
+        fwrite(buffer,1,count,fout);
+        //addLen += count;
+    }
+
     // .shstrtab
-    padNum = shdrTab[".shstrtab"]->sh_offset - shdrTab[".data"]->sh_offset - shdrTab[".data"]->sh_size;
+    padNum = shdrTab[".shstrtab"]->sh_offset - shdrTab[".text"]->sh_offset - shdrTab[".text"]->sh_size;
     fwrite(pad,sizeof(pad),padNum,fout);
     fwrite(shstrtab.c_str(),shstrtab.size(),1,fout);
 

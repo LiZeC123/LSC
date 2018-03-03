@@ -42,7 +42,7 @@ public:
 
     void assemObj(int dataLen);
     void writeElfHead(FILE* fin,FILE* fout);
-    void writeElfTail(FILE* fout);
+    void writeElfTail(FILE* fin,FILE* fout);
 
 private:
     std::vector<Elf32_Rel*> relTextTab;
