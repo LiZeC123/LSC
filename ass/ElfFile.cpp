@@ -1,5 +1,7 @@
+#include <string.h>
 #include "ElfFile.h"
-
+#include "SymTab.h"
+using namespace std;
 
 RelInfo::RelInfo(string segName,int addr,string name,int type)
 {
@@ -90,4 +92,177 @@ int ElfFile::getSegIndex(string name)
         }
     }
     return -1;
+}
+
+void ElfFile::assemObj(int dataLen)
+{
+    vector<string> AllSegNames = shdrNames;
+    AllSegNames.push_back(".shstrtab");
+    AllSegNames.push_back(".symtab");
+    AllSegNames.push_back(".strtab");
+    AllSegNames.push_back(".rel.text");
+    AllSegNames.push_back(".rel.data");
+
+    // 段索引
+    map<string,int> shIdx;
+    // 段名索引
+    map<string,int> shstrIdx;
+    // 建立索引
+    for(unsigned int i=0;i<AllSegNames.size();i++){
+        string name = AllSegNames[i];
+        shIdx[name] = i;
+        shstrIdx[name] = shstrtab.size();
+        shstrtab += name;
+        shstrtab.push_back('\0');
+    }
+
+    // 符号索引
+    map<string,int> symIdx;
+    // 符号名索引
+    map<string,int> strIdx;
+    // 建立索引
+    for(unsigned int i=0;i<symNames.size();i++){
+        string name = symNames[i];
+        symIdx[name] = i;
+        strIdx[name] = strtab.size();
+        strtab += name;
+        strtab.push_back('\0');
+    }
+
+    // 更新符号表符号名索引
+    for(unsigned int i=0;i<symNames.size();i++){
+        string name = symNames[i];
+        symTab[name]->st_name = strIdx[name];
+    }
+
+    // 处理重定位表
+    for(unsigned int i=0;i<relTab.size();i++){
+        Elf32_Rel * rel = new Elf32_Rel();
+        rel->r_offset = relTab[i]->rel.r_offset;
+        rel->r_info = ELF32_R_INFO(
+            symIdx[relTab[i]->relName],
+            ELF32_R_TYPE(relTab[i]->rel.r_info)
+        );
+
+        if(relTab[i]->segName == ".text"){
+            relTextTab.push_back(rel);
+        }
+        else if(relTab[i]->segName == ".data") {
+            relDataTab.push_back(rel);
+        }
+        else{
+            delete rel;
+        }
+    }
+
+
+    int* p_id = (int*)ehdr.e_ident;
+	*p_id++=0x464c457f;
+    *p_id++=0x00010101;
+    *p_id++=0x00000000;
+    *p_id++=0x00000000;
+    
+    ehdr.e_type=ET_REL;
+	ehdr.e_machine=EM_386;
+	ehdr.e_version=EV_CURRENT;
+	ehdr.e_entry=0;
+	ehdr.e_phoff=0;
+	ehdr.e_flags=0;
+	ehdr.e_ehsize= sizeof(Elf32_Ehdr);
+	ehdr.e_phentsize=0;
+	ehdr.e_phnum=0;
+	ehdr.e_shentsize = sizeof(Elf32_Shdr);
+	ehdr.e_shnum     = AllSegNames.size();
+	ehdr.e_shstrndx  = shIdx[".shstrtab"];
+
+    int curOff = sizeof(ehdr);
+    curOff += dataLen;
+
+    addShdr(".shstrtab",SHT_STRTAB,0,0,curOff,shstrtab.size(),SHN_UNDEF,0,1,0);
+    curOff += shstrtab.size();
+    curOff += (4 - curOff % 4) % 4;
+
+    ehdr.e_shoff = curOff;      // 段表偏移位置
+    curOff += ehdr.e_shnum*ehdr.e_shentsize;
+
+    addShdr(".symtab",SHT_STRTAB,0,0,curOff,symNames.size()*sizeof(Elf32_Sym),shIdx[".strtab"],0,1,sizeof(Elf32_Sym));
+    curOff += symNames.size()*sizeof(Elf32_Sym);
+
+    addShdr(".strtab",SHT_STRTAB,0,0,curOff,strtab.size(),SHN_UNDEF,0,1,0);
+    curOff += strtab.size();
+    curOff += (4 - curOff % 4) % 4;
+  
+    addShdr(".rel.text",SHT_REL,0,0,curOff,relTextTab.size()*sizeof(Elf32_Rel),shIdx[".symtab"],shIdx[".text"],1,sizeof(Elf32_Rel));
+    curOff += relTextTab.size()*sizeof(Elf32_Rel);
+
+    addShdr(".rel.data",SHT_REL,0,0,curOff,relDataTab.size()*sizeof(Elf32_Rel),shIdx[".symtab"],shIdx[".data"],1,sizeof(Elf32_Rel));
+    curOff += relDataTab.size()*sizeof(Elf32_Rel);
+
+    for(unsigned int i=0;i<AllSegNames.size();i++){
+        string name = AllSegNames[i];
+        shdrTab[name]->sh_name = shstrIdx[name];
+    }
+}
+
+
+void ElfFile::writeElfHead(FILE* fin,FILE* fout)
+{
+    int padNum = 0;
+    char pad[1] = {0};
+
+    fwrite(&ehdr,ehdr.e_ehsize,1,fout);
+
+    // .text
+    char buffer[1024] = {0};
+    int count = -1;
+    while(count){
+        count = fread(buffer,1,1024,fin);
+        fwrite(buffer,1,count,fout);
+    }
+
+    // .data
+    padNum = shdrTab[".data"]->sh_offset - shdrTab[".text"]->sh_offset - shdrTab[".text"]->sh_size;
+    fwrite(pad,sizeof(pad),padNum,fout);
+}
+
+void ElfFile::writeElfTail(FILE* fout)
+{
+    int padNum = 0;
+    char pad[1] = {0};
+
+    // .shstrtab
+    padNum = shdrTab[".shstrtab"]->sh_offset - shdrTab[".data"]->sh_offset - shdrTab[".data"]->sh_size;
+    fwrite(pad,sizeof(pad),padNum,fout);
+    fwrite(shstrtab.c_str(),shstrtab.size(),1,fout);
+
+    // 段表
+    padNum = ehdr.e_shoff - shdrTab[".shstrtab"]->sh_offset - shdrTab[".shstrtab"]->sh_size;
+    fwrite(pad,sizeof(pad),padNum,fout);
+    for(unsigned int i=0;i<shdrNames.size();i++){
+        Elf32_Shdr* sh = shdrTab[shdrNames[i]];
+        fwrite(sh,ehdr.e_shentsize,1,fout);
+    }
+
+    // 符号表
+    for(unsigned int i=0;i<symNames.size();i++){
+        Elf32_Sym* sym = symTab[symNames[i]];
+        fwrite(sym,sizeof(Elf32_Sym),1,fout);
+    }
+
+    // .strtab
+    fwrite(strtab.c_str(),strtab.size(),1,fout);
+
+    // .rel.text
+    padNum = shdrTab[".rel.text"]->sh_offset - shdrTab[".strtab"]->sh_offset - shdrTab[".strtab"]->sh_size;
+    fwrite(pad,sizeof(pad),padNum,fout);
+    for(unsigned int i=0;i<relTextTab.size();i++){
+        Elf32_Rel* rel = relTextTab[i];
+        fwrite(rel,sizeof(Elf32_Rel),1,fout);
+    }
+
+    // .rel.data
+    for(unsigned int i=0;i<relDataTab.size();i++){
+        Elf32_Rel* rel = relDataTab[i];
+        fwrite(rel,sizeof(Elf32_Rel),1,fout);      
+    }  
 }

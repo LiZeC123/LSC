@@ -39,4 +39,12 @@ public:
     void addSym(Label* label);
     RelInfo* addRel(string segName,int addr,string name,int type);
     int getSegIndex(string name);
+
+    void assemObj(int dataLen);
+    void writeElfHead(FILE* fin,FILE* fout);
+    void writeElfTail(FILE* fout);
+
+private:
+    std::vector<Elf32_Rel*> relTextTab;
+    std::vector<Elf32_Rel*> relDataTab;
 };

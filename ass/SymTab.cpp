@@ -55,6 +55,11 @@ void SymTab::begSeg(std::string segName)
 
 void SymTab::endSeg()
 {
+    // TODO: 分析是否需要跳过第一次
+    // if(Label::currSegName == ""){
+    //     return;
+    // }
+
     if(Scanner::ScanLoop == 1){
         dataLen += (4 - dataLen % 4) % 4;
         elfile.addShdr(Label::currSegName,Label::currAddr,dataLen);
@@ -92,4 +97,25 @@ void SymTab::setRelLabel(Label* label)
 Label* SymTab::getRelLabel()
 {
     return relLabel;
+}
+
+int SymTab::getDataLen()
+{
+    return dataLen;
+}
+
+void SymTab::writeToFile(FILE* fin,FILE* fout)
+{
+    exportSyms();
+    elfile.assemObj(dataLen);
+    elfile.writeElfHead(fin,fout);
+    writeData(fout);
+    elfile.writeElfTail(fout);
+}
+
+void SymTab::writeData(FILE* fout)
+{
+    for(unsigned int i=0;i<defTab.size();i++){
+        defTab[i]->write(fout);
+    }
 }

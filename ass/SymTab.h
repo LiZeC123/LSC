@@ -20,6 +20,9 @@ public:
     ElfFile& getFile();
     void setRelLabel(Label* label);
     Label* getRelLabel();
+    int getDataLen();
+    void writeToFile(FILE* fin,FILE* fout);
+    
 private:
     std::map<std::string,Label*> symTab;
     std::vector<Label*> defTab; 
@@ -27,4 +30,6 @@ private:
     int dataLen;
     ElfFile elfile;
     Label* relLabel;    // 临时保存可能的重定位项
+
+    void writeData(FILE* fout);
 };

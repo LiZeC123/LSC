@@ -1,4 +1,5 @@
 #include "Label.h"
+#include "Generator.h"
 using namespace std;
 
 int Label::currAddr = 0x00000000;
@@ -92,6 +93,14 @@ const std::vector<int>& Label::getCont()
     return cont;
 }
 
+ void Label::write(FILE* fout)
+ {
+     for(int i=0;i<times;i++){
+         for(auto& value:cont){
+            fwrite(&value,len,1,fout);
+         }
+     }
+ }
 
 void Label::printSelf()
 {

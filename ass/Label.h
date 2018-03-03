@@ -23,6 +23,7 @@ public:
     int getLen();
     const std::vector<int>& getCont();
     
+    void write(FILE* fout);
 
     void printSelf();
 private:
