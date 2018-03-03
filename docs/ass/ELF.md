@@ -23,4 +23,253 @@ ELF文件一般结构
 |                            |
 
 
-在linux系统的`/esr/include/elf.h`中可以获得ELF文件的全部信息. `elf.h`文件的结构很简单,基本上就是各个模块的结构体以及各个字段合法取值的宏. 每个字段和每个宏都提供了注释,因此阅读起来页没有太多难度,另外在[维基百科](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format)上提供了解释.
+在linux系统的`/usr/include/elf.h`中可以获得ELF文件的全部信息.
+
+
+文件头(ELF Header)
+-------------------
+``` c
+typedef uint16_t Elf32_Half;
+typedef uint32_t Elf32_Word;
+typedef uint32_t Elf32_Addr;
+typedef uint32_t Elf32_Off;
+
+typedef struct
+{
+  unsigned char	e_ident[EI_NIDENT];	/* Magic number and other info */
+  Elf32_Half	e_type;			/* Object file type */
+  Elf32_Half	e_machine;		/* Architecture */
+  Elf32_Word	e_version;		/* Object file version */
+  Elf32_Addr	e_entry;		/* Entry point virtual address */
+  Elf32_Off	e_phoff;		/* Program header table file offset */
+  Elf32_Off	e_shoff;		/* Section header table file offset */
+  Elf32_Word	e_flags;		/* Processor-specific flags */
+  Elf32_Half	e_ehsize;		/* ELF header size in bytes */
+  Elf32_Half	e_phentsize;		/* Program header table entry size */
+  Elf32_Half	e_phnum;		/* Program header table entry count */
+  Elf32_Half	e_shentsize;		/* Section header table entry size */
+  Elf32_Half	e_shnum;		/* Section header table entry count */
+  Elf32_Half	e_shstrndx;		/* Section header string table index */
+} Elf32_Ehdr;
+```
+ELF文件头描述了文件格式,平台信息以及文件结构等信息,具体内容如下:
+1. e_ident
+    - 魔数,是16字节的数组,一般值为`71 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00`
+    - 前4字节对应ASCII码为DEL,E,L,F,对每个ELF文件都是一样的
+    - 第5字节表示文件类别,0表示无效,1表示32位文件,2表示64位文件
+    - 第6字节表示字节序,0表示无效,1表示小端序,2表示大端序
+    - 第7字节表示ELF版本,默认为1
+    - 第8字节ELF标准未定义,通常取0表示Unix系统
+    - 第9-16字节ELF标准未定义,通常取0
+2. e_type
+    - 表示ELF文件类型
+    - 0表示无效,1表示重定位目标文件,2表示可执行文件,3表示共享目标文件,4表示核心转储文件
+    - 对于汇编器,使用重定位目标文件,取值为ET_REL
+    - 对于连接器,使用可执行文件,取值为ET_EXEC
+3. e_machine
+    - 表示机器类型
+    - 3表示Intel 80386体系结构,取值为EM_386
+4. e_version
+    - 表示ELF文件版本,取值为EV_CURRENT
+5. e_entry
+    - ELF文件线性入口地址,重定位文件一般取值为0
+6. e_phoff
+    - 程序头在文件中的偏移,标识程序头起始位置
+7. e_shoff
+    - 表示段表在程序中的偏移,标识段表在文件的位置
+8. e_flags
+    - ELF平台相关信息,通常取0
+9. e_ehsize
+    -表示ELF文件头大小,即sizeof(Elf32_Ehdr) = 52 字节
+10. e_phentsize
+    - 表示程序头表大小,即sizeof(Elf32_Phdr) = 32 字节
+11. e_phnum	
+    - 表示程序头表项的个数
+    - 从而确定程序头表在地址为e_phoff 到 e_phoff + e_phnum * e_phentsize的区间内
+12. e_shentsize
+    - 表示段表项大小,即 sizeof(Elf32_Shdr) = 40 字节
+13.	e_shnum
+    - 表示段表个数
+    - 从而确定段表在地址为e_shoff 到 e_shoff + e_ehsize * e_shentsize的区间内
+14.	e_shstrndx
+    - 表示段表字符串所在段在段表的索引
+
+注意: 使用readelf指令的-h参数可以查看ELF文件头信息
+
+
+段表(Section Header Tbale) 
+--------------------------
+``` c
+typedef struct
+{
+  Elf32_Word	sh_name;		/* Section name (string tbl index) */
+  Elf32_Word	sh_type;		/* Section type */
+  Elf32_Word	sh_flags;		/* Section flags */
+  Elf32_Addr	sh_addr;		/* Section virtual addr at execution */
+  Elf32_Off	sh_offset;		/* Section file offset */
+  Elf32_Word	sh_size;		/* Section size in bytes */
+  Elf32_Word	sh_link;		/* Link to another section */
+  Elf32_Word	sh_info;		/* Additional section information */
+  Elf32_Word	sh_addralign;		/* Section alignment */
+  Elf32_Word	sh_entsize;		/* Entry size if section holds table */
+} Elf32_Shdr;
+```
+ELF文件中,除了文件头和程序头表以外,其他信息都是以段的形式组织的,段表记录了每个段的详细信息,包括段的名称,位置,大小,属性等,具体信息如下:
+1. sh_name
+    - 一个4字节偏移量,记录了段名字符串在段表字符串表中的偏移
+    - 段表字符串表是一个文件块,记录了所有的段表字符串内容,储存在.shstrtab段中
+    - 段表字符串表在段表中的位置为 e_shoff +  e_shentsize * e_shstrndx 
+2. sh_type
+    - 表示段类型
+    - 1表示程序段,取值SHT_PROGBITS,例如.text段和.data段
+    - 2表示符号表段,取值为SHT_SYMTAB,例如.symtab段
+    - 3表示串表段,取值为SHT_STRTAB,例如.shstrtab段和.strtab
+    - 8表示无内容段,取值SHT_NOBITS,例如.bss段
+    - 9表示重定位段,取值SHT_REL,例如.rel.text和.rel.data等
+3. sh_flags
+    - 段标记
+    - 0表示默认属性
+    - 1表示可写,取值为SHF_WRITE
+    - 2表示需要分配空间,取值为SHF_ALLOC
+    - 4表示可执行,取值为SHF_EXECINSTR
+    - 属性可以复合
+    - .text段可分配,可执行,不可写,取值为SHF_ALLOC | SHF_EXECINSTR
+    - .data段可分陪,可写不可执行,取值为SHF_WRITE | SHF_ALLOC
+4. sh_addr
+    - 表示段加载后的线性地址,可重定位文件一般取值为0
+5. sh_offset
+    - 表示段在文件中的偏移
+6. sh_size
+    - 表示段的大小
+    - 如果段是SHT_NOBITS,则此大小表示加载后的大小而不是文件实际大小
+7. sh_link和sh_info
+    - 对于符号表段(SHT_SYMTAB)
+        - sh_link记录符号表使用的串表(".strtab")对应的段表项在段表中的索引
+        - sh_info记录符号表内最后一个局部符号的符号表项的索引+1,这通常对应是第一个全局符号的索引
+    - 对于重定位标段(SHT_REL)
+        - sh_link记录重定位表使用的符号表段(".symtab")对应的段表项在段表中的索引
+        - sh_info记录重定位表作用的段对应的段表项在段表中的索引(例如.rel.text对应.text)
+    - 对于其他段,这两项默认取0
+8. sh_addralign
+    - 表示段对齐方式,取值必须是2的幂,即1,2,4,8等,且当取值为1时,表示没有对齐需求
+    - 对于重定位文件
+        - 代码段取值为4
+        - 数据段取值为4
+        - 其他段取值为1
+    - 对于可执行文件
+        - 代码段取值为16
+        - 数据段取值为4
+        - 其他段取值为1
+9. sh_entsize
+    - 一般保存诸如符号表,重定位表时,表项的大小
+    - 对于符号表, 表项大小为sizeof(Elf32_Sym) = 32字节
+    - 对于重定位表, 表项大小为sizeof(Elf32_Rel) = 8字节
+    - 对于其他段,该字段默认为0
+
+注意: 使用readelf指令的-S参数可以查看ELF文件段表信息
+
+
+
+程序头表(Program Header Table)
+-----------------------------
+ELF文件中程序头表和段表是相互独立的,且一般只有可执行文件拥有程序头表. 有关细节在后续链接器开发过程中再做补充.
+
+
+符号表(.symbol)  
+------------------
+``` c
+typedef struct
+{
+  Elf32_Word	st_name;		/* Symbol name (string tbl index) */
+  Elf32_Addr	st_value;		/* Symbol value */
+  Elf32_Word	st_size;		/* Symbol size */
+  unsigned char	st_info;		/* Symbol type and binding */
+  unsigned char	st_other;		/* Symbol visibility */
+  Elf32_Section	st_shndx;		/* Section index */
+} Elf32_Sym;
+```
+
+符号表保存了程序中的符号信息,包括程序中的文件名,函数名,全部变量名等. 具体细节如下
+1. st_name
+    - 一个4字节偏移量,记录了符号名字符串在字符串表的偏移
+    - 字符串表是一个文件块,可从段表中获得偏移地址
+2. st_value
+    - 符号的值
+    - 在可重定位文件中,记录了符号相对于段基址的偏移
+    - 在可执行文件中,记录了符号的线性地址
+3. st_size
+    - 表示符号的大小,单位为字节
+4. st_info
+    - 表示符号类型相关信息
+    - 低4位表示类型
+        - 使用宏ELF32_ST_TYPE获得
+        - 0 表示未知类型,取值STT_NOTYPE
+        - 1 表示数据对象,取值STT_OBJECT
+        - 2 表示函数,取值STT_FUNC
+        - 3 表示段,取值STT_SECTION
+        - 4 表示文件名,取值STT_FILE
+    - 高4位表示绑定信息
+        - 使用宏ELF32_ST_BIND获得
+        - 0 表示局部符号,取值STB_LOCAL
+        - 1 表示全局符号,取值STB_GLOBAL
+        - 2 表示弱符号,取值STB_WEAK   
+5. st_other
+    - 此字段未定义,取值为0
+6. st_shndx
+    - 表示符号所在段对应段表项在段表内的索引,一般取整数
+    - 0 表示未定义,取值SHN_UNDEF
+
+注意: 使用readelf指令的-s参数可以查看ELF文件符号表信息
+
+
+重定位表(.rel.)
+---------------
+``` c
+typedef struct
+{
+  Elf32_Addr	r_offset;		/* Address */
+  Elf32_Word	r_info;			/* Relocation type and symbol index */
+} Elf32_Rel;
+```
+
+重定位表常见于可重定位文件,静态链接的可执行文件一般都不包含重定位表. 每个需要重定位的段都可以对应一个重定位表,例如.text段对应.rel,text段,.data段对应.rel.data段. 重定位表结构细节如下
+
+1. r_offset
+    - 重定位地址,表示重定位位置相对于被重定位段基址的偏移
+2. r_info
+    - 表示重定位类型和符号
+    - 低8位表示重定位类型
+        - 使用宏ELF32_R_TYPE获得
+        - 绝对地址重定位取值R_386_32
+        - 相对地址重定位取值R_386_PC32
+    - 高24位表示重定位符号对应的符号表项在符号表中的索引
+
+注意: 使用readelf指令的-r参数可以查看ELF文件符号表信息
+
+
+串表(.shstrtab / .strtab)
+-------------------------
+ELF文件的段表和符号表需要保存段名和符号名,但段表和符号表都是长度固定的数据结构. 因此ELF文件将名称和字符串放在另外的表中, 仅仅记录相应的字符串在串表的偏移值.
+
+注意: 使用hexdump指令的-C参数可以查看文件的二进制内容
+
+
+
+
+
+ELF文件解析方式
+----------------
+
+1. 读取文件头
+    - 文件头是固定大小的,从中可以获得程序头在文件中的偏移(e_phoff),段表在程序中的偏移(e_shoff),段表字符串所在段在段表的索引(e_shstrndx)
+2. 读取段表字符串对应段表项
+    - e_shoff +  e_shentsize * e_shstrndx 
+    - 根据段表项中记录的段表偏移(sh_offset),获得段表字符串表段的位置
+3. 读取段表
+    - 根据段表在程序中的偏移(e_shoff)和段表个数(e_shnum)可以获得段表范围在地址为e_shoff 到 e_shoff + e_ehsize * e_shentsize的区间内
+    - 在每一项中,根据段名字符串在段表字符串表中的偏移(sh_name),获得段名字符串地址
+4. 读取符号表
+    - 根据段表定位到符号表位置
+    - 根据符号表使用的串表对应的段表项在段表中的索引位置(sh_link),得到符号表使用的串表在文件中的位置
+    - 依次读取符号表
+5. 读取重定位表
