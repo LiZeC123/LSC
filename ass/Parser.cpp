@@ -188,18 +188,19 @@ void Parser::inst()
 {
     if(look->sym >= I_MOV && look->sym<=I_LEA){
         Symbol s = look->sym;
-        OpType dstType,srcType; int len;
+        OpType dstType,srcType;
+        int len; int regNum = 0;
         move();
-        oprand(dstType,len,true);
+        oprand(dstType,len,regNum);
         match(COMMA);
-        oprand(srcType,len,false);
+        oprand(srcType,len,regNum);
         gen->genTwoOp(s,dstType,srcType,len);
     }
     else if(look->sym >= I_CALL && look->sym <= I_POP){
         Symbol s = look->sym;
-        OpType type; int len;
+        OpType type; int len; int regNum = 0;
         move();
-        oprand(type,len,true);
+        oprand(type,len,regNum);
         gen->genOneOp(s,type,len);
     }
     else{
@@ -211,17 +212,19 @@ void Parser::inst()
 
 // <oprand> -> <NUM> | <IDENT> | <reg> | <men>
 // 操作数类型,长度,已经识别的寄存器数量
-void Parser::oprand(OpType& type,int& len,bool isDstReg)
+void Parser::oprand(OpType& type,int& len,int& regNum)
 {
     int regCode;string name;Label* label;
     switch (look->sym)
     {
     case NUM:
+        modrm.mod = -1;
         type = IMMEDIATE;
         instr.imm32 = ((Num*)look)->val;
         move();
         break;
     case IDENT:
+        modrm.mod = -1;
         type = IMMEDIATE;
         name = ((ID*)look)->name;
         label = symtab.getLabel(name);
@@ -234,6 +237,7 @@ void Parser::oprand(OpType& type,int& len,bool isDstReg)
         men();
         break;
     case SUB:
+        modrm.mod = -1;
         type = IMMEDIATE;
         move();
         instr.imm32 = - ((Num*)look)->val;  // 取负数
@@ -241,15 +245,17 @@ void Parser::oprand(OpType& type,int& len,bool isDstReg)
     default:
         type = REGISTER;
         regCode = reg(len); // 除了寄存器类型,其他类型都不涉及长度
-        if(isDstReg){
-            // 目标寄存器写入reg
-            modrm.reg = regCode;
-        }
-        else{
-            // 源寄存器写入rm
+        if(regNum != 0){
+            // 第二次读取到寄存器,将源寄存器写入rm
             modrm.mod = 3;
             modrm.rm = regCode;
         }
+        else{
+            // 第一次读取寄存器,将此寄存器临时保存在reg
+            // 可能是 mov eax,ebx 也有可能是mov [ebp-4],eax
+            modrm.reg = regCode;
+        }
+        regNum++;
         break;
     }
 

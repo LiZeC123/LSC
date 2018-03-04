@@ -33,7 +33,7 @@ private:
     void type(string name,std::vector<int>& cont);
     void valtail(string name,std::vector<int>& cont,int size);
     void inst();
-    void oprand(OpType& type,int& len,bool isDstReg);
+    void oprand(OpType& type,int& len,int& regNum);
     void men();
     int reg(int& len);
     void addr();

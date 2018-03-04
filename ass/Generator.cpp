@@ -215,7 +215,7 @@ int Generator::getOpCode(Symbol sym,OpType dstType,OpType srcType,int len)
         index = 3;
         break;
     case REGISTER:
-        index = 2 * (dstType != IMMEDIATE);
+        index = 2 * (dstType != REGISTER);
         break;
     case MEMORY:
         index = 1;
