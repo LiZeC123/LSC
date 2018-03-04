@@ -5,13 +5,13 @@ using namespace std;
 int Label::currAddr = 0x00000000;
 string Label::currSegName = "";
 
-Label::Label(string name,bool ex)
+Label::Label(string name,bool ex,bool global)
 {
     segName = currSegName;
     lbName = name;
     equed  = false;
     externed = ex;
-    global = false; 
+    this->global = global; 
     addr = currAddr;
     times = 0;
     len = 0;
@@ -46,6 +46,11 @@ Label::Label(string name,int times,int len,std::vector<int> cont)
     this->len = len;
     this->cont = cont;
     currAddr += times*len*cont.size();  // 计算实际占用的空间
+}
+
+void Label::setGlobal(bool global)
+{
+    this->global = global;
 }
 
 string Label::getSegName()
@@ -104,9 +109,9 @@ const std::vector<int>& Label::getCont()
 
 void Label::printSelf()
 {
-    if(externed)printf("externed ");
-    if(global)  printf("global ");
-    if(equed)   printf("equed ");
+    printf("%s",externed?"Ex ":"   ");
+    printf("%s",global?"G  ":"   ");
+    printf("%s",equed?"Eq ":"   ");
     printf("%5s/%11s ",segName.c_str(),lbName.c_str());
     printf("len = %1d times = %3d addr = 0x%-8x",len,times,addr);
     if(!cont.empty()){

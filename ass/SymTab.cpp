@@ -22,7 +22,13 @@ void SymTab::addLabel(Label* label)
     }
 
     if(hasName(label->getName())){
-        delete symTab[label->getName()];
+        // 对于extern属性,会被新的符号覆盖
+        // global属性从原有符号属性继承
+        Label* old =  symTab[label->getName()];
+        if(old->isGlobal()){
+            label->setGlobal(true);
+        }
+        delete old;
         symTab[label->getName()] = label;
     }
     else{

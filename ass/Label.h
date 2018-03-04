@@ -9,10 +9,12 @@ public:
     static int currAddr;
     static string currSegName;
 
-    Label(string name,bool ex = false);                         // 标签或外部符号
+    Label(string name,bool ex = false,bool global = false);     // 标签,外部符号,全局符号声明
     Label(string name,int value);                               // 宏符号
     Label(string name,int times,int len,std::vector<int> cont); // 数据符号
     
+    void setGlobal(bool global);
+
     string getSegName();
     string getName(); 
     bool isEqu();
@@ -36,4 +38,4 @@ private:
     int times;              // 重复次数
     int len;                // 单位内存大小
     std::vector<int> cont;  // 符号内容
-};
+}; 

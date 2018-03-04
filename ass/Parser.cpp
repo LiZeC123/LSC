@@ -68,6 +68,7 @@ void Parser::program()
             break;
         case KW_GLB:
             move();
+            symtab.addLabel(new Label(((ID*)look)->name,true,true));
             match(IDENT);
             break;
         case IDENT:
