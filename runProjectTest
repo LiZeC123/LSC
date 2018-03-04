@@ -2,3 +2,5 @@
 
 cd ./compile
 make test
+cd ../ass
+make test

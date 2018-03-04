@@ -16,7 +16,7 @@ then
 	make clear
 else
 	cd ./compile
-	make
+	make -j8
 	cd ../ass
-	make
+	make -j8
 fi
