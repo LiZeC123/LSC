@@ -402,7 +402,7 @@ void Parser::regaddrtail(int regCode,bool isSub)
 // 在后续代码生成中,进行进一步的处理
 void Parser::tempSave(Label* label)
 {
-    if (Scanner::ScanLoop == 2 && !label->getLen()){
+    if (Scanner::ScanLoop == 2 && !label->isEqu()){
         symtab.setRelLabel(label);
     }
 }
