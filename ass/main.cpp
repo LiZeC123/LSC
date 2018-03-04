@@ -50,7 +50,10 @@ int main(int argc,char* argv[])
     fclose(fptmp);
     fptmp = fopen(objtmp.c_str(),"r");
     tab.writeToFile(fptmp,fpObj);
-    
+
+    fclose(fptmp);
+    fclose(fpObj);
+
     remove(objtmp.c_str());     // 汇编完成,删除临时文件
 
     cout << "\n汇编完成!" << endl;
