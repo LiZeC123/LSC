@@ -6,7 +6,7 @@
 class Generator
 {
 public:
-    Generator(SymTab& tab,Parser& p,FILE* fout);
+    Generator(SymTab& tab ,FILE* fout);
     bool processRel(int type);
     void genTwoOp(Symbol s,OpType dstType,OpType srcType,int len);
     void genOneOp(Symbol s,OpType type,int len);

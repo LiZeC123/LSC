@@ -38,10 +38,9 @@ static int NonOpCodep[] =
     0xc3
 };
 
-Generator::Generator(SymTab& tab,Parser& p,FILE* fout) : symtab(tab)
+Generator::Generator(SymTab& tab,FILE* fout) : symtab(tab)
 {
     this->fout = fout;
-    p.setGen(this);
 }
 
 bool Generator::processRel(int type)

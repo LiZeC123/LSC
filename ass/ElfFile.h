@@ -41,7 +41,7 @@ public:
     int getSegIndex(string name);
 
     void assemObj(int dataLen);
-    void writeElfHead(FILE* fin,FILE* fout);
+    void writeElfHead(FILE* fout);
     void writeElfTail(FILE* fin,FILE* fout);
 
 private:

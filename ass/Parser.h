@@ -11,10 +11,9 @@ class Generator;
 class Parser
 {
 public:
-    Parser(Lexer& lex,SymTab& tab);
+    Parser(Lexer& lex,SymTab& tab,FILE* fout);
     void analyse();
-
-    void setGen(Generator* g);
+    ~Parser();
 private:
     Token* look;
     Lexer& lexer;

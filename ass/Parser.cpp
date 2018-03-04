@@ -10,9 +10,10 @@
 using namespace std;
 
 
-Parser::Parser(Lexer& lex,SymTab& tab) : 
+Parser::Parser(Lexer& lex,SymTab& tab,FILE* fout) : 
     lexer(lex),
-    symtab(tab)
+    symtab(tab),
+    gen(new Generator(tab,fout))
 { }
 
 void Parser::analyse()
@@ -23,9 +24,9 @@ void Parser::analyse()
     }
 }
 
-void Parser::setGen(Generator* g)
+Parser::~Parser()
 {
-    gen = g;
+    delete gen;
 }
 
 void Parser::move()

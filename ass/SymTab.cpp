@@ -109,7 +109,7 @@ void SymTab::writeToFile(FILE* fin,FILE* fout)
 {
     exportSyms();
     elfile.assemObj(dataLen);
-    elfile.writeElfHead(fin,fout);
+    elfile.writeElfHead(fout);
     writeData(fout);
     elfile.writeElfTail(fin,fout);
 }

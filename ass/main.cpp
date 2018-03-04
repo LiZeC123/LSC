@@ -38,10 +38,11 @@ int main(int argc,char* argv[])
     Scanner scanner = Scanner(filename);
     Lexer lex       = Lexer(scanner);
     SymTab tab      = SymTab();
-    Parser parser   = Parser(lex,tab);
-    Generator gen   = Generator(tab,parser,fptmp);
+    Parser parser   = Parser(lex,tab,fptmp);
 
     parser.analyse();
+
+    
 
     cout << "符号表内容如下:" << endl;
     tab.printSymbolTable();
@@ -50,6 +51,8 @@ int main(int argc,char* argv[])
     fptmp = fopen(objtmp.c_str(),"r");
     tab.writeToFile(fptmp,fpObj);
     
+    remove(objtmp.c_str());     // 汇编完成,删除临时文件
+
     cout << "\n汇编完成!" << endl;
     return 0;
 }

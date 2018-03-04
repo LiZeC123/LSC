@@ -205,11 +205,8 @@ void ElfFile::assemObj(int dataLen)
 }
 
 
-void ElfFile::writeElfHead(FILE* fin,FILE* fout)
+void ElfFile::writeElfHead(FILE* fout)
 {
-    int padNum = 0;
-    char pad[1] = {0};
-
     fwrite(&ehdr,ehdr.e_ehsize,1,fout);
 }
 
