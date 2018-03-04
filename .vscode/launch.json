@@ -40,6 +40,26 @@
                         "ignoreFailures": true
                     }
                 ]
+            },
+            {
+                "name": "Link Launch",
+                "type": "cppdbg",
+                "request": "launch",
+                "preLaunchTask": "makeLit",
+                "program": "${workspaceRoot}/lit/lscl",
+                "args": ["${workspaceRoot}/test/baseTest.o","${workspaceRoot}/stdlib/stdlib.o"],
+                "stopAtEntry": false,
+                "cwd": "${workspaceRoot}",
+                "environment": [],
+                "externalConsole": true,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
             }
         ]
     }

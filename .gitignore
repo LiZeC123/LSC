@@ -76,5 +76,7 @@ Thumbs.db
 *.out
 lscc
 lsca
+lscl
+lsc
 *.shtmp
 *.tmp

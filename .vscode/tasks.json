@@ -36,6 +36,23 @@
                     "message": 5
                 }
             }
+        },
+        {
+            "label": "makeLit",
+            "type": "shell",
+            "command": "./makeProject lit",
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceRoot}/lit"],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
         }
     ]
 }

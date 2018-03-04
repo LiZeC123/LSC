@@ -8,6 +8,10 @@ elif [ $1x == "compile"x ]
 then
 	cd ./compile
     make
+elif [ $1x == "lit"x ]
+then
+	cd ./lit
+    make
 elif [ $1x == "clear"x ]
 then
 	cd ./compile
