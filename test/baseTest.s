@@ -10,7 +10,7 @@ int2str:
 	sub esp,40
 	mov eax,0
 	mov [ebp-4],eax
-.L15:
+.L16:
 	mov eax,[ebp+12]
 	mov ebx,0
 	mov ecx,0
@@ -19,7 +19,7 @@ int2str:
 	mov [ebp-8],ecx
 	mov eax,[ebp-8]
 	cmp eax,0
-	je .L16
+	je .L17
 	mov eax,[ebp+12]
 	mov ebx,10
 	mov edx,0
@@ -55,9 +55,9 @@ int2str:
 	mov [ebp-40],eax
 	mov eax,[ebp-40]
 	mov [ebp+12],eax
-	jmp .L15
-.L16:
-.L14:
+	jmp .L16
+.L17:
+.L15:
 	mov esp,ebp
 	pop ebp
 	ret
@@ -65,7 +65,7 @@ global main
 main:
 	push ebp
 	mov ebp,esp
-	sub esp,4
+	sub esp,8
 	mov eax,@L2
 	mov [globalChar],eax
 	mov eax,12
@@ -75,6 +75,9 @@ main:
 	call lscPrints
 	add esp,8
 	mov [ebp-4],eax
+	call testPrintNum
+	add esp,0
+	mov [ebp-8],eax
 	mov eax,0
 	jmp .L1
 .L1:
@@ -107,8 +110,8 @@ testAssgin:
 	mov ebx,[ebp-12]
 	mov [ebx],eax
 	mov eax,[ebp-4]
-	jmp .L4
-.L4:
+	jmp .L5
+.L5:
 	mov esp,ebp
 	pop ebp
 	ret
@@ -146,7 +149,7 @@ testPrintNum:
 	call lscPrints
 	add esp,8
 	mov [ebp-48],eax
-.L10:
+.L11:
 	mov esp,ebp
 	pop ebp
 	ret

@@ -3,12 +3,13 @@ char* globalChar;
 
 int lscPrints(char* str,int n);
 void int2str(char* buf,int i);
+int testPrintNum();
 
 int main()
 {
     globalChar = "Hello World!";
     lscPrints(globalChar,12);
-
+    testPrintNum();
     return 0;
 }
 
