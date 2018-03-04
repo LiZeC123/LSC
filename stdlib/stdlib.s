@@ -1,3 +1,4 @@
+section .data
 section .text
 global lscPrints
 lscPrints:
