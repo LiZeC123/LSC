@@ -17,4 +17,5 @@ Lsc项目文档
     - [ELF文件结构](./ass/ELF.md)
     - [词法分析](./ass/LexicalAnalysis.md)
     - [语法分析](./ass/GrammaticalAnalysis.md)
+    - [代码生成与符号管理](./ass/Symbol.md)
 - 链接阶段(待补充)
