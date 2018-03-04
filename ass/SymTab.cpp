@@ -55,11 +55,6 @@ void SymTab::begSeg(std::string segName)
 
 void SymTab::endSeg()
 {
-    // TODO: 分析是否需要跳过第一次
-    // if(Label::currSegName == ""){
-    //     return;
-    // }
-
     if(Scanner::ScanLoop == 1){
         dataLen += (4 - dataLen % 4) % 4;
         elfile.addShdr(Label::currSegName,Label::currAddr,dataLen);

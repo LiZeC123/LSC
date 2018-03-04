@@ -185,7 +185,6 @@ void Parser::valtail(string name,std::vector<int>& cont,int size)
 // <inst> -> <noneop>
 void Parser::inst()
 {
-    //TODO: 代码生成
     if(look->sym >= I_MOV && look->sym<=I_LEA){
         Symbol s = look->sym;
         OpType dstType,srcType; int len;

@@ -68,7 +68,7 @@ void ElfFile::addSym(Label* label)
         sym->st_shndx = STN_UNDEF;
     }
     else{
-        sym->st_shndx = getSegIndex(label->getName());
+        sym->st_shndx = getSegIndex(label->getSegName()); 
     }
 
     symTab[label->getName()] = sym;
@@ -86,7 +86,7 @@ RelInfo* ElfFile::addRel(string segName,int addr,string name,int type)
 int ElfFile::getSegIndex(string name)
 {
     unsigned int i;
-    for(i=0;i<symNames.size();i++){
+    for(i=0;i<shdrNames.size();i++){
         if(shdrNames[i] == name){
             return i;
         }
@@ -185,7 +185,7 @@ void ElfFile::assemObj(int dataLen)
     ehdr.e_shoff = curOff;      // 段表偏移位置
     curOff += ehdr.e_shnum*ehdr.e_shentsize;
 
-    addShdr(".symtab",SHT_STRTAB,0,0,curOff,symNames.size()*sizeof(Elf32_Sym),shIdx[".strtab"],0,1,sizeof(Elf32_Sym));
+    addShdr(".symtab",SHT_SYMTAB,0,0,curOff,symNames.size()*sizeof(Elf32_Sym),shIdx[".strtab"],0,1,sizeof(Elf32_Sym));
     curOff += symNames.size()*sizeof(Elf32_Sym);
 
     addShdr(".strtab",SHT_STRTAB,0,0,curOff,strtab.size(),SHN_UNDEF,0,1,0);
