@@ -12,7 +12,7 @@ typedef enum {
   DR_EAX,DR_ECX,DR_EDX,DR_EBX,
   DR_ESP,DR_EBP,DR_ESI,DR_EDI,
   I_MOV,I_CMP,                      // 双操作数指令
-  I_ADD,I_SUB,
+  I_SUB,I_ADD,
   I_AND,I_OR,
   I_LEA,
   I_CALL,I_INT,                     // 单操作数指令

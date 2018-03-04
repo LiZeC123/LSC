@@ -121,8 +121,8 @@ void Generator::genTwoOp(Symbol s,OpType dstType,OpType srcType,int len)
 void Generator::genOneOp(Symbol s,OpType type,int len)
 {
     int op = OneOpCode[s - I_CALL];
-    if(op == I_CALL || (op >= I_JMP && op <= I_JNE) ){
-        if(op != I_CALL && op != I_JMP){
+    if(s == I_CALL || (s >= I_JMP && s <= I_JNE) ){
+        if(s != I_CALL && s != I_JMP){
             writeBytes(0x0f,1);
         }
         writeBytes(op,1);
