@@ -107,7 +107,7 @@ void ElfFile::getData(char* buf,Elf32_Off offset,Elf32_Word size)
 
 void ElfFile::assemObj(Linker* linker)
 {
-	vector<string> AllSegNames = shdrNames;
+	vector<string> AllSegNames;
 	AllSegNames.push_back("");
 	vector<string> segNames = linker->getSegNames();
 
@@ -195,9 +195,6 @@ void ElfFile::assemObj(Linker* linker)
 				,flags,MEM_ALIGN);
 	}
 
-
-
-
     curOff += ehdr.e_phentsize*ehdr.e_phnum;
 
 	addShdr("",0,0,0,0,0,0,0,0,0);
@@ -270,7 +267,7 @@ void ElfFile::writeElf(Linker* linker,FILE* fout)
     
 	// 检查data段与text段关系
     // .shstrtab
-    padNum = shdrTab[".shstrtab"]->sh_offset - shdrTab[".text"]->sh_offset - shdrTab[".text"]->sh_size;
+    padNum = shdrTab[".shstrtab"]->sh_offset - shdrTab[".data"]->sh_offset - shdrTab[".data"]->sh_size;
     fwrite(pad,sizeof(pad),padNum,fout);
     fwrite(shstrtab.c_str(),shstrtab.size(),1,fout);
 

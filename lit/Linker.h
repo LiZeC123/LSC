@@ -34,4 +34,6 @@ private:
 
     std::vector<SymLink*> symLinks; // 引用符号集
     std::vector<SymLink*> symDef;   // 定义符号集
+
+    ElfFile* genFile;               // 用于生成最后可执行文件的Elf类
 };

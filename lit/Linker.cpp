@@ -11,7 +11,7 @@ Linker::Linker()
 	for(unsigned int i=0;i<segNames.size();i++){
         segLists[segNames[i]]=new SegList();
     }
-		
+	genFile = new ElfFile();
 }
 
 bool Linker::link(const char* filename)
@@ -178,14 +178,16 @@ void Linker::relocate()
 
 void Linker::assemExe()
 {
-    fileList[0]->assemObj(this);
+    genFile->assemObj(this);
+    //fileList[0]->assemObj(this);
 }
 
 
 void Linker::exportElf(const char* filename)
 {
     FILE * fout = fopen(filename,"w");
-    fileList[0]->writeElf(this,fout);
+    genFile->writeElf(this,fout);
+    //fileList[0]->writeElf(this,fout);
     fclose(fout);
 }
 
