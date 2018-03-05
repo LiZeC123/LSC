@@ -47,7 +47,7 @@
                 "request": "launch",
                 "preLaunchTask": "makeLit",
                 "program": "${workspaceRoot}/lit/lscl",
-                "args": ["${workspaceRoot}/test/baseTest.o","${workspaceRoot}/stdlib/stdlib.o"],
+                "args": ["${workspaceRoot}/test/baseTest.o","${workspaceRoot}/stdlib/stdlib.o","${workspaceRoot}/stdlib/start.o"],
                 "stopAtEntry": false,
                 "cwd": "${workspaceRoot}",
                 "environment": [],

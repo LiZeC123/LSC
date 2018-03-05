@@ -23,4 +23,6 @@ else
 	make -j8
 	cd ../ass
 	make -j8
+	cd ../lit
+	make -j8
 fi

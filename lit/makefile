@@ -9,10 +9,10 @@ all: $(OBJ)
 	$(CC) $(OBJ) -o lscl 
 test: $(OBJ)
 	$(CC) $(OBJ) -o lscl 
-	./lscl ../test/baseTest.o ../stdlib/stdlib.o
+	./lscl ../test/baseTest.o ../stdlib/stdlib.o ../stdlib/start.o
 main.o: Linker.h
 	$(CC) main.cpp -c -o main.o 
-ElfFile.o: ElfFile.cpp ElfFile.h
+ElfFile.o: ElfFile.cpp ElfFile.h Linker.h common.h
 	$(CC) ElfFile.cpp -c -o ElfFile.o
 Linker.o: Linker.cpp Linker.h common.h
 	$(CC) Linker.cpp -c -o Linker.o
