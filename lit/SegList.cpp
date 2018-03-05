@@ -48,7 +48,7 @@ void SegList::relocAddr(unsigned int relAddr,unsigned char type, unsigned int sy
     Block* block = nullptr;
     for(unsigned int i=0;i<blocks.size();i++){
         unsigned int start = blocks[i]->offset;
-        unsigned int end = blocks[i]->size;
+        unsigned int end = start + blocks[i]->size;
         if(start <= relOffset && relOffset < end){
             block = blocks[i];
             break;

@@ -48,14 +48,8 @@ void ElfFile::readElf(const string file)
 		Elf32_Shdr*shdr=new Elf32_Shdr();
 		fread(shdr,ehdr.e_shentsize,1,fp);
 		string name(shstrTabData+shdr->sh_name);
-		if(name.empty()){
-            //删除空段表项
-            delete shdr;
-        } 
-        else {
-			shdrNames.push_back(name);
-			shdrTab[name]=shdr;
-		}
+		shdrNames.push_back(name);
+		shdrTab[name] = shdr;
 	}
 	delete []shstrTabData;//清空段表字符串表
 
@@ -75,15 +69,8 @@ void ElfFile::readElf(const string file)
 		Elf32_Sym*sym=new Elf32_Sym();
 		fread(sym,sh_symTab->sh_entsize,1,fp);
 		string name(strTabData+sym->st_name);
-		if(name.empty()){
-            //删除空符号项
-            delete sym;
-        }	
-		else {
-			symNames.push_back(name);
-			//symList.push_back(sym);
-			symTab[name]=sym;//加入符号表
-		}
+		symNames.push_back(name);
+		symTab[name]=sym;//加入符号表
 	}
 
     for(unsigned int i=0;i<shdrNames.size();i++){

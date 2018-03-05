@@ -62,18 +62,18 @@ void Linker::collectInfo()
             if(ELF32_ST_BIND(it->second->st_info) == STB_GLOBAL) {
                 SymLink* symLink = new SymLink();
                 symLink->name = it->first;
-                if(it->second->st_shndx == STN_UNDEF){
-                    // 导入符号
-                    symLink->recv = elf;
-                    symLink->prov = nullptr;
-                    symLinks.push_back(symLink);
-                }
-                else{
-                    // 导出符号
-                    symLink->recv = nullptr;
-                    symLink->prov = elf;
-                    symDef.push_back(symLink);
-                }
+                // 导出符号
+                symLink->recv = nullptr;
+                symLink->prov = elf;
+                symDef.push_back(symLink);
+            }
+            else if (it->second->st_shndx == STN_UNDEF) {
+                SymLink *symLink = new SymLink();
+                symLink->name = it->first;
+                // 导入符号
+                symLink->recv = elf;
+                symLink->prov = nullptr;
+                symLinks.push_back(symLink);
             }
         }
     }
