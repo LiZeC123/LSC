@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Linker.h"
 
+using namespace std;
 
 int main(int argc,char* argv[])
 {
@@ -15,7 +16,17 @@ int main(int argc,char* argv[])
         linker.addElfFile(argv[i]);
     }
 
+    const char* outName = "z.out";
+    bool success = linker.link(outName);
+
     linker.printInfo();
+
+    if(success){
+        cout << "链接成功" << endl;
+    }
+    else{
+        cout << "链接失败" << endl;
+    }
 
     return 0;
 }

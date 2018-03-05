@@ -27,6 +27,12 @@ public:
     void relocAddr(unsigned int relAddr,unsigned char type, unsigned int symAddr);
 
     void addOwner(ElfFile* file);
+
+    unsigned int getBaseAddr();
+    unsigned int getBegin();
+    unsigned int getOffset();
+    unsigned int getSize();
+    std::vector<Block*> getBlocks();
 private:
     unsigned int baseAddr;              // 基地址
     unsigned int begin;                 // 对齐前偏移

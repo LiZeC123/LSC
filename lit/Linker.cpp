@@ -1,8 +1,6 @@
 #include "Linker.h"
 #include "common.h"
 
-#define START "@start"
-
 using namespace std;
 
 Linker::Linker()
@@ -14,6 +12,21 @@ Linker::Linker()
         segLists[segNames[i]]=new SegList();
     }
 		
+}
+
+bool Linker::link(const char* filename)
+{
+    collectInfo();
+    if(!symValid()){
+        return false;
+    }
+    allocAddr();
+    symParser();
+    relocate();
+    assemExe();
+    exportElf(filename);
+
+    return true;
 }
 
 void Linker::addElfFile(char* filename)
@@ -114,9 +127,7 @@ bool Linker::symValid()
 
 void Linker::symParser()
 {
-    for(int i=0;i<fileList.size();i++){
-        ElfFile* elf = fileList[i];
-
+    for(ElfFile* elf:fileList){
         for(auto it=elf->symTab.begin();it!=elf->symTab.end();it++){
             Elf32_Sym* sym = it->second;
             if(sym->st_shndx != STN_UNDEF){
@@ -126,20 +137,20 @@ void Linker::symParser()
         }
     }
 
-    for(int i=0;i<symLinks.size();i++){
-        string name = symLinks[i]->name;
-        Elf32_Sym* provsym = symLinks[i]->prov->symTab[name];
-        Elf32_Sym* recvsym = symLinks[i]->recv->symTab[name];
+    for(auto symlink:symLinks){
+        string name = symlink->name;
+        Elf32_Sym* provsym = symlink->prov->symTab[name];
+        Elf32_Sym* recvsym = symlink->recv->symTab[name];
         recvsym->st_value = provsym->st_value;
     }
 }
 
 void Linker::relocate()
 {
-    for(int i=0;i<fileList.size();i++){
+    for(unsigned int i=0;i<fileList.size();i++){
         vector<RelInfo*> tab = fileList[i]->relTab;
 
-        for(int j=0;j<tab.size();j++){
+        for(unsigned int j=0;j<tab.size();j++){
             // 重定位符号
             string relName = tab[j]->relName;
             Elf32_Sym* sym = fileList[i]->symTab[relName];
@@ -165,10 +176,38 @@ void Linker::relocate()
     }
 }
 
+void Linker::assemExe()
+{
+    fileList[0]->assemObj(this);
+}
+
+
+void Linker::exportElf(const char* filename)
+{
+    FILE * fout = fopen(filename,"w");
+    fileList[0]->writeElf(this,fout);
+    fclose(fout);
+}
+
 void Linker::printInfo()
 {
     for(auto file:fileList){
         file->printInfo();
         printf("\n");
     }
+}
+
+std::vector<string> Linker::getSegNames()
+{
+    return segNames;
+}
+
+std::vector<SymLink*> Linker::getSymDef()
+{
+    return symDef;
+}
+
+std::map<string,SegList*> Linker::getSegLists()
+{
+    return segLists;
 }

@@ -46,7 +46,7 @@ void SegList::relocAddr(unsigned int relAddr,unsigned char type, unsigned int sy
 {
     unsigned int relOffset = relAddr - baseAddr;
     Block* block = nullptr;
-    for(int i=0;i<blocks.size();i++){
+    for(unsigned int i=0;i<blocks.size();i++){
         unsigned int start = blocks[i]->offset;
         unsigned int end = blocks[i]->size;
         if(start <= relOffset && relOffset < end){
@@ -72,4 +72,29 @@ void SegList::relocAddr(unsigned int relAddr,unsigned char type, unsigned int sy
 void SegList::addOwner(ElfFile* file)
 {
     this->ownerList.push_back(file);
+}
+
+unsigned int SegList::getBaseAddr()
+{
+    return baseAddr;
+}
+
+unsigned int SegList::getBegin()
+{
+    return begin;
+}
+
+unsigned int SegList::getOffset()
+{
+    return offset;
+}
+
+unsigned int SegList::getSize()
+{
+    return size;
+}
+
+std::vector<Block*> SegList::getBlocks()
+{
+    return blocks;
 }

@@ -12,13 +12,20 @@ public:
 
 
     Linker();
+    bool link(const char* filename);
     void addElfFile(char* filename);
     void allocAddr();
     void collectInfo();
     bool symValid();
     void symParser();
     void relocate();
+    void assemExe();
+    void exportElf(const char* filename);
     void printInfo();
+
+    std::vector<string> getSegNames();
+    std::vector<SymLink*> getSymDef();
+    std::map<string,SegList*> getSegLists();
 private:
 
     std::vector<string> segNames;

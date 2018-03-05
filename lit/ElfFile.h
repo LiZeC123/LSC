@@ -6,6 +6,8 @@
 
 using std::string;
 
+class Linker;
+
 class RelInfo
 {
 public:
@@ -22,7 +24,14 @@ class ElfFile
 public:
     void readElf(const string file);
     void getData(char* buf,Elf32_Off offset,Elf32_Word size);
+    void assemObj(Linker* linker);
+    void writeElf(Linker* linker,FILE* fout);
     const string& getFileName();
+    void addPhdr(Elf32_Word type,Elf32_Off off,Elf32_Addr vaddr,Elf32_Word filesz,Elf32_Word memsz,Elf32_Word flags,Elf32_Word align);
+    void addShdr(string sh_name,Elf32_Word sh_type,Elf32_Word sh_flags,Elf32_Addr sh_addr,Elf32_Off sh_offset,
+			Elf32_Word sh_size,Elf32_Word sh_link,Elf32_Word sh_info,Elf32_Word sh_addralign,
+			Elf32_Word sh_entsize);
+    void addSym(string name,Elf32_Sym*s);
     void printInfo();
 
     
