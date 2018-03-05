@@ -11,6 +11,7 @@ RelInfo::RelInfo(string segName,Elf32_Rel* rel,string relName)
 
 void ElfFile::readElf(const string file)
 {
+	this->file = file;
 	FILE*fp=fopen(file.c_str(),"rb");
 
 	//读取文件头
@@ -107,6 +108,19 @@ void ElfFile::readElf(const string file)
 	fclose(fp);
 }
 
+void ElfFile::getData(char* buf,Elf32_Off offset,Elf32_Word size)
+{
+	FILE* fp = fopen(file.c_str(),"rb");
+	rewind(fp);
+	fseek(fp,offset,0);
+	fread(buf,size,1,fp);
+	fclose(fp);
+}
+
+const string& ElfFile::getFileName()
+{
+	return file;
+}
 
 void ElfFile::printInfo()
 {

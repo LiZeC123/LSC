@@ -21,9 +21,12 @@ class ElfFile
 
 public:
     void readElf(const string file);
-
+    void getData(char* buf,Elf32_Off offset,Elf32_Word size);
+    const string& getFileName();
     void printInfo();
-private:
+
+    
+
     Elf32_Ehdr ehdr;                        // 文件头
     std::vector<Elf32_Phdr*> phdrTab;       // 程序头表
     std::map<string,Elf32_Shdr*> shdrTab;   // 段表
@@ -33,6 +36,7 @@ private:
     std::vector<RelInfo*> relTab;           // 重定位表
     string shstrtab;                        // 段表字符串表
     string strtab;                          // 字符串表
-
+private:
+    string file;
 
 };
