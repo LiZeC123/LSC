@@ -44,8 +44,8 @@ int main(int argc,char* argv[])
 
     
 
-    cout << "符号表内容如下:" << endl;
-    tab.printSymbolTable();
+    // cout << "符号表内容如下:" << endl;
+    // tab.printSymbolTable();
 
     fclose(fptmp);
     fptmp = fopen(objtmp.c_str(),"r");
@@ -56,7 +56,7 @@ int main(int argc,char* argv[])
 
     remove(objtmp.c_str());     // 汇编完成,删除临时文件
 
-    cout << "\n汇编完成!" << endl;
+    //cout << "\n汇编完成!" << endl;
     return 0;
 }
 

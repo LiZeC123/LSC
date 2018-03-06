@@ -17,16 +17,17 @@ int main(int argc,char* argv[])
     }
 
     const char* outName = "z.out";
-    bool success = linker.link(outName);
+    linker.link(outName);
+    //bool success = linker.link(outName);
 
-    linker.printInfo();
+    // linker.printInfo();
 
-    if(success){
-        cout << "链接成功" << endl;
-    }
-    else{
-        cout << "链接失败" << endl;
-    }
+    // if(success){
+    //     cout << "链接完成" << endl;
+    // }
+    // else{
+    //     cout << "链接失败" << endl;
+    // }
 
     return 0;
 }

@@ -30,11 +30,11 @@ int main(int argc,char* argv[])
     // printf("\n变量表内容如下:\n");
     // tab.printValTab();
     // printf("\n");
-    printf("函数表内容如下:\n");
-    tab.printFunTab();
-    printf("\n");
-    printf("字符串表内容如下:\n");
-    tab.printStrTab();
+    // printf("函数表内容如下:\n");
+    // tab.printFunTab();
+    // printf("\n");
+    // printf("字符串表内容如下:\n");
+    // tab.printStrTab();
 
     string asmFile = string(filename);
     std::size_t pos = asmFile.rfind(".c");

@@ -81,7 +81,7 @@ string getCurrWordPath()
 
 void execCmd(const char* cmdBuf)
 {
-	printf("%s\n",cmdBuf);
+	//printf("%s\n",cmdBuf);
 	system(cmdBuf);
 }
 
