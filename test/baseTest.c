@@ -1,14 +1,20 @@
 char* globalChar;
 
 
-int lscPrints(char* str,int n);
-void int2str(char* buf,int i);
+void lscRead(char* buf,int maxLen);
+void lscWrite(char* buf,int len);
+int lscstr2int(char* str);
+void lscint2str(char* buf,int n);
+void lscPrintStr(char* str);
+void lscPrintInt(int n);
+int lscReadInt();
+
 int testPrintNum();
 
 int main()
 {
     globalChar = "Hello World!\n";
-    lscPrints(globalChar,14);
+    lscPrintStr(globalChar);
     testPrintNum();
     return 0;
 }
@@ -33,32 +39,12 @@ int testPrintNum()
     int fi = 5,fj = 4,fk = 3;
     int fsum;
     fsum = fi+fj*fk;
-    int2str(str,fsum);
-	lscPrints(hit,13);
-    lscPrints(str,3);
-    lscPrints(rtn,2);
+    lscint2str(str,fsum);
+	lscPrintStr(hit);
+    lscPrintStr(str);
+    lscPrintStr(rtn);
 }
 
-void int2str(char* buf,int i)
-{
-	char tmp[10];
-    int count = 0;
-    while(i != 0){
-        int d = i % 10;
-		tmp[count] = d + 48;
-        *(buf+count) = d + 48;
-        count++;
-        i = i / 10;
-    }
-	
-    int idx = 0;
-	while(count >= 0){
-		*(buf+idx) = tmp[count];
-		--count;
-        ++idx;
-	}
-    *(buf+idx) = '\0';
-}
 		
 
 

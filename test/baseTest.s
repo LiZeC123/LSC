@@ -1,157 +1,24 @@
 section .data
 global globalChar
 	globalChar dd 0
-	@L12 db "5 + 4 * 3 = ",0
-	@L13 db 10,0
+	@L11 db "5 + 4 * 3 = ",0
+	@L12 db 10,0
 	@L2 db "Hello World!",10,0
 section .text
-global int2str
-int2str:
-	push ebp
-	mov ebp,esp
-	sub esp,68
-	mov eax,0
-	mov [ebp-16],eax
-.L20:
-	mov eax,[ebp+12]
-	mov ebx,0
-	mov ecx,0
-	cmp eax,ebx
-	setne cl
-	mov [ebp-20],ecx
-	mov eax,[ebp-20]
-	cmp eax,0
-	je .L21
-	mov eax,[ebp+12]
-	mov ebx,10
-	mov edx,0
-	idiv ebx
-	mov [ebp-24],edx
-	mov eax,[ebp-24]
-	mov [ebp-28],eax
-	mov eax,[ebp-16]
-	mov ebx,1
-	imul ebx
-	mov [ebp-32],eax
-	lea eax,[ebp-12]
-	mov ebx,[ebp-32]
-	add eax,ebx
-	mov [ebp-36],eax
-	mov eax,[ebp-28]
-	mov ebx,48
-	add eax,ebx
-	mov [ebp-44],eax
-	mov eax,[ebp-44]
-	mov ebx,[ebp-36]
-	mov [ebx],eax
-	mov eax,[ebp-16]
-	mov ebx,1
-	imul ebx
-	mov [ebp-48],eax
-	mov eax,[ebp+8]
-	mov ebx,[ebp-48]
-	add eax,ebx
-	mov [ebp-52],eax
-	mov eax,[ebp-28]
-	mov ebx,48
-	add eax,ebx
-	mov [ebp-60],eax
-	mov eax,[ebp-60]
-	mov ebx,[ebp-52]
-	mov [ebx],eax
-	mov eax,[ebp-16]
-	mov [ebp-64],eax
-	mov eax,[ebp-16]
-	mov ebx,1
-	add eax,ebx
-	mov [ebp-16],eax
-	mov eax,[ebp+12]
-	mov ebx,10
-	mov edx,0
-	idiv ebx
-	mov [ebp-68],eax
-	mov eax,[ebp-68]
-	mov [ebp+12],eax
-	jmp .L20
-.L21:
-	mov eax,0
-	mov [ebp-20],eax
-.L34:
-	mov eax,[ebp-16]
-	mov ebx,0
-	mov ecx,0
-	cmp eax,ebx
-	setge cl
-	mov [ebp-24],ecx
-	mov eax,[ebp-24]
-	cmp eax,0
-	je .L35
-	mov eax,[ebp-20]
-	mov ebx,1
-	imul ebx
-	mov [ebp-28],eax
-	mov eax,[ebp+8]
-	mov ebx,[ebp-28]
-	add eax,ebx
-	mov [ebp-32],eax
-	mov eax,[ebp-16]
-	mov ebx,1
-	imul ebx
-	mov [ebp-40],eax
-	lea eax,[ebp-12]
-	mov ebx,[ebp-40]
-	add eax,ebx
-	mov [ebp-44],eax
-	mov eax,[ebp-44]
-	mov eax,[eax]
-	mov [ebp-52],al
-	mov eax,0
-	mov al,[ebp-52]
-	mov ebx,[ebp-32]
-	mov [ebx],eax
-	mov eax,[ebp-16]
-	mov ebx,1
-	sub eax,ebx
-	mov [ebp-16],eax
-	mov eax,[ebp-20]
-	mov ebx,1
-	add eax,ebx
-	mov [ebp-20],eax
-	jmp .L34
-.L35:
-	mov eax,[ebp-20]
-	mov ebx,1
-	imul ebx
-	mov [ebp-24],eax
-	mov eax,[ebp+8]
-	mov ebx,[ebp-24]
-	add eax,ebx
-	mov [ebp-28],eax
-	mov eax,0
-	mov al,0
-	mov ebx,[ebp-28]
-	mov [ebx],eax
-.L19:
-	mov esp,ebp
-	pop ebp
-	ret
 global main
 main:
 	push ebp
 	mov ebp,esp
-	sub esp,8
+	sub esp,4
 	mov eax,@L2
 	mov [globalChar],eax
-	mov eax,14
-	push eax
 	mov eax,[globalChar]
 	push eax
-	call lscPrints
-	add esp,8
-	mov [ebp-4],eax
+	call lscPrintStr
+	add esp,4
 	call testPrintNum
 	add esp,0
-	mov [ebp-8],eax
+	mov [ebp-4],eax
 	mov eax,0
 	jmp .L1
 .L1:
@@ -184,8 +51,8 @@ testAssgin:
 	mov ebx,[ebp-12]
 	mov [ebx],eax
 	mov eax,[ebp-4]
-	jmp .L5
-.L5:
+	jmp .L4
+.L4:
 	mov esp,ebp
 	pop ebp
 	ret
@@ -193,10 +60,10 @@ global testPrintNum
 testPrintNum:
 	push ebp
 	mov ebp,esp
-	sub esp,64
-	mov eax,@L12
+	sub esp,52
+	mov eax,@L11
 	mov [ebp-24],eax
-	mov eax,@L13
+	mov eax,@L12
 	mov [ebp-28],eax
 	mov eax,5
 	mov [ebp-32],eax
@@ -218,30 +85,21 @@ testPrintNum:
 	push eax
 	lea eax,[ebp-20]
 	push eax
-	call int2str
+	call lscint2str
 	add esp,8
-	mov eax,13
-	push eax
 	mov eax,[ebp-24]
 	push eax
-	call lscPrints
-	add esp,8
-	mov [ebp-56],eax
-	mov eax,3
-	push eax
+	call lscPrintStr
+	add esp,4
 	lea eax,[ebp-20]
 	push eax
-	call lscPrints
-	add esp,8
-	mov [ebp-60],eax
-	mov eax,2
-	push eax
+	call lscPrintStr
+	add esp,4
 	mov eax,[ebp-28]
 	push eax
-	call lscPrints
-	add esp,8
-	mov [ebp-64],eax
-.L11:
+	call lscPrintStr
+	add esp,4
+.L10:
 	mov esp,ebp
 	pop ebp
 	ret
