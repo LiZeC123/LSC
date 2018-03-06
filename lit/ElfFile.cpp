@@ -172,7 +172,7 @@ void ElfFile::assemObj(Linker* linker)
 	ehdr.e_type = ET_EXEC;
 	ehdr.e_machine = EM_386;
 	ehdr.e_version = EV_CURRENT;
-	ehdr.e_entry = symTab[START]->st_name;
+	ehdr.e_entry = symTab[START]->st_value;
 	ehdr.e_phoff = 0;
 	ehdr.e_shoff = 0;
 	ehdr.e_flags = 0;
@@ -237,7 +237,7 @@ void ElfFile::assemObj(Linker* linker)
 void ElfFile::writeElf(Linker* linker,FILE* fout)
 {
     int padNum = 0;
-    char pad[1] = {0};
+    unsigned char pad[1] = {0};
 
 	// 文件头
 	fwrite(&ehdr,ehdr.e_ehsize,1,fout);
@@ -249,6 +249,7 @@ void ElfFile::writeElf(Linker* linker,FILE* fout)
 
 	// .text .data
 	for(auto name:linker->getSegNames()){
+		pad[0] = (name == ".text") ? 0x90 : 0x00;
 		SegList* seg = linker->getSegLists()[name];
 		padNum = seg->getOffset() - seg->getBegin();
 		fwrite(pad,sizeof(pad),padNum,fout);
@@ -258,12 +259,14 @@ void ElfFile::writeElf(Linker* linker,FILE* fout)
 			if(last != nullptr){
 				unsigned int lastEnd = last->offset + last->size;
 				padNum = block->offset - lastEnd;
+				//int n = sizeof(pad);
 				fwrite(pad,sizeof(pad),padNum,fout);
 			}
 			fwrite(block->data,block->size,1,fout);
 			last = block;
 		}
 	}
+	pad[0] = 0;
     
 	// 检查data段与text段关系
     // .shstrtab
