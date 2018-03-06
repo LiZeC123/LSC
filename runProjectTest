@@ -1,6 +1,4 @@
 #! /bin/bash
 
-cd ./compile
-make test
-cd ../ass
-make test
+./lsc ./test/baseTest.c
+./z.out
