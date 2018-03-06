@@ -172,7 +172,44 @@ ELF文件中,除了文件头和程序头表以外,其他信息都是以段的形
 
 程序头表(Program Header Table)
 -----------------------------
-ELF文件中程序头表和段表是相互独立的,且一般只有可执行文件拥有程序头表. 有关细节在后续链接器开发过程中再做补充.
+``` c
+typedef struct
+{
+  Elf32_Word	p_type;			/* Segment type */
+  Elf32_Off	p_offset;		/* Segment file offset */
+  Elf32_Addr	p_vaddr;		/* Segment virtual address */
+  Elf32_Addr	p_paddr;		/* Segment physical address */
+  Elf32_Word	p_filesz;		/* Segment size in file */
+  Elf32_Word	p_memsz;		/* Segment size in memory */
+  Elf32_Word	p_flags;		/* Segment flags */
+  Elf32_Word	p_align;		/* Segment alignment */
+} Elf32_Phdr;
+```
+
+ELF文件中程序头表和段表是相互独立的,且一般只有可执行文件拥有程序头表. 
+
+1. p_type
+    - 段的类型,由于我们只关注可加载段,所以取值为PT_LOAD
+2. p_offset
+    - 段对应的内容在文件中的偏移
+3. p_vaddr
+    - 段在内存中的线性地址
+4. p_paddr
+    - 段的物理地址
+    - 由于现代操作系统使用分页机制,因此此段与p_vaddr保持一致即可
+5. p_filesz
+    - 段在文件内的大小
+6. p_memsz
+    - 段在内存中的大小
+7. p_flags
+    - 与sh_flags类似,表示段属性
+    - 1 表示可执行,取值PF_X
+    - 2 表示可写,取值PF_W
+    - 4 表示可读,取值PF_R
+    - 段标记可以符合
+8. p_align
+    - 对齐方式
+    - 一般取值为0x1000,即linux默认页面大小
 
 
 符号表(.symbol)  
