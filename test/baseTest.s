@@ -1,6 +1,6 @@
 section .data
 global globalChar
-	globalChar db 0
+	globalChar dd 0
 	@L2 db "Hello World!",0
 section .text
 global int2str

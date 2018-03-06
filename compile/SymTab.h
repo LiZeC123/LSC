@@ -51,6 +51,7 @@ public:
     //bool isConst();         // 是否是常量
     bool notConst();        // 是否不是常量
     bool getArray();        // 是否是数组
+    bool getIsPtr();        // 是否是指针类型
     bool isInit();
  
 

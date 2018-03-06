@@ -268,6 +268,11 @@ bool Var::getArray()
     return isArray;
 }
 
+bool Var::getIsPtr()
+{
+    return isPtr;
+}
+
 bool Var::isInit()
 {
     return inited;
@@ -888,12 +893,31 @@ void SymTab::genData(FILE* file)
     for(Var* var:glbVars){
         fprintf(file,"global %s\n",var->getName().c_str());
         fprintf(file,"\t%s " ,var->getName().c_str());
-        int typeSize = var->getType() == KW_CHAR ? 1 : 4;
+
+        int typeSize;
+        if(var->getIsPtr()){
+            // 如果是指针,则一律是4字节大小
+            typeSize = 4;
+        }
+        else{
+            typeSize = var->getType() == KW_CHAR ? 1 : 4;
+        }
+
         if(var->getArray()){
             fprintf(file,"times %d",var->getSize()/typeSize);
         }
-        const char* type = var->getType() == KW_CHAR ? "db" : "dd";
-        fprintf(file,"%s " ,type);
+
+        if(var->getIsPtr()){
+            // 同理,指针始终使用dd长度
+            const char* type = "dd";
+            fprintf(file,"%s " ,type);
+        }
+        else{
+            const char* type = var->getType() == KW_CHAR ? "db" : "dd";
+            fprintf(file,"%s " ,type);
+        }
+
+
 
         if(var->isInit()){
             if(var->isBase()){
