@@ -3,20 +3,22 @@
 if [ $1x == "ass"x ]
 then
 	cd ./ass
-    make
+	make
 elif [ $1x == "compile"x ]
 then
 	cd ./compile
-    make
+	make
 elif [ $1x == "lit"x ]
 then
 	cd ./lit
-    make
+	make
 elif [ $1x == "clear"x ]
 then
 	cd ./compile
 	make clear
 	cd ../ass
+	make clear
+	cd ../lit
 	make clear
 else
 	cd ./compile
@@ -25,4 +27,6 @@ else
 	make -j8
 	cd ../lit
 	make -j8
+	cd ..
+	g++ main.cpp -o lsc -std=c++11
 fi
