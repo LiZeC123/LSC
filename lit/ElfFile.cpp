@@ -261,7 +261,7 @@ void ElfFile::writeElf(Linker* linker,FILE* fout)
 				padNum = block->offset - lastEnd;
 				for(int i=0;i<padNum;i++){
 					// 虽然填充值不影响程序运行,但是会影响objdump程序的反汇编
-					// 所以最后把每个字节否填充成nop指令
+					// 所以最好把每个字节都填充成nop指令
 					// pad长度小于指定长度时,会直接读取数组后面的数据,导致填充了垃圾数据
 					// 所以需要逐字节填充
 					fwrite(pad,sizeof(pad),1,fout);
