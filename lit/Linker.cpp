@@ -185,7 +185,7 @@ void Linker::assemExe()
 
 void Linker::exportElf(const char* filename)
 {
-    FILE * fout = fopen(filename,"w");
+    FILE * fout = fopen(filename,"wb");
     genFile->writeElf(this,fout);
     //fileList[0]->writeElf(this,fout);
     fclose(fout);
