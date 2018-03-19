@@ -4,7 +4,7 @@ global @start
 @start:
     pop esi
     mov ecx,esp
-    and esp,4294967280
+    and esp,0xfffffff0
     push ecx
     push esi
     call main
