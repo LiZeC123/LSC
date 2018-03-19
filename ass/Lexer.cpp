@@ -184,11 +184,31 @@ Token* Lexer::getStr()
 Token* Lexer::getNum()
 {
     int val=0;
-    do
-    {
-        val = val * 10 + ch - '0';
+    if(ch!='0'){//10进制
+        do{
+            val=val*10+ch-'0';
+            scan();
+        }while(ch>='0'&&ch<='9');
+    }
+    else{
         scan();
-    } while (ch >= '0' && ch <= '9');
+        if(ch=='x'){//16进制
+            scan();
+            if((ch>='0'&&ch<='9')||(ch>='A'&&ch<='F')||(ch>='a'&&ch<='f')){
+                do{
+                    val=val*16+ch;
+                    if(ch>='0'&&ch<='9')val-='0';
+                    else if(ch>='A'&&ch<='F')val+=10-'A';
+                    else if(ch>='a'&&ch<='f')val+=10-'a';							
+                    scan();
+                }while((ch>='0'&&ch<='9')||(ch>='A'&&ch<='F')||(ch>='a'&&ch<='f'));
+            }
+            else{
+                //0x后无数据,实际不可能存在
+                return new Token(ERR);
+            }
+        }
+    }
     return new Num(val);
 }
 
