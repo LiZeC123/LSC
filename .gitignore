@@ -80,6 +80,3 @@ lscl
 lsc
 *.shtmp
 *.tmp
-
-!/stdlib/start.o
-!/stdlib/stdlib.o
