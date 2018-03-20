@@ -24,6 +24,8 @@ then
 	make clear
 	cd ../lit
 	make clear
+	cd ../preproc
+	make clear
 	cd ../stdlib
 	rm -f *.o
 else
@@ -32,6 +34,8 @@ else
 	cd ../ass
 	make -j8
 	cd ../lit
+	make -j8
+	cd ../preproc
 	make -j8
 	cd ../stdlib
 	../ass/lsca start.s
