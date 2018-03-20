@@ -12,6 +12,10 @@ elif [ $1x == "lit"x ]
 then
 	cd ./lit
 	make
+elif [ $1x == "pre"x ]
+then
+	cd ./preproc
+	make
 elif [ $1x == "clear"x ]
 then
 	cd ./compile
