@@ -20,6 +20,8 @@ then
 	make clear
 	cd ../lit
 	make clear
+	cd ../stdlib
+	rm -f *.o
 else
 	cd ./compile
 	make -j8
@@ -27,6 +29,9 @@ else
 	make -j8
 	cd ../lit
 	make -j8
+	cd ../stdlib
+	../ass/lsca start.s
+	../ass/lsca stdlib.s
 	cd ..
 	g++ main.cpp -o lsc -std=c++11
 fi
