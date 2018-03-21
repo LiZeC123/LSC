@@ -64,6 +64,14 @@ Token* Lexer::nextToken()
             t = new Token(POUND);
             scan();
         }
+        else if(ch == '<'){
+            t = new Token(LABRACK);
+            scan();
+        }
+        else if(ch == '>'){
+            t = new Token(RABRACK);
+            scan();
+        }
         else{
             // 无关符号,直接跳过
             scan(); 

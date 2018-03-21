@@ -9,6 +9,7 @@ typedef enum {
     POUND,                          // #
     KW_INCLUDE,                     //include
     KW_DEFINE,                      //define
+    LABRACK,RABRACK,                // < >
 } Symbol;
 
 // 更新词法记号列表的同时需要更新Token.cpp中的字符串表
