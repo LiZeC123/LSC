@@ -14,21 +14,26 @@ section .data
 section .text
 global @start
 @start:
+    pop esi
+    mov ecx,esp
+    and esp,0xfffffff0
+    push ecx
+    push esi
     call main
     mov eax,1
     mov ebx,0
     int 128
 ```
-实际上,start.o对应的内容非常简单,即调用main函数,在main函数结束后,通过系统调用结束整个程序. 由于lsc语言在启动和结束过程没有特殊的需求,因此start.o文件仅仅是调用main函数,否则可以在调用main函数的前后进行一些初始化和销毁的操作.
+start.o的主要内容就是调用main函数,并且在main函数结束后,通过系统调用结束整个程序. 根据 #3 的讨论,按照与GCC相同的方法,start.o在调用main函数前对命令行参数进行了处理并将栈指针对齐.
 
-标准库
+标准I/O库
 ---------
 
 在任何一个语言中,标准库都是一个重要的部分. 由于lsc语言并不内置输入输出有关的语法元素, 因此关于输入和输出的函数作为标准库的一部分提供给用户.
 
-在项目的stdlib文件夹下,提供了stdlib.h和stdlib.o两个文件,其中头文件定义了所有的标准库函数,而.o文件提供了实现的代码. 
+在项目的stdlib文件夹下,提供了lscio.h和stdlib.o两个文件,其中头文件定义了所有的标准I/O库函数,而.o文件提供了实现的代码. 
 
-实际上,lsc的标志库是由汇编和lsc语言构成的,其中
+实际上,lsc的标准I/O库是由汇编和lsc语言构成的,其中
 ``` c
 void lscRead(char* buf,int maxLen);
 void lscWrite(char* buf,int len);
