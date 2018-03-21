@@ -113,11 +113,39 @@ Token * Lexer::getIdent()
 
 Token* Lexer::getStr()
 {
+   Token* t = nullptr;
+    string str="";
     while(!scan('"')){
-        continue;
+        //转义
+        if(ch=='\\'){
+            scan();
+            if(ch=='n')str.push_back('\n');
+            else if(ch=='\\')str.push_back('\\');
+            else if(ch=='t')str.push_back('\t');
+            else if(ch=='"')str.push_back('"');
+            else if(ch=='0')str.push_back('\0');
+            else if(ch=='\n');//什么也不做，字符串换行
+            else if(ch==-1){
+                t=new Token(ERR);
+                break;
+            }
+            else{
+                str.push_back(ch);
+            } 
+        }
+        //文件结束
+        else if(ch=='\n'||ch==-1){
+            t=new Token(ERR);
+            break;
+        }
+        else{
+            str.push_back(ch);
+        }
+            
     }
-
-    return new Token(ERR);
+    //最终字符串
+    if(!t)t=new Str(str);
+    return t;
 }
 
 Token* Lexer::getNum()

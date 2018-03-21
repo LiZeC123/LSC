@@ -13,6 +13,7 @@ const char * tokenName[]=
 	"error",
 	"文件结尾",
 	"标识符",
+	"字符串",
 	"#",
 	"include",
 	"define",
@@ -43,4 +44,13 @@ string ID::toString()
 	return Token::toString()+name;
 }
 
+/*******************************************************************************
+                                   字符串
+*******************************************************************************/
 
+Str::Str (string s):Token(STR),str(s) { }
+
+string Str::toString()
+{
+	return string("[")+Token::toString()+"]:"+str;
+}

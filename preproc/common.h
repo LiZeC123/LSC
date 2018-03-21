@@ -5,6 +5,7 @@ typedef enum {
     ERR,                            //错误，异常
     END,                            //文件结束标记
     IDENT,                          //标识符
+    STR,                            //字符串
     POUND,                          // #
     KW_INCLUDE,                     //include
     KW_DEFINE,                      //define

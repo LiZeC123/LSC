@@ -19,3 +19,11 @@ public:
     ID(std::string n);
     virtual std::string toString();
 };
+
+class Str:public Token
+{
+public:
+    std::string str;
+    Str(std::string s);
+    virtual std::string toString();
+};
