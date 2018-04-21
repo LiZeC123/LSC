@@ -1,24 +1,15 @@
 #include <iostream>
-#include "Scanner.h"
-#include "Lexer.h"
-
+#include "PreProc.h"
 
 using namespace std;
 int main()
 {
-    const char* filename = "./test/testMacro.c";
-    Scanner scanner = Scanner(filename);
-    Lexer lex = Lexer(scanner);
+    string cfile = "../test/testMacro.c";
+    string ifile = "./cii.i";
+    PreProc proc(cfile,ifile);
 
-    while(true){
-        Token* token = lex.nextToken();
-        if(token->sym != END){
-            cout << token->toString() << endl;
-        }
-        else {
-            break;
-        }
-    }
+    proc.anaylse();
+
 
     return 0;
 }
