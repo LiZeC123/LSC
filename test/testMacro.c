@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <lscio.h>
 #include "../stdlib/lscio.h"
 
 #define MAX_SIZE 10
