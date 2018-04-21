@@ -20,4 +20,5 @@ private:
 
 
     void doInclude(std::ofstream& ifile, std::string includeFile,bool isStd);
+    void doDefine(std::ofstream& ifile, std::string& name, std::string value);
 };

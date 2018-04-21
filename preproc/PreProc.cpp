@@ -46,6 +46,11 @@ void PreProc::doCmd(ofstream& ifile, const string& line)
     else {
         vector<string> cmdList = spiltCmd(line);
         if(cmdList[1] == "include") {
+            if(cmdList.size() < 5){
+                Error::preError(ERROR_COMMAND,filename,rowNum);
+                return;
+            }
+
             if(cmdList[2] == "\""){
                 string filename;
                 for(size_t i=3;i<cmdList.size();i++){
@@ -75,7 +80,11 @@ void PreProc::doCmd(ofstream& ifile, const string& line)
             }
         }
         else if(cmdList[1] == "define") {
-            // ...
+            if(cmdList.size() != 4){
+                Error::preError(ERROR_COMMAND,filename,rowNum);
+                return;
+            }
+            doDefine(ifile,cmdList[2],cmdList[3]);
         }
         else{
             Error::preError(ERROR_COMMAND,filename,rowNum);
@@ -95,7 +104,7 @@ vector<string> PreProc::spiltCmd(const string& line)
         if((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 'A' && line[i] <= 'Z') || (line[i] == '_')){
             do{
                 word.push_back(line[i++]);
-            } while((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 'A' && line[i] <= 'Z'));
+            } while((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 'A' && line[i] <= 'Z') || (line[i] == '_') || (line[i] >= '0' && line[i] <= '9'));
             r.push_back(word);
         }
         else if(line[i] == ' '){
@@ -139,4 +148,19 @@ void PreProc::doInclude(ofstream& ifile, string includeFile,bool isStd)
         Error::preError(ERROR_FILENAME,filename,rowNum);
     }
     
+}
+
+void PreProc::doDefine(ofstream& ifile, string& name, string value)
+{
+    string typeStr;
+    if(name[0] == '"'){
+        typeStr = "char* ";
+    }
+    else if(name[0] == '\'') {
+        typeStr = "char ";
+    }
+    else{
+        typeStr = "int ";
+    }
+    ifile << typeStr << name << " = " << value << endl;
 }
