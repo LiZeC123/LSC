@@ -2,14 +2,14 @@
 #include "PreProc.h"
 
 using namespace std;
-int main()
+int main(int argc, const char* argv[])
 {
-    string cfile = "../test/testMacro.c";
-    string ifile = "./cii.i";
-    PreProc proc(cfile,ifile);
-
-    proc.anaylse();
-
+    if(argc >= 2){
+        string cfile(argv[1]);
+        string ifile = "./cii.i";
+        PreProc proc(cfile,ifile);
+        proc.anaylse();
+    }
 
     return 0;
 }
