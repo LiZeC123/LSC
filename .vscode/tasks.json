@@ -60,7 +60,7 @@
             "command": "./makeProject pre",
             "problemMatcher": {
                 "owner": "cpp",
-                "fileLocation": ["relative", "${workspaceRoot}/lit"],
+                "fileLocation": ["relative", "${workspaceRoot}/preproc"],
                 "pattern": {
                     "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
                     "file": 1,

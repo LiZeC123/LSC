@@ -8,7 +8,7 @@ CC = g++
 lscp: $(OBJ) 
 	$(CC) $(CXXFLAGS) $(OBJ) -o lscp 
 test: lscp
-	./lscp ../test/baseTest.c
+	./lscp ../test/testMacro.c
 clear:
 	rm -rf *.o
 	rm -rf lscp

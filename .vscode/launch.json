@@ -7,7 +7,7 @@
                 "request": "launch",
                 "preLaunchTask": "makePre",
                 "program": "${workspaceFolder}/preproc/lscp",
-                "args": [],
+                "args": ["${workspaceRoot}/test/testMacro.c"],
                 "stopAtEntry": false,
                 "cwd": "${workspaceFolder}",
                 "environment": [],
