@@ -1,4 +1,4 @@
-OBJ = main.o PreProc.o
+OBJ = main.o Error.o PreProc.o
 WARNFLG = -Wall -Wextra
 DEBUG = -g
 STD = -std=c++11

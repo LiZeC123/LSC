@@ -1,5 +1,7 @@
 #include "PreProc.h"
+#include "Error.h"
 #include <iostream>
+
 using namespace std;
 
 PreProc::PreProc(string& cfilename, string& ifilename) :
@@ -7,12 +9,11 @@ PreProc::PreProc(string& cfilename, string& ifilename) :
 { 
     filename = cfilename;
     if(!cfile){
-        
-        cout << "预处理错误: 源文件打开失败" << endl;
+        Error::preError(SOURCE_FILE_FAIL,filename,0);
     }
 
     if(!ifile){
-        cout << "预处理错误: 输出文件打开失败" << endl; 
+        Error::preError(OUTPUT_FILE_FAIL,filename,0);
     }
 }
 
@@ -23,7 +24,7 @@ void PreProc::anaylse()
     while(getline(cfile,line)){
         ++rowNum;
         if(line[0] == '#'){
-            doCmd(cfile,ifile,line);
+            doCmd(ifile,line);
         }
         else{
             cout << line << endl;
@@ -37,10 +38,10 @@ void PreProc::anaylse()
 }
 
 
-void PreProc::doCmd(ifstream& cfile,ofstream& ifile, const string& line)
+void PreProc::doCmd(ofstream& ifile, const string& line)
 {
     if(line.size() == 1){
-        printf("预处理错误<第%d行> %s, 编译预处理指令不能为空\n",rowNum,line.c_str());
+        Error::preError(EMPTY_COMMAND,filename,rowNum);
     }
     else {
         vector<string> cmdList = spiltCmd(line);
@@ -70,14 +71,14 @@ void PreProc::doCmd(ifstream& cfile,ofstream& ifile, const string& line)
                 doInclude(ifile,filename,true);
             }
             else{
-                 printf("预处理错误 <第%d行> %s, include指定的文件名不正确\n",rowNum,line.c_str());
+                Error::preError(ERROR_FILENAME,filename,rowNum);
             }
         }
         else if(cmdList[1] == "define") {
             // ...
         }
         else{
-            printf("第%d行: %s, 无效的编译预处理指令\n",rowNum,line.c_str());
+            Error::preError(ERROR_COMMAND,filename,rowNum);
         }
         
     } 
@@ -135,7 +136,7 @@ void PreProc::doInclude(ofstream& ifile, string includeFile,bool isStd)
         }
     }
     else{
-        printf("第%d行: 无法打开指定的包含文件文件%s\n",rowNum,includeFile.c_str());
+        Error::preError(ERROR_FILENAME,filename,rowNum);
     }
     
 }

@@ -15,7 +15,7 @@ private:
     std::ifstream cfile;
     std::ofstream ifile;
     int rowNum = 0;
-    void doCmd(std::ifstream& cfile,std::ofstream& ifile, const std::string& line);
+    void doCmd(std::ofstream& ifile, const std::string& line);
     std::vector<std::string> spiltCmd(const std::string& line);
 
 
