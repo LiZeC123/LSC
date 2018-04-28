@@ -8,6 +8,12 @@ PreProc::PreProc(string& cfilename, string& ifilename) :
     cfile(cfilename), ifile(ifilename)
 { 
     filename = cfilename;
+    path = cfilename;
+    std::size_t pos = cfilename.rfind("/");
+    if(pos > 0){
+        path.erase(pos);
+    }
+  
     if(!cfile){
         Error::preError(SOURCE_FILE_FAIL,filename,0);
     }
@@ -133,7 +139,7 @@ void PreProc::doInclude(ofstream& ifile, string includeFile,bool isStd)
         filename = "./stdlib/"+includeFile;
     }
     else{
-        filename = includeFile;
+        filename = path + "/" + includeFile;
     }
 
     ifstream in(filename);
@@ -161,5 +167,5 @@ void PreProc::doDefine(ofstream& ifile, string& name, string value)
     else{
         typeStr = "int ";
     }
-    ifile << typeStr << name << " = " << value << endl;
+    ifile << typeStr << name << " = " << value << ";" << endl;
 }
