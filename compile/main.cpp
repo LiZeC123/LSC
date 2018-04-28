@@ -37,15 +37,22 @@ int main(int argc,char* argv[])
     // tab.printStrTab();
 
     string asmFile = string(filename);
-    std::size_t pos = asmFile.rfind(".c");
-    if (pos > 0 && pos == asmFile.length() - 2)
+    std::size_t ipos = asmFile.rfind(".i");
+    std::size_t cpos = asmFile.rfind(".c");
+   
+    if (ipos>0 && ipos==asmFile.length()-2)
     {
-        asmFile.replace(pos, 2, ".s");
+        asmFile.replace(ipos, 2, ".s");
+    }
+    else if(cpos>0 && cpos==asmFile.length()-2) 
+    {
+        asmFile.replace(cpos, 2, ".s");
     }
     else
     {
         asmFile = asmFile + ".s";
     }
+
     FILE* fpAsm = fopen(asmFile.c_str(),"w");
     tab.toX86(fpAsm);
     fclose(fpAsm);

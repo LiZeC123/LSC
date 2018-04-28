@@ -105,7 +105,7 @@ string getFilePath()
 // 检查是否是合法的输入文件
 bool checkType(const string& type)
 {
-	static string list[] = {".c",".s",".o"};
+	static string list[] = {".c",".i",".s",".o"};
 	for(const auto& t: list){
 		if(t == type){
 			return true;
@@ -119,7 +119,7 @@ bool checkType(const string& type)
 // 命令所在路径, 命令名(非全局命令,需要在开头加上/), 命令参数
 void execCmd(const string& path, const string& cmd, const string& file)
 {
-	static char cmdBuf[1024];
+	static char cmdBuf[2048];
 	sprintf(cmdBuf, "%s%s %s", path.c_str(),cmd.c_str(),file.c_str());
 	printf("%s\n",cmdBuf);
 	system(cmdBuf);
@@ -160,7 +160,12 @@ int main(int argc,char* argv[])
 	// 编译, 汇编
 	for(const auto& file: compilefiles){
 		if(file.getType() == ".c"){
-			execCmd(exePath,"/compile/lscc", file.getCoreName()+".c");
+			execCmd(exePath,"/preproc/lscp", file.getCoreName()+".c");
+			execCmd(exePath,"/compile/lscc", file.getCoreName()+".i");
+			execCmd(exePath,"/ass/lsca", file.getCoreName()+".s");
+		}
+		else if(file.getType() == ".i"){
+			execCmd(exePath,"/compile/lscc", file.getCoreName()+".i");
 			execCmd(exePath,"/ass/lsca", file.getCoreName()+".s");
 		}
 		else if(file.getType() == ".s") {

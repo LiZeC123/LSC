@@ -131,7 +131,7 @@ void PreProc::doInclude(ofstream& ifile, string includeFile,bool isStd)
 {
     string filename;
     if(isStd){
-        filename = "../stdlib/"+includeFile;
+        filename = "./stdlib/"+includeFile;
     }
     else{
         filename = includeFile;
