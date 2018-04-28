@@ -1,4 +1,24 @@
 #! /bin/bash
 
+echo ">>> Base Test <<<"
 ./lsc ./test/baseTest.c
 ./z.out
+echo
+echo
+echo ">>> Test Compile IO Library <<<"
+./compile/lscc ./test/testIO.c
+./ass/lsca ./test/testIO.s
+echo 
+echo
+echo ">>> Test Use  IO Library <<<"
+./lsc ./test/testlib.c
+echo
+echo
+echo ">>> Test Use Macro <<<"
+./lsc ./test/testMacro.c
+./z.out
+echo
+echo
+echo ">>> Test Use Command Args <<<"
+./lsc ./test/useArg.c
+./z.out 123 321 1234 4321
