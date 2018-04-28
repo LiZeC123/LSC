@@ -4,7 +4,7 @@
 #include <string>
 #include <unistd.h>
 #define SIZE 256
-
+//#define _LSC_DEBUG_
 using namespace std;
 
 // 手动取出以下函数的定义,从而避免vscode的语法检查无法识别头文件函数定义的问题
@@ -121,8 +121,11 @@ void execCmd(const string& path, const string& cmd, const string& file)
 {
 	static char cmdBuf[2048];
 	sprintf(cmdBuf, "%s%s %s", path.c_str(),cmd.c_str(),file.c_str());
-	printf("%s\n",cmdBuf);
 	system(cmdBuf);
+
+#ifdef _LSC_DEBUG_
+	printf("Run Shell Command -> %s\n",cmdBuf);
+#endif
 }
 
 

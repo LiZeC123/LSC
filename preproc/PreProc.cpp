@@ -27,7 +27,6 @@ void PreProc::anaylse()
             doCmd(ifile,line);
         }
         else{
-            cout << line << endl;
             ifile << line << endl;
         }
     }
