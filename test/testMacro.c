@@ -6,11 +6,13 @@
 
 int main()
 {
-    int a[MAX_SIZE];
+    int a[10];
+    a[0] = MAX_SIZE;
 
     for(int i=0;i<10;i++){
         char* str = "MAX_SIZE";
     }
     int b = 0xacd;
     int maybe = acd;
+    lscPrintStr("Finish!");
 }
