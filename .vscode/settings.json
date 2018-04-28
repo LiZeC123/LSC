@@ -30,6 +30,7 @@
         "system_error": "cpp",
         "string": "cpp",
         "vector": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "lscio.h": "c"
     }
 }
