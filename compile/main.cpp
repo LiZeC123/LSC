@@ -58,9 +58,11 @@ int main(int argc,char* argv[])
     fclose(fpAsm);
 
 
-
-    printf("\n编译完成!\n");
-    printf("%d 错误 %d 警告\n",err.getErrorNum(),err.getWarnNum());
+    if(err.getErrorNum() > 0){
+        printf("\n编译完成!\n");
+        printf("%d 错误 %d 警告\n",err.getErrorNum(),err.getWarnNum());
+    }
+    
     return 0;
 }
 
