@@ -6,7 +6,7 @@
 #define SIZE 256
 
 //#define __LSC_DEBUG__
-#define __LSC_VERSION__ "1.0.0"
+#define __LSC_VERSION__ "1.1.0"
 
 using namespace std;
 
@@ -86,6 +86,11 @@ class Args
 public:
 	bool isHelped = false;
 	bool isSetOutput = false;
+	bool isOnlyPreproc = false;
+	bool isOnlyCompile = false;
+	bool isOnlyAss = false;
+	bool isSaveTempFile = false;
+
 	string outputName;
 };
 
@@ -146,13 +151,17 @@ void execCmd(const string& path, const string& cmd, const string& file)
 void printHelpInfo()
 {
 	printf("Lsc %s (on %s,%s)\n", __LSC_VERSION__,__DATE__, __TIME__);
-	printf("[GCC %d.%d.%d] on Ubuntu\n",__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__);
-	printf("Lsc iS Compile!\n\n");
+	printf("[GCC %d.%d.%d] on Ubuntu\n\n",__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__);
+	
 	printf("指令格式 lsc [options] file ...\n");
 	printf("-h 显示此信息\n");
-	printf("-o 指定输出文件名\n");
-	//printf("");
-	//printf("");
+	printf("-o 指定输出的可执行文件名\n");
+	printf("-E 只进行编译预处理\n");
+	printf("-S 只进行编译预处理和编译\n");
+	printf("-C 只进行编译预处理,编译和汇编\n");
+	printf("-T 保留中间文件\n\n");
+
+	printf("Lsc iS Compile!\n");
 }
 
 void analyseOptions(Args& args, int argc, char* argv[])
@@ -165,8 +174,8 @@ void analyseOptions(Args& args, int argc, char* argv[])
 				printf("选项不能为空\n");
 			}
 			else if(option[1] == 'o'){
-				args.isSetOutput = true;
 				if((i+1) < argc){
+					args.isSetOutput = true;
 					args.outputName = string(argv[i+1]);
 				}
 				else{
@@ -176,6 +185,18 @@ void analyseOptions(Args& args, int argc, char* argv[])
 			else if(option[1] == 'h') {
 				args.isHelped = true;
 				printHelpInfo();
+			}
+			else if(option[1] == 'E'){
+				args.isOnlyPreproc = true;
+			}
+			else if(option[1] == 'S'){
+				args.isOnlyCompile = true;
+			}
+			else if(option[1] == 'C'){
+				args.isOnlyAss = true;
+			}
+			else if(option[1] == 'T'){
+				args.isSaveTempFile = true;
 			}
 			else{
 				printf("选项: %s 无效\n",argv[i]);
@@ -206,10 +227,74 @@ void analyseFile(vector<CompileFile>& compilefiles, int argc, char* argv[])
     }
 }
 
+void toIFile(const vector<CompileFile>& compilefiles, const string& exePath)
+{
+	for(const auto& file: compilefiles){
+		if(file.getType() == ".c"){
+			execCmd(exePath,"/preproc/lscp", file.getCoreName()+".c");
+		}
+	}
+}
+
+void toSFile(const vector<CompileFile>& compilefiles, const string& exePath)
+{
+	for(const auto& file: compilefiles){
+		if(file.getType() == ".c" || file.getType() == ".i"){
+			execCmd(exePath,"/compile/lscc", file.getCoreName()+".i");
+		}
+	}
+}
+
+void toOFile(const vector<CompileFile>& compilefiles, const string& exePath)
+{
+	for(const auto& file: compilefiles){
+		if(file.getType() == ".c"|| file.getType() == ".i" || file.getType() == ".s"){
+			execCmd(exePath,"/ass/lsca", file.getCoreName()+".s");
+		}
+	}
+}
+
+void toExeFile(const vector<CompileFile>& compilefiles, const string& exePath)
+{
+	string allfiles = exePath + "/stdlib/start.o " + exePath + "/stdlib/stdlib.o ";
+	for(const auto& file: compilefiles){
+		allfiles += (file.getCoreName()+ ".o ");
+	}
+	execCmd(exePath,"/lit/lscl", allfiles);
+	execCmd("","chmod +x z.out","");
+}
+
+void clearTempFile(const vector<CompileFile>& compilefiles, const Args& args)
+{
+	if(args.isOnlyPreproc){
+		// 只保留编译预处理文件,则不进行任何删除
+		return;
+	}
+	if(args.isOnlyCompile){
+		for(const auto& file: compilefiles){
+			execCmd("","rm -f",file.getCoreName()+".i");
+		}
+	}
+	else if(args.isOnlyAss) {
+		for(const auto& file: compilefiles){
+			execCmd("","rm -f",file.getCoreName()+".i");
+			execCmd("","rm -f",file.getCoreName()+".s");
+		}
+	}
+	else{
+		for(const auto& file: compilefiles){
+			execCmd("","rm -f",file.getCoreName()+".i");
+			execCmd("","rm -f",file.getCoreName()+".s");
+			execCmd("","rm -f",file.getCoreName()+".o");
+		}	
+	}
+}
+
 
 int main(int argc,char* argv[])
 {
 	if(argc == 1){
+		printf("输入文件不能为空, 输入 lsc -h 查看帮助\n");
         return 0;
     }
 
@@ -220,39 +305,40 @@ int main(int argc,char* argv[])
 	analyseFile(compilefiles,argc,argv);
 
 
-	if(args.isHelped && compilefiles.size()==0){
+	if(compilefiles.size()==0){
+		if(!args.isHelped){
+			printf("输入文件不能为空, 输入 lsc -h 查看帮助\n");
+		}
+
 		return 0;
 	}
 
-
-   
    string exePath = getFilePath();
-	// 编译, 汇编
-	for(const auto& file: compilefiles){
-		if(file.getType() == ".c"){
-			execCmd(exePath,"/preproc/lscp", file.getCoreName()+".c");
-			execCmd(exePath,"/compile/lscc", file.getCoreName()+".i");
-			execCmd(exePath,"/ass/lsca", file.getCoreName()+".s");
-		}
-		else if(file.getType() == ".i"){
-			execCmd(exePath,"/compile/lscc", file.getCoreName()+".i");
-			execCmd(exePath,"/ass/lsca", file.getCoreName()+".s");
-		}
-		else if(file.getType() == ".s") {
-			execCmd(exePath,"/ass/lsca", file.getCoreName()+".s");
-		}
-	}
+   if(args.isOnlyPreproc) {
+	   toIFile(compilefiles,exePath);
+   }
+   else if(args.isOnlyCompile) {
+	   toIFile(compilefiles,exePath);
+	   toSFile(compilefiles,exePath);
+   }
+   else if(args.isOnlyAss) {
+	   toIFile(compilefiles,exePath);
+	   toSFile(compilefiles,exePath);
+	   toOFile(compilefiles,exePath);
+   }
+   else{
+	   toIFile(compilefiles,exePath);
+	   toSFile(compilefiles,exePath);
+	   toOFile(compilefiles,exePath);
+	   toExeFile(compilefiles,exePath);
+   }
 
-	// 链接
-	string allfiles = exePath + "/stdlib/start.o " + exePath + "/stdlib/stdlib.o ";
-	for(const auto& file: compilefiles){
-		allfiles += (file.getCoreName()+ ".o ");
-	}
-	execCmd(exePath,"/lit/lscl", allfiles);
-	execCmd("","chmod +x z.out","");
-
-	if(args.isSetOutput){
+	if(args.isSetOutput && !args.isOnlyPreproc && !args.isOnlyCompile && !args.isOnlyAss){
 		execCmd("","mv z.out "+args.outputName,"");
+	}
+
+	if(!args.isSaveTempFile) {
+		clearTempFile(compilefiles, args);
 	}
 }
 
