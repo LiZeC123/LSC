@@ -51,7 +51,7 @@ Lsc语言目前定义为一个在C语言的子集上扩展的语言.希望通过
 
 参考文献
 -------------
-[1] 范志东, 张琼声. 自己动手构造编译系统:编译、汇编与链接[M]. 机械工业出版社, 2016.
-[2] Stanley B. Lippman, Josée Lajoie, Barbara E. Moo. C++ Primer中文版[M]. 电子工业出版社, 2013.
-[3] RandalE.Bryant, DavidR.O'Hallaron. 深入理解计算机系统[M]. 机械工业出版社, 2011.
+- [1] 范志东, 张琼声. 自己动手构造编译系统:编译、汇编与链接[M]. 机械工业出版社, 2016.
+- [2] Stanley B. Lippman, Josée Lajoie, Barbara E. Moo. C++ Primer中文版[M]. 电子工业出版社, 2013.
+- [3] RandalE.Bryant, DavidR.O'Hallaron. 深入理解计算机系统[M]. 机械工业出版社, 2011.
 
