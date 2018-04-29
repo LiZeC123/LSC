@@ -4,8 +4,8 @@
 
 using namespace std;
 
-PreProc::PreProc(string& cfilename, string& ifilename) :
-    cfile(cfilename), ifile(ifilename)
+PreProc::PreProc(string& cfilename, string& ifilename, string& stdp) :
+    cfile(cfilename), ifile(ifilename), stdPath(stdp)
 { 
     filename = cfilename;
     path = cfilename;
@@ -136,7 +136,7 @@ void PreProc::doInclude(ofstream& ifile, string includeFile,bool isStd)
 {
     string filename;
     if(isStd){
-        filename = "./stdlib/"+includeFile;
+        filename = stdPath + "/" +includeFile;
     }
     else{
         filename = path + "/" + includeFile;

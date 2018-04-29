@@ -231,7 +231,8 @@ void toIFile(const vector<CompileFile>& compilefiles, const string& exePath)
 {
 	for(const auto& file: compilefiles){
 		if(file.getType() == ".c"){
-			execCmd(exePath,"/preproc/lscp", file.getCoreName()+".c");
+			string opt = file.getCoreName()+".c " + exePath + "/stdlib";
+			execCmd(exePath,"/preproc/lscp", opt);
 		}
 	}
 }
