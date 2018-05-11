@@ -584,6 +584,16 @@ InterInst* Fun::getReturnPoint()
     return returnPoint;
 }
 
+void Fun::setPtrLevel(int level)
+{
+    this->ptrLevel = level;
+}
+
+int Fun::getPtrLevel()
+{
+    return ptrLevel;
+}
+
 void Fun::toX86(FILE* file)
 {
     auto v = intercode.getCode();

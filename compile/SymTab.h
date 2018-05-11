@@ -124,6 +124,9 @@ public:
     void setReturnPoint(InterInst* inst);   // 设置函数返回点
     InterInst* getReturnPoint();            // 获得函数返回点
 
+    void setPtrLevel(int level);
+    int getPtrLevel();
+
     bool getExtern();
     void setExtern(bool isExtern);
     Symbol getType();
@@ -138,6 +141,7 @@ public:
 private:
     bool externed;                  // 是否有extern声明
     Symbol type;                    // 返回类型
+    int ptrLevel;                   // 指针等级
     std::string name;               // 函数名
     std::vector<Var*> paraVar;      // 参数列表
 
