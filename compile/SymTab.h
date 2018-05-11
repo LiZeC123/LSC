@@ -40,6 +40,7 @@ public:
     int getOffset();
     Var* getStep();         // 获得相应的变量长度,并返回一个表示该长度的特殊整数变量
     Var* getPointer();      // 获得当前变量对应的指针
+    int getPtrLevel();      // 获得指针等级
     string getPtrVal();     // 获得初始值变量
     string getStrVal();     // 获得初始字符串的值
     int getVal();
@@ -67,6 +68,7 @@ public:
     void setLeft(bool isLeft);
     void setPoint(Var* ptr);
     void setOffset(int offset);
+    void setPtrLevel(int level);
 
     void value();
     void printSelf();
@@ -96,6 +98,7 @@ private:
     
     std::string ptrVal;             // 字符指针初始值
     Var* ptr;                       // 变量的指针变量
+    int ptrLevel;                   // 指针等级,例如int**等级为2
 
 
     int size;                       // 变量大小

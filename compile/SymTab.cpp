@@ -212,6 +212,11 @@ Var* Var::getPointer()
     return ptr;
 }
 
+int Var::getPtrLevel()
+{
+    return ptrLevel;
+}
+
 string Var::getPtrVal()
 {
     return ptrVal;
@@ -349,6 +354,11 @@ void Var::setPoint(Var* ptr)
 void Var::setOffset(int offset)
 {
     this->offset = offset;
+}
+
+void Var::setPtrLevel(int level)
+{
+    this->ptrLevel = level;
 }
 
 void Var::value()
