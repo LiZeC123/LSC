@@ -99,6 +99,13 @@ bool GenIR::genVarInit(Var* var)
     return true;
 }
 
+/**
+ *  genPtr仅仅在符号表上产生了一个变量
+ *  并且将该变量的ptr字段指向输入的变量p, 其本身并没有保存*p的值
+ *  因此在后续的赋值操作中需要对此变量进行特殊的判断
+ *  即如果需要使用此变量的值, 则临时的加入OP_GET指令获得值, 然后再参与运行
+ *  如果没有用到此变量的值, 则不产生任何代码
+ */
 Var* GenIR::genPtr(Var* val)
 {
     if(val->isBase()){
@@ -218,11 +225,11 @@ Var* GenIR::genMinus(Var* val)
 }
 
 /*
- * 判断val是否为引用类型(例如q = &a; val = *q),
- * 是则执行OP_GET,相当于tmp = *(&val) 并返回tmp
- * 否则执行OP_AS ,相当于tmp = p,并返回tmp
- * 总之,无论val为何种类型,最后tmp都是与val等价的变量
- * 此外,由于tmp是临时变量,因此变为右值,在后续的计算过程中可能会产生影响
+ * 由于genPtr不生成代码, 因此通过genPtr得到的变量中不包含实际的值
+ * 即val变量可能只有ptr字段指向了变量p,但本身没有保存*p的内容
+ * 因此需要判断val是否为引用类型(ptr字段是否有效), 亦即val是否是通过genPtr运算得到的
+ * 是则, 则通过OP_GET获得*p实际的值
+ * 否则, 说明val是普通变量,直接使用值即可
 */
 Var* GenIR::genAssign(Var* val)
 {
@@ -251,14 +258,14 @@ Var* GenIR::genAssign(Var* lval,Var* rval)
 
     if(rval->isRef()){
         // 如果rval是引用类型,产生一个等价的右值
-        // 由于一条指令不能访问两次内存,因此对于引用类型要先取出相应的值
-        // 并作为临时变量参与后续的运算
+        // 即通过OP_GET获得实际的值
         rval = genAssign(rval);
     }
     if(lval->isRef()){
-        // 如果lva是引用类型,直接执行 OP_SET,
-        // 由于OP_SET x y 等价于 *y = x  
-        // 所以先让lval取地址,获得执行lval的指针,然后依次传入两个参数
+        // 如果lva是引用类型,直接执行 OP_SET
+        // 此时说明lval是某个变量通过*运算得到的, 此时操作实际与lval本身无关
+        // 可以直接将数据写入lval执行的位置
+        // OP_SET rval, lval->getPoinger() 等价与 *(&lval) = rval
         symtab.addInst(new InterInst(OP_SET,rval,lval->getPointer()));
     }
     else{
