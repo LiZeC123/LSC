@@ -84,9 +84,6 @@ Symbol Parser::type()
     }
 }
 
-// <def>     -> <ID> <idtail>
-// <def>     -> * <ID> <idtail>
-
 // <def>   ->  <ID><idtail>
 // <mulss> ->  * <mulss>
 // <mulss> -> e
@@ -225,8 +222,9 @@ void Parser::para(std::vector<Var*>& para)
     
 }
 
-// <paradata> -> * <ID>
-// <paradata> -> <ID> <paradatatail>
+// <paradata> -> <mulss> <ID> <paradatatail>
+// <mulss> ->  * <mulss>
+// <mulss> -> e
 Var* Parser::paradata(Symbol s)
 {
     string name;
