@@ -230,33 +230,27 @@ void Parser::para(std::vector<Var*>& para)
 Var* Parser::paradata(Symbol s)
 {
     string name;
-    if(match(MUL)){
-        if(firstIs(IDENT)){
-            name = ((ID*)look) -> name;
-            move();
-            return new Var(symtab.getScopePath(),false,s,true,name,nullptr);
-        }
-        else{
-            recovery(firstIs(COMMA)_OR_(RPAREN), ID_LOST,ID_WRONG);
-        }
+    int ptrLevel = 0;
+    while(match(MUL)){
+        ptrLevel++;
+    }
+
+    if(firstIs(IDENT)){
+        name = ((ID*)look) -> name;
+        move();
+        return paradatatail(s,name,ptrLevel);
     }
     else{
-        if(firstIs(IDENT)){
-            name = ((ID*)look) -> name;
-            move();
-            return paradatatail(s,name);
-        }
-        else{
-            recovery(firstIs(COMMA)_OR_(RPAREN)_OR_(LBRACK), ID_LOST,ID_WRONG);
-        }
+        recovery(firstIs(COMMA)_OR_(RPAREN)_OR_(LBRACK), ID_LOST,ID_WRONG);
     }
+
     // 无论何种错误,最后都需要返回一个Var*
-    return new Var(symtab.getScopePath(),false,s,false,name,nullptr);
+    return new Var(symtab.getScopePath(),false,s,false,name,nullptr);    
 }
 
 // <paradatatail> -> [ <num> ]
 // <paradatatail> -> e
-Var* Parser::paradatatail(Symbol s,string name)
+Var* Parser::paradatatail(Symbol s,string name,int ptrLevel)
 {
     if(match(LBRACK)){
         // 函数参数列表中的数组可以没有指定长度
@@ -271,10 +265,10 @@ Var* Parser::paradatatail(Symbol s,string name)
             recovery(firstIs(COMMA),RBRACK_LOST,RBRACK_WRONG);
         }
 
-        return new Var(symtab.getScopePath(),false,s,false,name,len);
+        return new Var(symtab.getScopePath(),false,s,ptrLevel,name,len);
     }
     else{
-        return new Var(symtab.getScopePath(),false,s,false,name,nullptr);
+        return new Var(symtab.getScopePath(),false,s,ptrLevel,name,nullptr);
     }
 }
 

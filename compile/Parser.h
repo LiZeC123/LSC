@@ -36,7 +36,7 @@ private:
     // 函数
     void para(std::vector<Var*>& para);
     Var* paradata(Symbol s);
-    Var* paradatatail(Symbol s,std::string name);
+    Var* paradatatail(Symbol s,string name,int ptrLevel);
     void paralist(std::vector<Var*>& para);
     void funtail(Fun* fun);
     void block();
