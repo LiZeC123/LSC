@@ -17,13 +17,13 @@ public:
     Var(Token* literal);
 
     // 初始化一个数组
-    Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,int len);
+    Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,int len);
     
     // 初始化普通的变量,指针
-    Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,Var* init);
+    Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,Var* init);
 
     // 临时变量
-    Var(std::vector<int> scopePath,Symbol s,bool isPtr);
+    Var(std::vector<int> scopePath,Symbol s,int ptrLevel);
 
     // 变量拷贝
     Var(std::vector<int> scopePath, Var* val);
@@ -40,6 +40,7 @@ public:
     int getOffset();
     Var* getStep();         // 获得相应的变量长度,并返回一个表示该长度的特殊整数变量
     Var* getPointer();      // 获得当前变量对应的指针
+    int getPtrLevel();      // 获得指针等级
     string getPtrVal();     // 获得初始值变量
     string getStrVal();     // 获得初始字符串的值
     int getVal();
@@ -61,12 +62,13 @@ public:
     void baseInit();                            // 默认初始化
     void setExterned(bool isExtern);
     void setType(Symbol s);
-    void setPtr(bool isPtr);
+    void setPtr(int ptrLevel);
     void setName(std::string name);
     void setArray(int len);
     void setLeft(bool isLeft);
     void setPoint(Var* ptr);
     void setOffset(int offset);
+    void setPtrLevel(int level);
 
     void value();
     void printSelf();
@@ -79,7 +81,7 @@ private:
     bool externed;                  // 是否有extern声明
     Symbol type;                    // 变量类型
     std::string name;               // 变量名
-    bool isPtr;                     // 是否是指针
+    //bool isPtr;                     // 是否是指针
     bool isArray;                   // 是否是数组
     int arraySize;                  // 数组长度
     bool isLeft;                    // 是否是左值
@@ -96,6 +98,7 @@ private:
     
     std::string ptrVal;             // 字符指针初始值
     Var* ptr;                       // 变量的指针变量
+    int ptrLevel;                   // 指针等级,例如int**等级为2
 
 
     int size;                       // 变量大小
@@ -106,7 +109,7 @@ private:
 class Fun
 {
 public:
-    Fun(bool isExtern,Symbol type,std::string name,std::vector<Var*> para);
+    Fun(bool isExtern,Symbol type,int ptrLevel,std::string name,std::vector<Var*> para);
 
     void enterScope();              // 进入一个新的作用域
     void leaveScope();              // 退出作用域并计算栈帧大小
@@ -120,6 +123,9 @@ public:
     
     void setReturnPoint(InterInst* inst);   // 设置函数返回点
     InterInst* getReturnPoint();            // 获得函数返回点
+
+    void setPtrLevel(int level);
+    int getPtrLevel();
 
     bool getExtern();
     void setExtern(bool isExtern);
@@ -135,6 +141,7 @@ public:
 private:
     bool externed;                  // 是否有extern声明
     Symbol type;                    // 返回类型
+    int ptrLevel;                   // 指针等级
     std::string name;               // 函数名
     std::vector<Var*> paraVar;      // 参数列表
 

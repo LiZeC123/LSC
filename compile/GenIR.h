@@ -53,6 +53,7 @@ private:
     Var* genMinus(Var* val); 
 
     Var* genAssign(Var* val);
+    Var* genCopy(Var* val);
     Var* genAssign(Var* lval,Var* rval);
 
     Var* genOr(Var* lval,Var* rval);

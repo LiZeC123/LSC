@@ -57,6 +57,9 @@ int main(int argc,char* argv[])
     tab.toX86(fpAsm);
     fclose(fpAsm);
 
+    tab.printValTab();
+    tab.printFunTab();
+    tab.printStrTab();
 
     if(err.getErrorNum() > 0){
         printf("\n编译完成!\n");
