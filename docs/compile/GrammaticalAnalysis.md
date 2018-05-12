@@ -29,12 +29,14 @@ int g(){ }
 #### 变量定义与声明的识别
 对于`<def>` 部分,首先分析变量的定义和声明,在上面的产生式识别了类型声明以后,还可以分成两类
 1. 以标识符开始的普通变量
-2. 以`*`开始的指针
+2. 以任意数量`*`开始的指针
 
 上述两类有可以声明对应的数组类型,因此有如下的产生式
 ```
+<def> -> <mulss> <def>
+<mulss> -> * <mulss>
+<mulss> -> e
 <def> -> <ID><defvar>
-<def> -> * <ID><defvar>
 
 <defvar> -> [ <NUM> ]
 <defvar> -> <init>
@@ -93,8 +95,9 @@ int g(){ }
 <para> -> <type><paradata><paralist>
 <para> -> e
 
-<paradata> -> * <ID>
-<paradata> -> <ID> <paradatatail>
+<paradata> -> <mulss> <ID> <paradatatail>
+<mulss> ->  * <mulss>
+<mulss> -> e
 
 <paradatatail> -> [ <num> ]
 <paradatatail> -> e
