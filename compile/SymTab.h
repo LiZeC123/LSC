@@ -17,13 +17,13 @@ public:
     Var(Token* literal);
 
     // 初始化一个数组
-    Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,int len);
+    Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,int len);
     
     // 初始化普通的变量,指针
-    Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,Var* init);
+    Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,Var* init);
 
     // 临时变量
-    Var(std::vector<int> scopePath,Symbol s,bool isPtr);
+    Var(std::vector<int> scopePath,Symbol s,int ptrLevel);
 
     // 变量拷贝
     Var(std::vector<int> scopePath, Var* val);
@@ -62,7 +62,7 @@ public:
     void baseInit();                            // 默认初始化
     void setExterned(bool isExtern);
     void setType(Symbol s);
-    void setPtr(bool isPtr);
+    void setPtr(int ptrLevel);
     void setName(std::string name);
     void setArray(int len);
     void setLeft(bool isLeft);
@@ -81,7 +81,7 @@ private:
     bool externed;                  // 是否有extern声明
     Symbol type;                    // 变量类型
     std::string name;               // 变量名
-    bool isPtr;                     // 是否是指针
+    //bool isPtr;                     // 是否是指针
     bool isArray;                   // 是否是数组
     int arraySize;                  // 数组长度
     bool isLeft;                    // 是否是左值
@@ -109,7 +109,7 @@ private:
 class Fun
 {
 public:
-    Fun(bool isExtern,Symbol type,std::string name,std::vector<Var*> para);
+    Fun(bool isExtern,Symbol type,int ptrLevel,std::string name,std::vector<Var*> para);
 
     void enterScope();              // 进入一个新的作用域
     void leaveScope();              // 退出作用域并计算栈帧大小

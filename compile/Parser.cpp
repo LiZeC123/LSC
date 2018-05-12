@@ -86,11 +86,18 @@ Symbol Parser::type()
 
 // <def>     -> <ID> <idtail>
 // <def>     -> * <ID> <idtail>
+
+// <def>   ->  <ID><idtail>
+// <mulss> ->  * <mulss>
+// <mulss> -> e
 void Parser::def(bool isExtern,Symbol s)
 {
-    string name;
-    bool isPtr = match(MUL);
+    int ptrLevel = 0;
+    while(match(MUL)){
+        ptrLevel++;
+    }
 
+    string name;
     if(firstIs(IDENT)){
         name = ((ID*)look)->name;
         move();
@@ -98,12 +105,12 @@ void Parser::def(bool isExtern,Symbol s)
     else{
         recovery(firstIs(SEMICON)_OR_(ASSIGN)_OR_(COMMA), ID_LOST,ID_WRONG);
     }
-    idtail(isExtern,s,isPtr,name);
+    idtail(isExtern,s,ptrLevel,name);
 }
 
 // <idtail>  -> <defvar><deflist>
 // <idtail>  -> ( <para> ) <funtail>
-void Parser::idtail(bool isExtern,Symbol s,bool isPtr,std::string name)
+void Parser::idtail(bool isExtern,Symbol s,int ptrLevel,std::string name)
 {
     if(match(LPAREN)){
         symtab.enter();
@@ -113,12 +120,12 @@ void Parser::idtail(bool isExtern,Symbol s,bool isPtr,std::string name)
             recovery(firstIs(LBRACE)_OR_(SEMICON),RPAREN_LOST,RPAREN_WRONG);
         }
         // 创建函数
-        Fun* fun = new Fun(isExtern,s,name,paraList);
+        Fun* fun = new Fun(isExtern,s,ptrLevel,name,paraList);
         funtail(fun);
         symtab.leave();
     }
     else{
-        Var* var = defvar(isExtern,s,isPtr,name);
+        Var* var = defvar(isExtern,s,ptrLevel,name);
         symtab.addVar(var);
 
         deflist(isExtern,s);
@@ -127,7 +134,7 @@ void Parser::idtail(bool isExtern,Symbol s,bool isPtr,std::string name)
 
 // <defvar> -> [ <NUM> ]
 // <defvar> -> <init>
-Var* Parser::defvar(bool isExtern,Symbol s,bool isPtr,std::string name)
+Var* Parser::defvar(bool isExtern,Symbol s,int ptrLevel,std::string name)
 {
     if(match(LBRACK)){
         int len = 0;
@@ -143,23 +150,23 @@ Var* Parser::defvar(bool isExtern,Symbol s,bool isPtr,std::string name)
             recovery(firstIs(COMMA)_OR_(SEMICON),RBRACK_LOST,RBRACK_WRONG);
         }
 
-        return new Var(symtab.getScopePath(),isExtern, s, isPtr,name,len);
+        return new Var(symtab.getScopePath(),isExtern, s, ptrLevel,name,len);
     }
     else{
-        return init(isExtern,s,isPtr,name);
+        return init(isExtern,s,ptrLevel,name);
     }
 }
 
 
 // <init>    -> = <expr>
 // <init>    -> e
-Var* Parser::init(bool isExtern,Symbol s,bool isPtr,std::string name)
+Var* Parser::init(bool isExtern,Symbol s,int ptrLevel,std::string name)
 {
     Var* init = nullptr;
     if(match(ASSIGN)){
         init = expr();
     }
-    return new Var(symtab.getScopePath(),isExtern,s,isPtr,name,init);
+    return new Var(symtab.getScopePath(),isExtern,s,ptrLevel,name,init);
 }
 
 

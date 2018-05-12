@@ -28,9 +28,9 @@ private:
     // 定义变量有关的函数
     // 上层函数获得信息后,作为参数传递给下面的语句,下面的函数,实际创建变量并返回
     void def(bool isExtern,Symbol s);
-    void  idtail(bool isExtern,Symbol s,bool isPtr,std::string name);
-    Var* defvar(bool isExtern,Symbol s,bool isPtr,std::string name);
-    Var* init(bool isExtern,Symbol s,bool isPtr,std::string name);
+    void  idtail(bool isExtern,Symbol s,int ptrLevel,std::string name);
+    Var* defvar(bool isExtern,Symbol s,int ptrLevel,std::string name);
+    Var* init(bool isExtern,Symbol s,int ptrLevel,std::string name);
     void deflist(bool isExtern,Symbol s);
 
     // 函数

@@ -32,9 +32,15 @@ bool GenIR::checkTypeMatch(Var* lval,Var* rval)
         return true;
     }
 	else if(!lval->isBase() && !rval->isBase()){
-        // 如果都是非基本类型,则只要基本类型相同
-        // 例如int* 与int[] 兼容
-        return (rval->getType()==lval->getType());
+        // 如果都是指针,若指针等级相同则类型相同视为相同
+        int llv = lval->getPtrLevel()+lval->getArray();
+        int rlv = rval->getPtrLevel()+rval->getArray();
+        if(llv==rlv){
+            return (rval->getType()==lval->getType());
+        }
+        else{
+            return false;
+        }        
     }
     else{
         return false;
@@ -116,6 +122,7 @@ Var* GenIR::genPtr(Var* val)
     Var* tmp = new Var(symtab.getScopePath(),val->getType(),false);
     tmp->setLeft(true);
     tmp->setPoint(val);
+    tmp->setPtrLevel(val->getPtrLevel()+val->getArray()-1);
     symtab.addVar(tmp);
     return tmp;
 }
@@ -132,6 +139,7 @@ Var* GenIR::genLea(Var* val)
     }
     else{
         Var* tmp = new Var(symtab.getScopePath(),val->getType(),true);
+        tmp->setPtrLevel(val->getPtrLevel()+val->getArray()+1);
         symtab.addVar(tmp);
         symtab.addInst(new InterInst(OP_LEA,tmp,val));
         return tmp;
@@ -179,7 +187,7 @@ Var* GenIR::genDecL(Var* val)
 
 Var* GenIR::genIncR(Var* val)
 {
-    Var* tmp = genAssign(val);                  // tmp = val
+    Var* tmp = genCopy(val);                  // tmp = val
     if(val->isRef()){
         Var* t2 = genAdd(tmp,val->getStep());   // t2 = tmp + sizeof(tmp)
         genAssign(val,t2);                      // (*p) = t2
@@ -192,7 +200,7 @@ Var* GenIR::genIncR(Var* val)
 
 Var* GenIR::genDecR(Var* val)
 {
-    Var* tmp = genAssign(val);
+    Var* tmp = genCopy(val);
     if(val->isRef()){
         Var* t2 = genSub(tmp,val->getStep());
         genAssign(val,t2);
@@ -233,14 +241,27 @@ Var* GenIR::genMinus(Var* val)
 */
 Var* GenIR::genAssign(Var* val)
 {
-    Var* tmp = new Var(symtab.getScopePath(),val);
-    symtab.addVar(tmp);
     if(val->isRef()){
-        symtab.addInst(new InterInst(OP_GET,tmp,val->getPointer()));
+        Var* before = genAssign(val->getPointer());
+        symtab.addInst(new InterInst(OP_GET,val,before));
+        return val;
     }
     else{
-        symtab.addInst(new InterInst(OP_AS,tmp,val));
+        return val;
     }
+}
+
+Var* GenIR::genCopy(Var* val)
+{
+    Var* tmp = new Var(symtab.getScopePath(),val);
+
+    if(val->isRef()){
+        // 如果是引用类型, 需要先取出真实值,然后再复制
+        val = genAssign(val);
+    }
+
+    symtab.addInst(new InterInst(OP_AS,tmp,val));
+
     return tmp;
 }
 
@@ -262,6 +283,7 @@ Var* GenIR::genAssign(Var* lval,Var* rval)
         rval = genAssign(rval);
     }
     if(lval->isRef()){
+        lval = genAssign(lval);
         // 如果lva是引用类型,直接执行 OP_SET
         // 此时说明lval是某个变量通过*运算得到的, 此时操作实际与lval本身无关
         // 可以直接将数据写入lval执行的位置

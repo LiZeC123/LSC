@@ -21,7 +21,7 @@ Var::Var()
     name = "<void>";
     isLeft = false;
     intVal = 0;
-    isPtr = true;
+    ptrLevel = 1;
 }
 
 // 常量初始化,字符串储存在字符串表中,其他常量仅用于初始化,使用后调用者负责删除
@@ -55,34 +55,34 @@ Var::Var(Token *literal)
     }
 }
 
-Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,int len)
+Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,int len)
 {
     baseInit();
     this->scopePath = scopePath;
     setExterned(isExtern);
     setType(s);
-    setPtr(isPtr);
+    setPtr(ptrLevel);
     setName(name);
     setArray(len);
 }
 
-Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,bool isPtr,std::string name,Var* init)
+Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,Var* init)
 {
     baseInit();
     this->scopePath = scopePath;
     setExterned(isExtern);
     setType(s);
-    setPtr(isPtr);
+    setPtr(ptrLevel);
     setName(name);
     initData = init;
 }
 
-Var::Var(std::vector<int> scopePath,Symbol s,bool isPtr)
+Var::Var(std::vector<int> scopePath,Symbol s,int ptrLevel)
 {
     baseInit();
     this->scopePath = scopePath;
     setType(s);
-    setPtr(isPtr);
+    setPtr(ptrLevel);
     setName(GenIR::genLb());
     setLeft(false);         // 临时变量默认是右值
 }
@@ -92,7 +92,8 @@ Var::Var(std::vector<int> scopePath, Var* val)
     baseInit();
     this->scopePath = scopePath;
     setType(val->getType());
-    setPtr(val->isArray || val->isPtr);
+    setPtr(val->ptrLevel+val->isArray);     // 如果是数组,指针等级+1,但不拷贝数组属性
+    //setPtr(val->isArray || val->isPtr);
     setName(GenIR::genLb());
     setLeft(false);
 }
@@ -150,7 +151,7 @@ void Var::baseInit()
     literal = false;
     scopePath.push_back(-1);
     externed = false;
-    isPtr = false;
+    ptrLevel = 0;
     isArray = false;
     arraySize = 0;
     isLeft = true; // 变量默认是可以作为左值
@@ -193,14 +194,23 @@ int Var::getOffset()
 
 Var* Var::getStep()
 {
+    int level = this->ptrLevel+this->getArray();
     if(this->isBase()){
         return SymTab::one;
     }
-    else if(this->type == KW_CHAR){
-        return SymTab::one;
+    else if(level == 1){
+        if(this->type == KW_CHAR){
+            return SymTab::one;
+        }
+        else if(this->type==KW_INT){
+            return SymTab::four;
+        }
+        else{
+            return nullptr;
+        }
     }
-    else if(this->type==KW_INT){
-        return SymTab::four;
+    else if(level >= 2){
+        return SymTab::four;    // 任何指针都是4字节
     }
     else{
         return nullptr;
@@ -239,7 +249,7 @@ int Var::getVal()
 
 bool Var::isBase()
 {
-    return (!isPtr)&&(!isArray);
+    return (ptrLevel==0)&&(!isArray);
 }
 
 bool Var::isVoid()
@@ -275,7 +285,7 @@ bool Var::getArray()
 
 bool Var::getIsPtr()
 {
-    return isPtr;
+    return (ptrLevel!=0);
 }
 
 bool Var::isInit()
@@ -308,10 +318,11 @@ void Var::setType(Symbol s)
 }
 
 
-void Var::setPtr(bool isPtr)
+void Var::setPtr(int ptrLevel)
 {
-    if(isPtr){
-        this->isPtr = true;
+    // 如果是指针,则更新有关字段,否则不需要任何操作
+    if(ptrLevel >= 0){
+        this->ptrLevel = ptrLevel;
         if(!externed){
             // 指针全部都是4字节
             size = 4;
@@ -426,7 +437,11 @@ void Var::printSelf()
 	//输出type
 	printf("%s",tokenName[type]);
 	//输出指针
-	if(isPtr)printf("*");
+    if(ptrLevel > 0){
+        for(int i=0;i<ptrLevel;i++){
+            printf("*");
+        }
+    }
 	//输出名字
 	printf(" %s",name.c_str());
 	//输出数组
@@ -437,7 +452,7 @@ void Var::printSelf()
 		switch(type){
 			case KW_INT:printf("%d",intVal);break;
 			case KW_CHAR:
-				if(isPtr)printf("<%s>",ptrVal.c_str());
+				if(ptrLevel==1)printf("<%s>",ptrVal.c_str()); //  被字符串初始化的常量是char*类型
 				else printf("%c",charVal);
 				break;
             default:
@@ -461,13 +476,14 @@ void Var::printSelf()
     printf("\n");
 }
 
-Fun::Fun(bool isExtern,Symbol type,std::string name,std::vector<Var*> para) :
+Fun::Fun(bool isExtern,Symbol type,int ptrLevel,std::string name,std::vector<Var*> para) :
     intercode(this)
 {
     externed = isExtern;
     this->type = type;
     this->name = name;
     this->paraVar = para;
+    this->ptrLevel = ptrLevel;
     curEsp = 0;
     maxDepth = 0;
     for(unsigned int i=0,argOff=8;i<para.size();i++,argOff+=4){
