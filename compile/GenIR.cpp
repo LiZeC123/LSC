@@ -254,7 +254,7 @@ Var* GenIR::genAssign(Var* val)
 Var* GenIR::genCopy(Var* val)
 {
     Var* tmp = new Var(symtab.getScopePath(),val);
-
+    symtab.addVar(tmp);     // 任何创建的变量都需要保存到变量表中
     if(val->isRef()){
         // 如果是引用类型, 需要先取出真实值,然后再复制
         val = genAssign(val);
