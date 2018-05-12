@@ -33,7 +33,8 @@ int g() {
 }
 
 
-int main(int argc){
+int main(int argc, char* argv[]){
+    char* name = argv[0];
     f();
     g();
 }
