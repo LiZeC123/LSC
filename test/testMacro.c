@@ -1,18 +1,21 @@
-#include <lscio.h>
-#include "../stdlib/lscio.h"
-
 #define MAX_SIZE 10
 #define acd 12
 
+void lscPrintStr(char* str);
+void lscPrintInt(int n);
+
 int main()
 {
-    int a[10];
-    a[0] = MAX_SIZE;
+    int a[MAX_SIZE];
+    a[0] = __LINE__;
 
-    for(int i=0;i<10;i++){
-        char* str = "MAX_SIZE";
-    }
-    int b = 0xacd;
+    lscPrintInt(a[0]);lscPrintStr("\n");
+
+    char* str = "MAX_SIZE";
+    lscPrintStr(str);lscPrintStr("\n");
+
     int maybe = acd;
+    lscPrintInt(maybe);lscPrintStr("\n");
+    
     lscPrintStr("Finish!");
 }

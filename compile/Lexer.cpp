@@ -22,6 +22,8 @@ KeyWords::KeyWords()
     keywords["break"] = KW_BREAK;
     keywords["continue"] =KW_CONTINUE ;
     keywords["return"] = KW_RETURN;
+    keywords["include"] = KW_INCLUDE;
+    keywords["define"] = KW_DEFINE;
 }
 
 Symbol KeyWords::getSym(std::string name)
@@ -32,7 +34,53 @@ Symbol KeyWords::getSym(std::string name)
 
 KeyWords Lexer::key = KeyWords();
 
-Lexer::Lexer(Scanner& sc) : scanner(sc)
+
+Macros::Macros(Scanner& sc) : scan(sc)
+{
+    Token* BUILD = new Token(BUILD_MACRO);
+    // macros["__DATE__"];
+    // macros["__TIME__"];
+    //TODO: 检查是否调用构造函数
+    macros["__LINE__"] = BUILD;
+    macros["__FILE__"] = BUILD;
+}
+
+bool Macros::isMacro(std::string name)
+{
+    return macros.find(name) != macros.end();
+}
+
+Token* Macros::getRealToken(std::string name)
+{
+    if(name == "__LINE__"){
+        return new Num(scan.getRow());
+    }
+    else if(name=="__FILE__"){
+        return new Str(scan.getFilename());
+    }
+    
+    return macros.find(name)->second;
+}
+
+void Macros::addMacro(std::string name,Token* value)
+{
+    if(isMacro(name)){
+        LEXERROR(MACRO_RE_DEF);
+    }
+    else{
+        macros[name] = value;
+    }
+}
+
+
+Macros::~Macros()
+{
+    for(auto it = macros.begin();it != macros.end();it++){
+        //delete it->second;
+    }
+}
+
+Lexer::Lexer(Scanner& sc) : scanner(sc), macros(sc)
 {
     token = nullptr;
     ch = ' ';
@@ -53,6 +101,13 @@ bool Lexer::scan(char need)
 
 Token* Lexer::nextToken()
 {
+    if(token != nullptr){
+        printf("%s\n",token->toString().c_str());
+    }
+    
+    if(macros.isMacro("MAX_SIZE")&&macros.getRealToken("MAX_SIZE")->sym != NUM){
+        int a = 3;
+    }
     while(ch != -1){
         Token * t = nullptr;
 
@@ -74,14 +129,13 @@ Token* Lexer::nextToken()
         else if (ch == '\''){
             t = getChar();
         }
+        else if(ch == '#'){
+            getMacro();
+            t=new Token(ERR);
+        }
         else{
             switch(ch)//界符
 			{
-            case '#'://忽略行（忽略宏定义）
-                while(ch!='\n' && ch!= -1)
-                    scan();//行 文件不结束
-                t=new Token(ERR);
-                break;
             case '+':
                 t=new Token(scan('+')?INC:ADD);break;
             case '-':
@@ -180,7 +234,12 @@ Token * Lexer::getIdent()
         scan();
     }while((ch>='a'&&ch<='z')||(ch>='A'&&ch<='Z')||ch=='_'||(ch>='0'&&ch<='9'));
     
-    //匹配结束
+    //匹配结束,首先检查是否为宏名
+    if(macros.isMacro(name)){
+        return macros.getRealToken(name);
+    }
+    
+    // 不是宏再检查是关键字还是标识符
     Symbol tag=key.getSym(name);
     if(tag==IDENT){
         //正常的标志符
@@ -326,6 +385,23 @@ Token* Lexer::getChar()
 
 
     return t;
+}
+
+
+void Lexer::getMacro()
+{
+    scan();
+    Token* key = nextToken();
+    if(key->sym == KW_DEFINE){
+        // define
+        // 另外拷贝一份,否则之后可能被修改或者析构
+        Token* name = nextToken()->copy();
+        Token* value = nextToken()->copy();
+
+        // 此处可以通过检查ch值来判断是否换行,注意检测-1的情况
+        // 存储多个Token即可实现对函数和语句的替换
+        macros.addMacro(((ID*)name)->name,value);
+    }
 }
 
 Lexer::~Lexer()

@@ -22,7 +22,8 @@ typedef enum {
     KW_IF,KW_ELSE,                  //if-else
     KW_SWITCH,KW_CASE,KW_DEFAULT,   //swicth-case-deault
     KW_WHILE,KW_DO,KW_FOR,          //循环
-    KW_BREAK,KW_CONTINUE,KW_RETURN  //break,continue,return
+    KW_BREAK,KW_CONTINUE,KW_RETURN, //break,continue,return
+    BUILD_MACRO,KW_INCLUDE,KW_DEFINE//预定义宏,include,define
 } Symbol;
 
 // 所有的词法错误码
@@ -36,6 +37,7 @@ enum LexErr
     OR_NO_PAIR,                 // 不支持的"或"运算符
     COMMENT_NO_END,             // 多行注释缺少结束符
     TOKEN_NO_EXIST,             // 未定义的符号
+    MACRO_RE_DEF,               // 宏重定义
 };
 
 // 所有的词法警告码

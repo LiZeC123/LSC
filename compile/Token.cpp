@@ -43,6 +43,11 @@ string Token::toString()
 	return std::string(tokenName[sym]);
 }
 
+Token* Token::copy()
+{
+	return new Token(sym);
+}
+
 Token::~Token () { }
 
 
@@ -57,6 +62,11 @@ string ID::toString()
 	return Token::toString()+name;
 }
 
+Token* ID::copy()
+{
+	return new ID(name);
+}
+
 /*******************************************************************************
                                    字符串
 *******************************************************************************/
@@ -66,6 +76,11 @@ Str::Str (string s):Token(STR),str(s) { }
 string Str::toString()
 {
 	return string("[")+Token::toString()+"]:"+str;
+}
+
+Token* Str::copy()
+{
+	return new Str(str);
 }
 
 /*******************************************************************************
@@ -81,6 +96,11 @@ string Num::toString()
 	return string("[")+Token::toString()+"]:"+ss.str();
 }
 
+Token* Num::copy()
+{
+	return new Num(val);
+}
+
 /*******************************************************************************
                                    字符
 *******************************************************************************/
@@ -94,3 +114,7 @@ string Char::toString()
 	return string("[")+Token::toString()+"]:"+ss.str();
 }
 
+Token* Char::copy()
+{
+	return new Char(ch);
+}
