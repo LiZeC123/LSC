@@ -1,24 +1,50 @@
 #! /bin/bash
 
-echo ">>> Base Test <<<"
-./lsc ./test/baseTest.c
+# echo ">>> Base Test <<<"
+# ./lsc ./test/baseTest.c
+# ./z.out
+# echo
+# echo
+echo -n "Begin IO Library Compile Test... "
+./compile/lscc ./test/IO.c
+./ass/lsca ./test/IO.s
+echo "Finish"
+
+# echo
+# echo
+# echo ">>> Test Use Macro <<<"
+# ./lsc ./test/testMacro.c
+# ./z.out
+# echo
+# echo
+# echo ">>> Test Use Command Args <<<"
+# ./lsc ./test/useArg.c
+# ./z.out 123 321 1234 4321
+
+
+echo -n "Begin AtithmeticTest... "
+./lsc ./test/arithmeticTest.c
 ./z.out
-echo
-echo
-echo ">>> Test Compile IO Library <<<"
-./compile/lscc ./test/testIO.c
-./ass/lsca ./test/testIO.s
-echo 
-echo
-echo ">>> Test Use  IO Library <<<"
-./lsc ./test/testlib.c
-echo
-echo
-echo ">>> Test Use Macro <<<"
-./lsc ./test/testMacro.c
+echo "Finish"
+
+
+echo -n "Begin LogicTest... "
+./lsc ./test/logicTest.c
 ./z.out
-echo
-echo
-echo ">>> Test Use Command Args <<<"
-./lsc ./test/useArg.c
-./z.out 123 321 1234 4321
+echo "Finish"
+
+echo -n "Begin PointerTest... "
+./lsc ./test/pointerTest.c
+./z.out
+echo "Finish"
+
+
+echo -n "Begin CmdArgsTest... "
+./lsc ./test/cmdArgsTest.c
+./z.out FisrtPart SecondPart TheLastPart
+echo "Finish"
+
+# 1. 数值计算
+# 2. 逻辑运算  > 看看文档
+# 3. 分支跳转检查
+# 4. 其他待补充
