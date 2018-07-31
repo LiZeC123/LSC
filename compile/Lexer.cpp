@@ -37,12 +37,8 @@ KeyWords Lexer::key = KeyWords();
 
 Macros::Macros(Scanner& sc) : scan(sc)
 {
-    Token* BUILD = new Token(BUILD_MACRO);
-    // macros["__DATE__"];
-    // macros["__TIME__"];
-    //TODO: 检查是否调用构造函数
-    macros["__LINE__"] = BUILD;
-    macros["__FILE__"] = BUILD;
+    macros["__LINE__"] = nullptr;
+    macros["__FILE__"] = nullptr;
 }
 
 bool Macros::isMacro(std::string name)
@@ -50,40 +46,35 @@ bool Macros::isMacro(std::string name)
     return macros.find(name) != macros.end();
 }
 
-Token* Macros::getRealToken(std::string name)
+vector<Token*>* Macros::getRealToken(std::string name)
 {
     if(name == "__LINE__"){
-        return new Num(scan.getRow());
+        return new vector<Token*>{ new Num(scan.getRow()) };
+
     }
     else if(name=="__FILE__"){
-        return new Str(scan.getFilename());
+        return new vector<Token*>{ new Str(scan.getFilename()) };
     }
-    
     return macros.find(name)->second;
 }
 
-void Macros::addMacro(std::string name,Token* value)
+void Macros::addMacro(std::string name,vector<Token*>* list)
 {
     if(isMacro(name)){
         LEXERROR(MACRO_RE_DEF);
     }
     else{
-        macros[name] = value;
+        macros[name] = list;
     }
 }
 
-
-Macros::~Macros()
-{
-    for(auto it = macros.begin();it != macros.end();it++){
-        //delete it->second;
-    }
-}
 
 Lexer::Lexer(Scanner& sc) : scanner(sc), macros(sc)
 {
     token = nullptr;
     ch = ' ';
+    macroTokenIndex = 0;
+    macroTokenList = nullptr;
 }
 
 bool Lexer::scan(char need)
@@ -101,17 +92,21 @@ bool Lexer::scan(char need)
 
 Token* Lexer::nextToken()
 {
-    if(token != nullptr){
-        printf("%s\n",token->toString().c_str());
+    if(macroTokenIndex != 0){
+        if(macroTokenList->size() > macroTokenIndex){
+            Token* r = macroTokenList->at(macroTokenIndex);
+            macroTokenIndex++;
+            return r;            
+        }
+        else{
+            macroTokenIndex = 0;
+        }
     }
-    
-    if(macros.isMacro("MAX_SIZE")&&macros.getRealToken("MAX_SIZE")->sym != NUM){
-        int a = 3;
-    }
+
     while(ch != -1){
         Token * t = nullptr;
 
-        // 掠过空白字符
+        // 略过空白字符
         while (ch == ' ' || ch == 10 || ch == 9)
         {
             scan();
@@ -236,7 +231,9 @@ Token * Lexer::getIdent()
     
     //匹配结束,首先检查是否为宏名
     if(macros.isMacro(name)){
-        return macros.getRealToken(name);
+        macroTokenList = macros.getRealToken(name);
+        macroTokenIndex = 1;
+        return macroTokenList->at(0);
     }
     
     // 不是宏再检查是关键字还是标识符
@@ -396,11 +393,16 @@ void Lexer::getMacro()
         // define
         // 另外拷贝一份,否则之后可能被修改或者析构
         Token* name = nextToken()->copy();
-        Token* value = nextToken()->copy();
+        vector<Token*>* list = new vector<Token*>();
+        while(ch!='\n' && ch!=-1){
+            Token* value = nextToken()->copy();
+            list->push_back(value);
+        }
+        
 
         // 此处可以通过检查ch值来判断是否换行,注意检测-1的情况
         // 存储多个Token即可实现对函数和语句的替换
-        macros.addMacro(((ID*)name)->name,value);
+        macros.addMacro(((ID*)name)->name,list);
     }
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include <map>
 #include "common.h"
 #include "Scanner.h"
@@ -27,12 +28,11 @@ public:
     //TODO 从词法分析阶段替换有关的宏名
     Macros(Scanner& sc);
     bool isMacro(std::string name);
-    Token* getRealToken(std::string name);
-    void addMacro(std::string name,Token* value);
-    ~Macros();
+    std::vector<Token*>* getRealToken(std::string name);
+    void addMacro(std::string name,std::vector<Token*>* list);
 private:
     Scanner& scan;
-    std::map<std::string,Token*> macros;
+    std::map<std::string,std::vector<Token*>*> macros;
 };
 
 
@@ -55,6 +55,8 @@ private:
     bool scan(char need = 0);
 
     Token * token;
+    unsigned int macroTokenIndex;
+    std::vector<Token*>* macroTokenList;
 
 private:
     Token* getIdent();
