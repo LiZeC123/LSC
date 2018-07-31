@@ -31,6 +31,21 @@
         "string": "cpp",
         "vector": "cpp",
         "fstream": "cpp",
-        "lscio.h": "c"
+        "lscio.h": "c",
+        "bitset": "cpp",
+        "chrono": "cpp",
+        "cmath": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "functional": "cpp",
+        "memory": "cpp",
+        "numeric": "cpp",
+        "ratio": "cpp",
+        "thread": "cpp",
+        "cinttypes": "cpp"
     }
 }
