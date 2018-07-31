@@ -1,6 +1,6 @@
 #define MAX_SIZE 10
 #define acd 12
-
+#define print lscPrintStr("Print From Marco!\n")
 void lscPrintStr(char* str);
 void lscPrintInt(int n);
 
@@ -17,5 +17,7 @@ int main()
     int maybe = acd;
     lscPrintInt(maybe);lscPrintStr("\n");
     
+    print;
+
     lscPrintStr("Finish!");
 }
