@@ -11,25 +11,26 @@ using namespace std;
 const char * tokenName[]=
 {
 	"error",//错误，异常，结束标记等
-	"文件结尾",//文件结束
-	"标识符",//标识符
-	"int","char","void",//数据类型
-	"extern",//extern
-	"数字","字符","字符串",//字面量
+	"文件结尾",
+	"标识符",
+	"int","char","void",
+	"extern",
+	"数字","字符","字符串",	//字面量
 	"!","&",//单目运算 ! - & *
 	"+","-","*","/","%%",//算术运算符
 	"++","--",
-	">",">=","<","<=","==","!=",//比较运算符
-	"&&","||",//逻辑运算
+	">",">=","<","<=","==","!=",
+	"&&","||",
 	"(",")",//()
 	"[","]",//[]
 	"{","}",//{}
-	",",":",";",//逗号,冒号,分号
-	"=",//赋值
-	"if","else",//if-else
-	"switch","case","default",//swicth-case-deault
-	"while","do","for",//循环
-	"break","continue","return"//break,continue,return
+	",",":",";",".",//逗号,冒号,分号,小数点
+	"=",
+	"if","else",
+	"switch","case","default",
+	"while","do","for",
+	"break","continue","return",
+	"预定义宏","include","define", 
 };
 
 /*******************************************************************************
@@ -41,6 +42,11 @@ Token::Token (Symbol t):sym(t) { }
 string Token::toString()
 {
 	return std::string(tokenName[sym]);
+}
+
+Token* Token::copy()
+{
+	return new Token(sym);
 }
 
 Token::~Token () { }
@@ -57,6 +63,11 @@ string ID::toString()
 	return Token::toString()+name;
 }
 
+Token* ID::copy()
+{
+	return new ID(name);
+}
+
 /*******************************************************************************
                                    字符串
 *******************************************************************************/
@@ -66,6 +77,11 @@ Str::Str (string s):Token(STR),str(s) { }
 string Str::toString()
 {
 	return string("[")+Token::toString()+"]:"+str;
+}
+
+Token* Str::copy()
+{
+	return new Str(str);
 }
 
 /*******************************************************************************
@@ -81,6 +97,11 @@ string Num::toString()
 	return string("[")+Token::toString()+"]:"+ss.str();
 }
 
+Token* Num::copy()
+{
+	return new Num(val);
+}
+
 /*******************************************************************************
                                    字符
 *******************************************************************************/
@@ -94,3 +115,7 @@ string Char::toString()
 	return string("[")+Token::toString()+"]:"+ss.str();
 }
 
+Token* Char::copy()
+{
+	return new Char(ch);
+}

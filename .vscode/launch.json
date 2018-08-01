@@ -66,7 +66,7 @@
                 "request": "launch",
                 "preLaunchTask": "makeCompile",
                 "program": "${workspaceRoot}/compile/lscc",
-                "args": ["${workspaceRoot}/test/testPointer.c"],
+                "args": ["${workspaceRoot}/test/MutilTest/main.c"],
                 "stopAtEntry": false,
                 "cwd": "${workspaceRoot}",
                 "environment": [],

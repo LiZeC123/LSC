@@ -6,7 +6,7 @@
         {
             "label": "makeCompile",
             "type": "shell",
-            "command": "./makeProject compile",
+            "command": "./makeProject cmp",
             "problemMatcher": {
                 "owner": "cpp",
                 "fileLocation": ["relative", "${workspaceRoot}/compile"],

@@ -20,7 +20,7 @@ int main(int argc,char* argv[])
     // 初始化模块
     Scanner scanner = Scanner(filename);
     Error err       = Error(&scanner);
-    Lexer lex       = Lexer(scanner);
+    Lexer lex       = Lexer(&scanner);
     SymTab tab      = SymTab();
     GenIR ir        = GenIR(tab);
     Parser parser   = Parser(lex,tab,ir);

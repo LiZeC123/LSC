@@ -1,21 +1,59 @@
 #! /bin/bash
 
+makeCompiler(){
+	cd ./compile
+	make -j4
+	cd ..
+}
+
+makeAssembler(){
+	cd ./ass
+	make -j4
+	cd ..
+}
+
+makeLinker(){
+	cd ./lit
+	make -j4
+	cd ..
+}
+
+makeLibary(){
+	cd ./stdlib
+	../ass/lsca start.s
+	../ass/lsca stdlib.s
+	cd ..
+}
+
+makeAll(){
+	echo "编译编译器模块..."
+	makeCompiler
+	echo "编译汇编器模块..."
+	makeAssembler
+	echo "编译链接器模块..."
+	makeLinker
+	echo "编译标准库模块...."
+	makeLibary
+	echo "链接主程序..."
+	g++ main.cpp -o lsc -std=c++11	
+	echo "编译完成"
+}
+
 if [ $1x == "ass"x ]
 then
-	cd ./ass
-	make
-elif [ $1x == "compile"x ]
+	makeAssembler
+elif [ $1x == "cmp"x ]
 then
-	cd ./compile
-	make
+	makeCompiler
 elif [ $1x == "lit"x ]
 then
-	cd ./lit
-	make
-elif [ $1x == "pre"x ]
+	makeLinker
+elif [ $1x == "lib"x ]
 then
-	cd ./preproc
-	make
+	makeLibary
+elif [ $1x == "all"x ]
+then
+	makeAll
 elif [ $1x == "clear"x ]
 then
 	cd ./compile
@@ -28,18 +66,31 @@ then
 	make clear
 	cd ../stdlib
 	rm -f *.o
+elif [ $1x == "install"x ]
+then
+	makeAll
+	echo "复制依赖文件到目录..."
+	sudo mkdir /usr/include/lsc
+	sudo cp ./stdlib/lscio.h  /usr/include/lsc/lscio.h
+	sudo cp ./stdlib/start.o /usr/include/lsc/start.o
+	sudo cp ./stdlib/stdlib.o /usr/include/lsc/stdlib.o
+	echo "安装完成"
+elif [ $1x == "uninstall"x ]
+then
+	echo "删除依赖文件..."
+	sudo rm -rf /usr/include/lsc
+	echo "卸载完成"
 else
-	cd ./compile
-	make -j8
-	cd ../ass
-	make -j8
-	cd ../lit
-	make -j8
-	cd ../preproc
-	make -j8
-	cd ../stdlib
-	../ass/lsca start.s
-	../ass/lsca stdlib.s
-	cd ..
-	g++ main.cpp -o lsc -std=c++11
+	echo ""
+	echo "用法: ./makeProject [参数]"
+	echo "参数可以选择以下值:"
+	echo "install   编译并安装lsc编译系统"
+	echo "unistall  卸载lsc编译系统"
+	echo "ass       编译汇编器"
+	echo "cmp       编译编译器"
+	echo "lit       编译连接器"
+	echo "lib       编译标准库"
+	echo "clear     清除编译中间结果"	
 fi
+
+
