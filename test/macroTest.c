@@ -1,3 +1,5 @@
+#include <lscio.h>
+
 #define MAX_SIZE 10
 #define acd 12
 #define print lscPrintStr("Print From Marco!\n")
