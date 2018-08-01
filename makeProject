@@ -25,6 +25,20 @@ makeLibary(){
 	cd ..
 }
 
+makeAll(){
+	echo "编译编译器模块..."
+	makeCompiler
+	echo "编译汇编器模块..."
+	makeAssembler
+	echo "编译链接器模块..."
+	makeLinker
+	echo "编译标准库模块...."
+	makeLibary
+	echo "链接主程序..."
+	g++ main.cpp -o lsc -std=c++11	
+	echo "编译完成"
+}
+
 if [ $1x == "ass"x ]
 then
 	makeAssembler
@@ -37,10 +51,9 @@ then
 elif [ $1x == "lib"x ]
 then
 	makeLibary
-elif [ $1x == "pre"x ]
+elif [ $1x == "all"x ]
 then
-	cd ./preproc
-	make
+	makeAll
 elif [ $1x == "clear"x ]
 then
 	cd ./compile
@@ -55,16 +68,7 @@ then
 	rm -f *.o
 elif [ $1x == "install"x ]
 then
-	echo "编译编译器模块..."
-	makeCompiler
-	echo "编译汇编器模块..."
-	makeAssembler
-	echo "编译链接器模块..."
-	makeLinker
-	echo "编译标准库模块...."
-	makeLibary
-	echo "链接主程序..."
-	g++ main.cpp -o lsc -std=c++11	
+	makeAll
 	echo "复制依赖文件到目录..."
 	sudo mkdir /usr/include/lsc
 	sudo cp ./stdlib/lscio.h  /usr/include/lsc/lscio.h

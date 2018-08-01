@@ -6,7 +6,7 @@
 #define SIZE 256
 
 //#define __LSC_DEBUG__
-#define __LSC_VERSION__ "1.1.0"
+#define __LSC_VERSION__ "1.2.0"
 
 using namespace std;
 
@@ -86,7 +86,6 @@ class Args
 public:
 	bool isHelped = false;
 	bool isSetOutput = false;
-	bool isOnlyPreproc = false;
 	bool isOnlyCompile = false;
 	bool isOnlyAss = false;
 	bool isSaveTempFile = false;
@@ -156,9 +155,8 @@ void printHelpInfo()
 	printf("指令格式 lsc [options] file ...\n");
 	printf("-h 显示此信息\n");
 	printf("-o 指定输出的可执行文件名\n");
-	printf("-E 只进行编译预处理\n");
-	printf("-S 只进行编译预处理和编译\n");
-	printf("-C 只进行编译预处理,编译和汇编\n");
+	printf("-S 只进行编译\n");
+	printf("-C 只进行编译和汇编\n");
 	printf("-T 保留中间文件\n\n");
 
 	printf("Lsc iS Compile!\n");
@@ -185,9 +183,6 @@ void analyseOptions(Args& args, int argc, char* argv[])
 			else if(option[1] == 'h') {
 				args.isHelped = true;
 				printHelpInfo();
-			}
-			else if(option[1] == 'E'){
-				args.isOnlyPreproc = true;
 			}
 			else if(option[1] == 'S'){
 				args.isOnlyCompile = true;
@@ -227,21 +222,12 @@ void analyseFile(vector<CompileFile>& compilefiles, int argc, char* argv[])
     }
 }
 
-void toIFile(const vector<CompileFile>& compilefiles, const string& exePath)
-{
-	for(const auto& file: compilefiles){
-		if(file.getType() == ".c"){
-			string opt = file.getCoreName()+".c " + exePath + "/stdlib";
-			execCmd(exePath,"/preproc/lscp", opt);
-		}
-	}
-}
 
 void toSFile(const vector<CompileFile>& compilefiles, const string& exePath)
 {
 	for(const auto& file: compilefiles){
 		if(file.getType() == ".c" || file.getType() == ".i"){
-			execCmd(exePath,"/compile/lscc", file.getCoreName()+".i");
+			execCmd(exePath,"/compile/lscc", file.getFullName());
 		}
 	}
 }
@@ -257,7 +243,7 @@ void toOFile(const vector<CompileFile>& compilefiles, const string& exePath)
 
 void toExeFile(const vector<CompileFile>& compilefiles, const string& exePath)
 {
-	string allfiles = exePath + "/stdlib/start.o " + exePath + "/stdlib/stdlib.o ";
+	string allfiles = "/usr/include/lsc/start.o  /usr/include/lsc/stdlib.o ";
 	for(const auto& file: compilefiles){
 		allfiles += (file.getCoreName()+ ".o ");
 	}
@@ -267,10 +253,6 @@ void toExeFile(const vector<CompileFile>& compilefiles, const string& exePath)
 
 void clearTempFile(const vector<CompileFile>& compilefiles, const Args& args)
 {
-	if(args.isOnlyPreproc){
-		// 只保留编译预处理文件,则不进行任何删除
-		return;
-	}
 	if(args.isOnlyCompile){
 		for(const auto& file: compilefiles){
 			execCmd("","rm -f",file.getCoreName()+".i");
@@ -315,26 +297,21 @@ int main(int argc,char* argv[])
 	}
 
    string exePath = getFilePath();
-   if(args.isOnlyPreproc) {
-	   toIFile(compilefiles,exePath);
-   }
-   else if(args.isOnlyCompile) {
-	   toIFile(compilefiles,exePath);
+	
+	if(args.isOnlyCompile) {
 	   toSFile(compilefiles,exePath);
-   }
-   else if(args.isOnlyAss) {
-	   toIFile(compilefiles,exePath);
-	   toSFile(compilefiles,exePath);
-	   toOFile(compilefiles,exePath);
-   }
-   else{
-	   toIFile(compilefiles,exePath);
-	   toSFile(compilefiles,exePath);
-	   toOFile(compilefiles,exePath);
-	   toExeFile(compilefiles,exePath);
-   }
+	}
+	else if(args.isOnlyAss) {
+		toSFile(compilefiles,exePath);
+		toOFile(compilefiles,exePath);
+	}
+	else{
+		toSFile(compilefiles,exePath);
+		toOFile(compilefiles,exePath);
+		toExeFile(compilefiles,exePath);
+	}
 
-	if(args.isSetOutput && !args.isOnlyPreproc && !args.isOnlyCompile && !args.isOnlyAss){
+	if(args.isSetOutput && !args.isOnlyCompile && !args.isOnlyAss){
 		execCmd("","mv z.out "+args.outputName,"");
 	}
 
