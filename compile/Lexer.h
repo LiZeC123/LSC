@@ -43,20 +43,25 @@ private:
 class Lexer
 {
 public:
-    Lexer(Scanner& scanner);
+    Lexer(Scanner* scanner);
     Token* nextToken();
     ~Lexer();
 
 private:
     static KeyWords key;
-    Scanner & scanner;
+    Scanner* scanner;
     Macros macros;
     char ch;
     bool scan(char need = 0);
 
     Token * token;
+
+    // 用于宏替换
     unsigned int macroTokenIndex;
-    std::vector<Token*>* macroTokenList;
+    std::vector<Token*>* macroTokenList;    
+
+
+    std::vector<Scanner*> scanStack;        //保存scanner的顺序的栈,用于include指令
 
 private:
     Token* getIdent();
@@ -64,4 +69,8 @@ private:
     Token* getChar();
     Token* getNum();
     void getMacro();
+
+    Scanner* loadIncludeFile();
+    Scanner* includeStdFile(std::vector<Token*> words);
+    Scanner* includeUserFile(std::string name);
 };

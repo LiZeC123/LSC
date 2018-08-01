@@ -35,7 +35,8 @@ void Error::lexError(int code)
 		"错误的或运算符",
 		"多行注释没有正常结束",
 		"词法记号不存在",
-		"宏重定义"
+		"宏重定义",
+		"include格式错误"
 	};
 	errorNum++;
     printf("%s<%d行,%d列> 词法错误:%s.\n",

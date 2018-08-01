@@ -17,7 +17,7 @@ typedef enum {
     LPAREN,RPAREN,                  //()
     LBRACK,RBRACK,                  //[]
     LBRACE,RBRACE,                  //{}
-    COMMA,COLON,SEMICON,            //逗号,冒号,分号
+    COMMA,COLON,SEMICON,POINT,      //逗号,冒号,分号,小数点
     ASSIGN,                         //赋值
     KW_IF,KW_ELSE,                  //if-else
     KW_SWITCH,KW_CASE,KW_DEFAULT,   //swicth-case-deault
@@ -38,6 +38,7 @@ enum LexErr
     COMMENT_NO_END,             // 多行注释缺少结束符
     TOKEN_NO_EXIST,             // 未定义的符号
     MACRO_RE_DEF,               // 宏重定义
+    INCLUDE_ERR,                // include格式错误
 };
 
 // 所有的词法警告码

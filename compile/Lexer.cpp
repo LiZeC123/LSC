@@ -69,7 +69,7 @@ void Macros::addMacro(std::string name,vector<Token*>* list)
 }
 
 
-Lexer::Lexer(Scanner& sc) : scanner(sc), macros(sc)
+Lexer::Lexer(Scanner* sc) : scanner(sc), macros(*sc)
 {
     token = nullptr;
     ch = ' ';
@@ -79,12 +79,12 @@ Lexer::Lexer(Scanner& sc) : scanner(sc), macros(sc)
 
 bool Lexer::scan(char need)
 {
-    ch = scanner.scan();
+    ch = scanner->scan();
     if(need){
         if(ch != need){
             return false;
         }
-        ch = scanner.scan();
+        ch = scanner->scan();
         return true;
     }
     return true;
@@ -192,6 +192,8 @@ Token* Lexer::nextToken()
                 t=new Token(LBRACE);scan();break;
             case '}':
                 t=new Token(RBRACE);scan();break;
+            case '.':
+                t=new Token(POINT);scan();break;
             case -1:scan();break;
             default:
                 t=new Token(ERR);//错误的词法记号
@@ -212,6 +214,13 @@ Token* Lexer::nextToken()
             continue;      // 错误符号,读取下一轮
         }
 
+    }
+
+    if(!scanStack.empty()){
+        scanner = scanStack.back();
+        scan();// 回复ch状态
+        scanStack.pop_back();
+        return nextToken();
     }
 
     if(token){
@@ -391,20 +400,82 @@ void Lexer::getMacro()
     Token* key = nextToken();
     if(key->sym == KW_DEFINE){
         // define
-        // 另外拷贝一份,否则之后可能被修改或者析构
+        // 另外拷贝一份,nextToken返回的符号下次调用前被析构
         Token* name = nextToken()->copy();
         vector<Token*>* list = new vector<Token*>();
+        // 通过检查ch值来判断是否换行
         while(ch!='\n' && ch!=-1){
             Token* value = nextToken()->copy();
             list->push_back(value);
         }
         
-
-        // 此处可以通过检查ch值来判断是否换行,注意检测-1的情况
-        // 存储多个Token即可实现对函数和语句的替换
         macros.addMacro(((ID*)name)->name,list);
     }
+    else if(key->sym == KW_INCLUDE){
+        // include
+        Scanner* newScan = loadIncludeFile();
+
+        if(newScan != nullptr){
+            scanStack.push_back(scanner);
+            scanner = newScan;
+        }
+    }
 }
+
+Scanner* Lexer::loadIncludeFile()
+{
+    Token* sp = nextToken();
+    if(sp->sym == LT){
+        // 系统头文件 
+        vector<Token*> fileNameToken;
+        sp = nextToken()->copy();
+        while(sp->sym != GT){
+            fileNameToken.push_back(sp);
+            sp = nextToken()->copy();
+        }
+
+        return includeStdFile(fileNameToken);
+    }
+    else if(sp->sym == STR){
+        // 用户自定义头文件
+        string userfile = ((Str*)sp)->str;
+        return includeUserFile(userfile);
+    }
+    else{
+        LEXERROR(INCLUDE_ERR);
+        return nullptr;
+    }
+}
+
+Scanner* Lexer::includeStdFile(vector<Token*> words){
+    static const string stdPath = "/usr/include/lsc/";
+    string name = stdPath;
+    
+    for(auto token:words){
+        if(token->sym == IDENT){
+            name.append(((ID*)token)->name);
+        }
+        else{
+            name.append(token->toString());
+        }
+    }
+
+    return new Scanner(name.c_str());
+}
+
+Scanner* Lexer::includeUserFile(string name)
+{
+
+    string filename = scanner->getFilename();
+    size_t n = filename.rfind("/");
+    size_t len = filename.size();
+    if(n > 0){
+        filename.replace(n+1,len-n-1,name);
+    }
+
+    return new Scanner(filename.c_str());
+}
+
 
 Lexer::~Lexer()
 {

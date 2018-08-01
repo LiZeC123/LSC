@@ -33,6 +33,7 @@ void Parser::analyse()
 void Parser::move()
 {
     look = lexer.nextToken();
+    printf("%s\n",look->toString().c_str());
 }
 
 bool Parser::match(Symbol need)
