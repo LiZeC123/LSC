@@ -3,7 +3,7 @@ WARNFLG = -Wall -Wextra
 DEBUG = -g
 STD = -std=c++11
 CXXFLAGS += $(DEBUG) $(WARNFLG) $(STD)
-CC = g++ $(FLAG)
+CC = g++
 
 lscc: $(OBJ) 
 	$(CC) $(CXXFLAGS) $(OBJ) -o lscc
