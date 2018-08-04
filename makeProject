@@ -2,26 +2,25 @@
 
 makeCompiler(){
 	cd ./compile
-	make -j4
+	make -j8
 	cd ..
 }
 
 makeAssembler(){
 	cd ./ass
-	make -j4
+	make -j8
 	cd ..
 }
 
 makeLinker(){
 	cd ./lit
-	make -j4
+	make -j8
 	cd ..
 }
 
 makeLibary(){
 	cd ./stdlib
-	../ass/lsca start.s
-	../ass/lsca stdlib.s
+	make -j8
 	cd ..
 }
 
@@ -39,6 +38,40 @@ makeAll(){
 	echo "编译完成"
 }
 
+makeClear(){
+	cd ./compile
+	make clear
+	cd ../ass
+	make clear
+	cd ../lit
+	make clear
+	cd ../stdlib
+	make clear
+	cd ..
+}
+
+copyStdLib(){
+	sudo cp ./stdlib/lscio.h  /usr/include/lsc/lscio.h
+	sudo cp ./stdlib/start.o /usr/include/lsc/start.o
+	sudo cp ./stdlib/stdlib.o /usr/include/lsc/stdlib.o
+}
+
+copyExeFile(){
+	sudo cp ./lsc /usr/local/bin/lsc
+	sudo cp ./compile/lscc /usr/local/bin/lscc
+	sudo cp ./ass/lsca /usr/local/bin/lsca
+	sudo cp ./lit/lscl /usr/local/bin/lscl
+}
+
+removeExeFile(){
+	sudo rm /usr/local/bin/lsc
+	sudo rm /usr/local/bin/lscc
+	sudo rm /usr/local/bin/lsca
+	sudo rm /usr/local/bin/lscl
+}
+
+
+
 if [ $1x == "ass"x ]
 then
 	makeAssembler
@@ -51,34 +84,25 @@ then
 elif [ $1x == "lib"x ]
 then
 	makeLibary
-elif [ $1x == "all"x ]
-then
-	makeAll
 elif [ $1x == "clear"x ]
 then
-	cd ./compile
-	make clear
-	cd ../ass
-	make clear
-	cd ../lit
-	make clear
-	cd ../preproc
-	make clear
-	cd ../stdlib
-	rm -f *.o
+	makeClear
 elif [ $1x == "install"x ]
 then
 	makeAll
 	echo "复制依赖文件到目录..."
 	sudo mkdir /usr/include/lsc
-	sudo cp ./stdlib/lscio.h  /usr/include/lsc/lscio.h
-	sudo cp ./stdlib/start.o /usr/include/lsc/start.o
-	sudo cp ./stdlib/stdlib.o /usr/include/lsc/stdlib.o
+
+	copyStdLib
+
+	copyExeFile
+
 	echo "安装完成"
 elif [ $1x == "uninstall"x ]
 then
 	echo "删除依赖文件..."
 	sudo rm -rf /usr/include/lsc
+	removeExeFile
 	echo "卸载完成"
 else
 	echo ""
