@@ -254,7 +254,7 @@ void toOFile(const vector<CompileFile>& compilefiles, const string& exePath)
 
 void toExeFile(const vector<CompileFile>& compilefiles, const string& exePath)
 {
-	string allfiles = "/usr/include/lsc/start.o  /usr/include/lsc/stdlib.o ";
+	string allfiles = "/usr/include/lsc/start.o  /usr/include/lsc/lscio.o /usr/include/lsc/lsclib.o ";
 	for(const auto& file: compilefiles){
 		allfiles += (file.getCoreName()+ ".o ");
 	}

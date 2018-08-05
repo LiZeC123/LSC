@@ -52,8 +52,11 @@ makeClear(){
 
 copyStdLib(){
 	sudo cp ./stdlib/lscio.h  /usr/include/lsc/lscio.h
+	sudo cp ./stdlib/lsclib.h  /usr/include/lsc/lsclib.h
 	sudo cp ./stdlib/start.o /usr/include/lsc/start.o
-	sudo cp ./stdlib/stdlib.o /usr/include/lsc/stdlib.o
+	sudo cp ./stdlib/lscio.o /usr/include/lsc/lscio.o
+	sudo cp ./stdlib/lsclib.o /usr/include/lsc/lsclib.o
+
 }
 
 copyExeFile(){

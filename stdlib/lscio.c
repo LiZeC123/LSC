@@ -1,16 +1,7 @@
-void lscRead(char* buf,int maxLen);
-void lscWrite(char* buf,int len);
+#include "lscio.h"
 
-int lscstr2int(char* str);
-void lscint2str(char* buf,int n);
-
-void lscPrintStr(char* str);
-void lscPrintInt(int n);
-
-int lscReadInt();
-
-
-int lscstr2int(char* buf)
+// 2^31 = 2147483648
+int lscstr2int(char* buf,int maxLen)
 {
 	int count = 0;
 	int asw = 0;
@@ -20,7 +11,7 @@ int lscstr2int(char* buf)
 		++count;
 	}
 	
-	while(buf[count] != '\n'){
+	while(buf[count] != '\n' && count < maxLen){
 		int d = buf[count] - 48;
 		asw = asw * 10 + d;
 		++count;
@@ -31,15 +22,15 @@ int lscstr2int(char* buf)
 
 int lscReadInt()
 {
-    char buf[20];
-    lscRead(buf,20);
-    return lscstr2int(buf);
+    char buf[10];
+    lscRead(buf,10);
+    return lscstr2int(buf,10);
 }
 
 void lscPrintStr(char* str)
 {
     int count = 0;
-    while(*(str+count) != '\0'){
+    while(str[count] != '\0'){
         ++count;
     }
     ++count;
@@ -62,16 +53,16 @@ void lscint2str(char* buf,int i)
     int idx = 0;
     --count;
 	while(count >= 0){
-		*(buf+idx) = tmp[count];
+        buf[idx] = tmp[count];
 		--count;
         ++idx;
 	}
-    *(buf+idx) = '\0';
+    buf[idx] = '\0';
 }
 
 void lscPrintInt(int n)
 {
-    char buf[20];
+    char buf[10];
     lscint2str(buf,n);
     lscPrintStr(buf);
 }
