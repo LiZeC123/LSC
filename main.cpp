@@ -6,7 +6,7 @@
 #define SIZE 256
 
 //#define __LSC_DEBUG__
-#define __LSC_VERSION__ "1.2.0"
+#define __LSC_VERSION__ "1.2.1"
 
 using namespace std;
 
@@ -85,11 +85,12 @@ class Args
 {
 public:
 	bool isHelped = false;
+	bool isVersion = false;
 	bool isSetOutput = false;
 	bool isOnlyCompile = false;
 	bool isOnlyAss = false;
 	bool isSaveTempFile = false;
-
+	
 	string outputName;
 };
 
@@ -159,7 +160,13 @@ void printHelpInfo()
 	printf("-C 只进行编译和汇编\n");
 	printf("-T 保留中间文件\n\n");
 
-	printf("Lsc iS Compile!\n");
+	printf("Lsc iS Compiler!\n");
+}
+
+void printVersionInfo()
+{
+	printf("Lsc %s (on %s,%s)\n", __LSC_VERSION__,__DATE__, __TIME__);
+	printf("[GCC %d.%d.%d] on Ubuntu\n\n",__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__);
 }
 
 void analyseOptions(Args& args, int argc, char* argv[])
@@ -192,6 +199,10 @@ void analyseOptions(Args& args, int argc, char* argv[])
 			}
 			else if(option[1] == 'T'){
 				args.isSaveTempFile = true;
+			}
+			else if(option[1] == 'V'){
+				args.isVersion = true;
+				printVersionInfo();
 			}
 			else{
 				printf("选项: %s 无效\n",argv[i]);
@@ -227,7 +238,7 @@ void toSFile(const vector<CompileFile>& compilefiles, const string& exePath)
 {
 	for(const auto& file: compilefiles){
 		if(file.getType() == ".c" || file.getType() == ".i"){
-			execCmd(exePath,"/compile/lscc", file.getFullName());
+			execCmd("","lscc", file.getFullName());
 		}
 	}
 }
@@ -236,7 +247,7 @@ void toOFile(const vector<CompileFile>& compilefiles, const string& exePath)
 {
 	for(const auto& file: compilefiles){
 		if(file.getType() == ".c"|| file.getType() == ".i" || file.getType() == ".s"){
-			execCmd(exePath,"/ass/lsca", file.getCoreName()+".s");
+			execCmd("","lsca", file.getCoreName()+".s");
 		}
 	}
 }
@@ -247,7 +258,7 @@ void toExeFile(const vector<CompileFile>& compilefiles, const string& exePath)
 	for(const auto& file: compilefiles){
 		allfiles += (file.getCoreName()+ ".o ");
 	}
-	execCmd(exePath,"/lit/lscl", allfiles);
+	execCmd("","lscl", allfiles);
 	execCmd("","chmod +x z.out","");
 }
 
@@ -289,7 +300,7 @@ int main(int argc,char* argv[])
 
 
 	if(compilefiles.size()==0){
-		if(!args.isHelped){
+		if(!args.isHelped && !args.isVersion){
 			printf("输入文件不能为空, 输入 lsc -h 查看帮助\n");
 		}
 
