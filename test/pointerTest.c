@@ -1,32 +1,29 @@
-#include <lscio.h>
+#include "../stdlib/lscio.h"
+#include "../stdlib/lsclib.h"
 
-void exit()
-{
-    // 使用除零错误来强制结束程序
-    // 后续考虑使用系统调用实现此函数
-    int d = 3/0;
-}
-
-// TODO: 添加行号宏,从而实现定位
-void checkEquals(int a,int b)
+void checkEquals(int a,int b,int line)
 {
     if(a != b){
-        lscPrintStr("checkEquals:");lscPrintInt(a);lscPrintStr(" != ");lscPrintInt(b);lscPrintStr("\n");
-        exit();
+        lscPrintStr(__FILE__);
+        lscPrintStr(" <第");lscPrintInt(line);lscPrintStr("行> ");
+        lscPrintStr("checkEquals: ");lscPrintInt(a);lscPrintStr(" != ");lscPrintInt(b);lscPrintStr("\n");
+        exit(1);
     }
 }
 
-void checkStrEquals(char a,char b)
+void checkCharEquals(char a,char b,int line)
 {
     if(a != b){
-        lscPrintStr("checkStrEquals: char not equal\n");
-        exit();
+        lscPrintStr(__FILE__);
+        lscPrintStr(" <第");lscPrintInt(line);lscPrintStr("行> ");
+        lscPrintStr("checkCharEquals: char not equal\n");
+        exit(1);
     }
 }
 
 void stringArrayTest()
 {
-        // 字符串有关运算测试
+    // 字符串有关运算测试
     char* name1 = "Lsc ";
     char* name2 = "iS Compile\n";
     char* name3 = "He";
@@ -61,10 +58,10 @@ void mutilPointerReadTest(){
 
     int v2;
     v2 = **ppv;
-    checkEquals(value,v2);
+    checkEquals(value,v2,__LINE__);
 
     v2 = *pv;
-    checkEquals(value,v2);
+    checkEquals(value,v2,__LINE__);
 
 
     
@@ -74,10 +71,10 @@ void mutilPointerReadTest(){
 
     char c2;
     c2 = **ppc;
-    checkStrEquals(c2,c);
+    checkCharEquals(c2,c,__LINE__);
 
     c2 = *pc;
-    checkStrEquals(c2,c);
+    checkCharEquals(c2,c,__LINE__);
 
     pc = *ppc;
 
@@ -97,10 +94,10 @@ void mutilPointerWriteTest()
     int** ppd = &pd;
 
     **ppd = 9843;
-    checkEquals(d,9843);
+    checkEquals(d,9843,__LINE__);
 
     *pd = 9721;
-    checkEquals(d,9721);
+    checkEquals(d,9721,__LINE__);
 
 
     char c;
@@ -108,10 +105,10 @@ void mutilPointerWriteTest()
     char** ppc = &pc;
 
     **ppc = 'c';
-    checkStrEquals(c,'c');
+    checkCharEquals(c,'c',__LINE__);
 
     *pc = 'e';
-    checkStrEquals(c,'e');
+    checkCharEquals(c,'e',__LINE__);
 }
 
 int arrayTest() {

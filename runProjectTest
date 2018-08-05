@@ -5,46 +5,32 @@
 # ./z.out
 # echo
 # echo
-echo -n "Begin IO Library Compile Test... "
-./compile/lscc ./test/IO.c
-./ass/lsca ./test/IO.s
-echo "Finish"
-
-# echo
-# echo
-# echo ">>> Test Use Macro <<<"
-# ./lsc ./test/testMacro.c
-# ./z.out
-# echo
-# echo
-# echo ">>> Test Use Command Args <<<"
-# ./lsc ./test/useArg.c
-# ./z.out 123 321 1234 4321
 
 
-echo -n "Begin AtithmeticTest... "
+echo "Begin AtithmeticTest... "
 ./lsc ./test/arithmeticTest.c
 ./z.out
-echo "Finish"
+code=$?
 
-
-echo -n "Begin LogicTest... "
+echo "Begin LogicTest... "
 ./lsc ./test/logicTest.c
 ./z.out
-echo "Finish"
+code+=$?
 
-echo -n "Begin PointerTest... "
+echo "Begin PointerTest... "
 ./lsc ./test/pointerTest.c
 ./z.out
-echo "Finish"
+code+=$?
 
-
-echo -n "Begin CmdArgsTest... "
+echo "Begin CmdArgsTest... "
 ./lsc ./test/cmdArgsTest.c
 ./z.out FisrtPart SecondPart TheLastPart
-echo "Finish"
+code+=$?
 
 # 1. 数值计算
 # 2. 逻辑运算  > 看看文档
 # 3. 分支跳转检查
 # 4. 其他待补充
+echo
+echo "返回码为$code"
+exit $((code))

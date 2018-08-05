@@ -1,30 +1,27 @@
-#include <lscio.h>
+#include "../stdlib/lscio.h"
+#include "../stdlib/lsclib.h"
 
 
-void exit()
-{
-    // 使用除零错误来强制结束程序
-    // 后续考虑使用系统调用实现此函数
-    int d = 3/0;
-}
-
-
-void checkTrue(int value)
+void checkTrue(int value,int line)
 {
     if(value){
         return;
     }
     else{
+        lscPrintStr(__FILE__);
+        lscPrintStr(" <第");lscPrintInt(line);lscPrintStr("行> ");
         lscPrintStr("checkTrue: is not True");
-        exit();
+        exit(1);
     }
 }
 
-void checkFalse(int value)
+void checkFalse(int value,int line)
 {
     if(value){
+        lscPrintStr(__FILE__);
+        lscPrintStr(" <第");lscPrintInt(line);lscPrintStr("行> ");
         lscPrintStr("checkFalse: is not False");
-        exit();
+        exit(1);
     }
 }
 
@@ -33,17 +30,17 @@ int main()
     int true = 1;
     int false = 0;
 
-    checkTrue(true);
-    checkFalse(false);
+    checkTrue(true,__LINE__);
+    checkFalse(false,__LINE__);
 
-    checkTrue(true&&true);
-    checkFalse(true&&false);
+    checkTrue(true&&true,__LINE__);
+    checkFalse(true&&false,__LINE__);
 
-    checkTrue(true||false);
-    checkFalse(false||false);
+    checkTrue(true||false,__LINE__);
+    checkFalse(false||false,__LINE__);
 
-    checkTrue(!false);
-    checkFalse(!true);
+    checkTrue(!false,__LINE__);
+    checkFalse(!true,__LINE__);
 
     return 0;
 }
