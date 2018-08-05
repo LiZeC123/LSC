@@ -1,3 +1,4 @@
 language: C++
 install: ./makeProject install
 script: ./runProjectTest
+sudo: required
