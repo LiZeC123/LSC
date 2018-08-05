@@ -2,25 +2,25 @@
 
 makeCompiler(){
 	cd ./compile
-	make -j8
+	make -j4
 	cd ..
 }
 
 makeAssembler(){
 	cd ./ass
-	make -j8
+	make -j4
 	cd ..
 }
 
 makeLinker(){
 	cd ./lit
-	make -j8
+	make -j4
 	cd ..
 }
 
 makeLibary(){
 	cd ./stdlib
-	make -j8
+	make
 	cd ..
 }
 
