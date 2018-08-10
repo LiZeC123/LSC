@@ -11,10 +11,12 @@ The Lsc Compiler Collection is the compiler system supporting lsc language, whic
 The lsc language is a C-like language that currently supports most of the features of the C language. It is hoped that through the development of this project, the knowledge and theory of the compilation principle, operating system and assembly language can be learned and practiced. And we can have a comprehensive and thorough understanding of the whole computer architecture.
 
 
-Documents
+Documentations
 ------------
-- [支持特性概述](./docs/feature.md)
-- [开发文档](./docs/index.md)
+- [Overview of support features](docs/en/feature.md)
+- [Developer documentation](docs/en/index.md)
+- [支持特性概述](docs/ch/feature.md)
+- [开发文档](docs/ch/index.md)
 
 
 Build and Run
