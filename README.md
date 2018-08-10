@@ -2,10 +2,11 @@ Lsc Compiler Collection
 ==========================
 [![AUR](https://img.shields.io/aur/license/yaourt.svg)](https://github.com/LiZeC123/LSC/blob/master/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com) 
-[![GitHub issues](https://img.shields.io/github/issues/badges/shields.svg)](https://github.com/LiZeC123/LSC/issues)
+[![GitHub issues](https://img.shields.io/github/issues/LiZeC123/LSC.svg)](https://github.com/LiZeC123/LSC/issues)
+[![GitHub tag](https://img.shields.io/github/tag/LiZeC123/LSC.svg)](https://github.com/LiZeC123/LSC/tags)
 [![Build Status](https://api.travis-ci.org/LiZeC123/LSC.svg?branch=master)](https://travis-ci.org/LiZeC123/LSC)
 
-The Lsc Compiler Collection is the compiler system supporting a C-like programming language, which includes compiler, assembler, linker for lsc, as well as libraies for this language(lscio, lsclib, ...). And lsc is a recursive acronym meaning of "LSC iS Compiler". 
+The Lsc Compiler Collection is the compiler system supporting lsc language, which includes compiler, assembler, linker for lsc, as well as libraies for this language(lscio, lsclib, ...). And lsc is a recursive acronym meaning of "LSC iS Compiler". 
 
 The lsc language is a C-like language that currently supports most of the features of the C language. It is hoped that through the development of this project, the knowledge and theory of the compilation principle, operating system and assembly language can be learned and practiced. And we can have a comprehensive and thorough understanding of the whole computer architecture.
 
