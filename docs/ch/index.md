@@ -25,3 +25,4 @@ Lsc项目开发文档
 	- [符号检验与重定位地址计算](./lit/Sym.md)
 - 标准库
     - [Lsc语言标准库](./stdlib/stdlib.md)
+    - [动态内存分配](./stdlib/alloc.md)
