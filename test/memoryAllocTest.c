@@ -4,18 +4,16 @@
 int main()
 {
     char* arr;
-    lscPrintStr("Before malloc");
-    arr = lscmalloc(10);
-    lscPrintStr("After malloc");
 
-    lscPrintStr("Before Write");
+    arr = lscmalloc(28);
+
     int i = 0;
-    while(i < 10){
+    while(i < 26){
         arr[i] = 'a'+i;
         i++;
     }
-    arr[9] = '\0';
-    lscPrintStr("After Write");
+    arr[26] = '\n';
+    arr[27] = '\0';
 
     lscPrintStr(arr);
 
