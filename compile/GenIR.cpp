@@ -119,7 +119,7 @@ Var* GenIR::genPtr(Var* val)
         return val;
     }
 
-    Var* tmp = new Var(symtab.getScopePath(),val->getType(),false);
+    Var* tmp = new Var(symtab.getScopePath(),val->getType(),val->getPtrLevel());
     tmp->setLeft(true);
     tmp->setPoint(val);
     tmp->setPtrLevel(val->getPtrLevel()+val->getArray()-1);
@@ -138,7 +138,7 @@ Var* GenIR::genLea(Var* val)
         return val->getPointer();
     }
     else{
-        Var* tmp = new Var(symtab.getScopePath(),val->getType(),true);
+        Var* tmp = new Var(symtab.getScopePath(),val->getType(),val->getPtrLevel());
         tmp->setPtrLevel(val->getPtrLevel()+val->getArray()+1);
         symtab.addVar(tmp);
         symtab.addInst(new InterInst(OP_LEA,tmp,val));
@@ -213,7 +213,7 @@ Var* GenIR::genDecR(Var* val)
 
 Var* GenIR::genNot(Var* val)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_NOT,tmp,val));
     return tmp;
@@ -226,7 +226,7 @@ Var* GenIR::genMinus(Var* val)
         return val;
     }
 
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_NEG,tmp,val));
     return tmp;
@@ -465,7 +465,7 @@ Var* GenIR::genCall(Fun* fun, std::vector<Var*>& args)
         return SymTab::getVoid();
     }
     else{
-        Var* ret = new Var(symtab.getScopePath(),fun->getType(),false);
+        Var* ret = new Var(symtab.getScopePath(),fun->getType(),fun->getPtrLevel());
         symtab.addInst(new InterInst(OP_CALL,fun,ret));
         symtab.addVar(ret); // 将返回值的声明延迟到函数调用以后 TODO: why?
         return ret;
@@ -570,28 +570,28 @@ bool GenIR::typeCheck(Var* lval,Var* rval)
 
 Var* GenIR::genOr(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_OR,tmp,lval,rval));
     return tmp;
 }
 Var* GenIR::genAnd(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_AND,tmp,lval,rval));
     return tmp;
 }
 Var* GenIR::genEqu(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_EQU,tmp,lval,rval));
     return tmp;
 }
 Var* GenIR::genNequ(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_NE,tmp,lval,rval));
     return tmp;
@@ -611,7 +611,7 @@ Var* GenIR::genAdd(Var* lval,Var* rval)
         lval = genMul(lval,rval->getStep());
     }
     else if(lval->isBase() && rval->isBase()){
-        tmp = new Var(symtab.getScopePath(),KW_INT,false);
+        tmp = new Var(symtab.getScopePath(),KW_INT,0);
     }
     else{
         Error::semError(EXPR_NOT_BASE,"");
@@ -638,7 +638,7 @@ Var* GenIR::genSub(Var* lval,Var* rval)
         rval = genMul(rval,lval->getStep());
     }
     else{
-        tmp = new Var(symtab.getScopePath(),KW_INT,false);
+        tmp = new Var(symtab.getScopePath(),KW_INT,0);
     }
 
     symtab.addVar(tmp);
@@ -648,28 +648,28 @@ Var* GenIR::genSub(Var* lval,Var* rval)
 
 Var* GenIR::genGt(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_GT,tmp,lval,rval));
     return tmp;
 }
 Var* GenIR::genGe(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_GE,tmp,lval,rval));
     return tmp;
 }
 Var* GenIR::genLt(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_LT,tmp,lval,rval));
     return tmp;
 }
 Var* GenIR::genLe(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_LE,tmp,lval,rval));
     return tmp;
@@ -677,7 +677,7 @@ Var* GenIR::genLe(Var* lval,Var* rval)
 
 Var* GenIR::genMul(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_MUL,tmp,lval,rval));
     return tmp;
@@ -685,14 +685,14 @@ Var* GenIR::genMul(Var* lval,Var* rval)
 
 Var* GenIR::genDiv(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_DIV,tmp,lval,rval));
     return tmp;
 }
 Var* GenIR::genMod(Var* lval,Var* rval)
 {
-    Var* tmp = new Var(symtab.getScopePath(),KW_INT,false);
+    Var* tmp = new Var(symtab.getScopePath(),KW_INT,0);
     symtab.addVar(tmp);
     symtab.addInst(new InterInst(OP_MOD,tmp,lval,rval));
     return tmp;
