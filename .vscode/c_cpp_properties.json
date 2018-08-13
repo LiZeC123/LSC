@@ -31,8 +31,8 @@
                 "/usr/local/include",
                 "/usr/include/x86_64-linux-gnu",
                 "/usr/include",
-                "${workspaceRoot}/stdlib",
-                "/usr/include/linux"
+                "/usr/include/linux",
+                "/usr/include/lsc"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",
