@@ -24,6 +24,10 @@ makeLibary(){
 	cd ..
 }
 
+makeMain(){
+	g++ main.cpp -o lsc -std=c++11 -Wall -Wextra
+}
+
 makeAll(){
 	echo "编译编译器模块..."
 	makeCompiler
@@ -34,7 +38,7 @@ makeAll(){
 	echo "编译标准库模块...."
 	makeLibary
 	echo "链接主程序..."
-	g++ main.cpp -o lsc -std=c++11 -Wall -Wextra
+	makeMain
 	echo "编译完成"
 }
 
@@ -105,6 +109,9 @@ then
 elif [ $1x == "lib"x ]
 then
 	makeLibary
+elif [ $1x == "main"x ]
+then
+	makeMain
 elif [ $1x == "clear"x ]
 then
 	makeClear
@@ -136,6 +143,7 @@ else
 	echo "cmp         编译编译器"
 	echo "lit         编译连接器"
 	echo "lib         编译标准库"
+	echo "main		  编译主函数"
 	echo "clear       清除编译中间结果"	
 	echo ""
 fi
