@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <set>
 #include <string>
 #include <unistd.h>
 #define SIZE 256
@@ -12,11 +13,6 @@ using namespace std;
 
 // 手动取出以下函数的定义,从而避免vscode的语法检查无法识别头文件函数定义的问题
 extern char *getcwd (char *__buf, size_t __size) __THROW __wur;
-extern int access (const char *__name, int __type) __THROW __nonnull ((1));
-extern ssize_t readlink (const char *__restrict __path,
-			 char *__restrict __buf, size_t __len)
-     __THROW __nonnull ((1, 2)) __wur;
-
 
 class CompileFile
 {
@@ -94,6 +90,13 @@ public:
 	string outputName;
 };
 
+
+// 各模块需要处理的参数列表, 主程序收到这些参数后直接转发给相应的模块
+vector<string> cmpRealList;
+vector<string> assRealList;
+vector<string> litRealList;
+
+
 // 检查是否是合法的输入文件
 bool checkType(const string& type)
 {
@@ -141,6 +144,31 @@ void printVersionInfo()
 	printf("[GCC %d.%d.%d] on Ubuntu\n\n",__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__);
 }
 
+bool analyseModuleOptions(string option)
+{
+	// 各模块可支持的参数
+	const static set<string> cmpOptionArgs = {
+		"--printValTab","--printFunTab","--printStrTab","--printTab",
+		"--printInterInst","--printEqualInterInst","--printTokenStream"};
+	const static set<string> assOptionArgs = {"--printSymbolTable"};
+	const static set<string> litOptionArgs = {"--printLinkInfo"};
+
+	if(cmpOptionArgs.find(option) != cmpOptionArgs.end()){
+		cmpRealList.push_back(option);
+		return true;
+	}
+	else if(assOptionArgs.find(option) != assOptionArgs.end()){
+		assRealList.push_back(option);
+		return true;
+	}
+	else if(litOptionArgs.find(option) != litOptionArgs.end()){
+		litRealList.push_back(option);
+		return true;
+	}
+
+	return false;
+}
+
 void analyseOptions(Args& args, int argc, char* argv[])
 {
 	for(int i=0;i<argc;i++){
@@ -177,7 +205,10 @@ void analyseOptions(Args& args, int argc, char* argv[])
 				printVersionInfo();
 			}
 			else{
-				printf("选项: %s 无效\n",argv[i]);
+				bool isModuleOption = analyseModuleOptions(option);
+				if(!isModuleOption){
+					printf("选项: %s 无效\n",argv[i]);
+				}				
 			}
 		}
 	}
