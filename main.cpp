@@ -94,34 +94,6 @@ public:
 	string outputName;
 };
 
-
-// 获得本程序对应的可执行文件实际的位置
-string getFilePath()
-{
-	char current_absolute_path[SIZE];
-	//获取当前程序绝对路径
-	int cnt = readlink("/proc/self/exe", current_absolute_path, SIZE);
-	if (cnt < 0 || cnt >= SIZE)
-	{
-		printf("获取可执行文件路径失败\n");
-		exit(-1);
-	}
-	
-	//获取当前目录绝对路径，即去掉程序名
-	int i;
-	for (i = cnt; i >= 0; --i)
-	{
-		if (current_absolute_path[i] == '/')
-		{
-			current_absolute_path[i + 1] = '\0';
-			break;
-		}
-	}
-	return string(current_absolute_path);
-}
-
-
-
 // 检查是否是合法的输入文件
 bool checkType(const string& type)
 {
@@ -234,7 +206,7 @@ void analyseFile(vector<CompileFile>& compilefiles, int argc, char* argv[])
 }
 
 
-void toSFile(const vector<CompileFile>& compilefiles, const string& exePath)
+void toSFile(const vector<CompileFile>& compilefiles)
 {
 	for(const auto& file: compilefiles){
 		if(file.getType() == ".c" || file.getType() == ".i"){
@@ -243,7 +215,7 @@ void toSFile(const vector<CompileFile>& compilefiles, const string& exePath)
 	}
 }
 
-void toOFile(const vector<CompileFile>& compilefiles, const string& exePath)
+void toOFile(const vector<CompileFile>& compilefiles)
 {
 	for(const auto& file: compilefiles){
 		if(file.getType() == ".c"|| file.getType() == ".i" || file.getType() == ".s"){
@@ -252,12 +224,27 @@ void toOFile(const vector<CompileFile>& compilefiles, const string& exePath)
 	}
 }
 
-void toExeFile(const vector<CompileFile>& compilefiles, const string& exePath)
+void toExeFile(const vector<CompileFile>& compilefiles)
 {
-	string allfiles = "/usr/include/lsc/start.o  /usr/include/lsc/lscio.o /usr/include/lsc/lsclib.o ";
-	for(const auto& file: compilefiles){
-		allfiles += (file.getCoreName()+ ".o ");
+	const static string libs[] = {
+		"/usr/include/lsc/start.o",
+		"/usr/include/lsc/lscio.o",
+		"/usr/include/lsc/lsclib.o"
+		};
+	const static string SPACE = " ";
+
+	string allfiles = "";
+	for(const auto& lib: libs){
+		allfiles.append(lib);
+		allfiles.append(SPACE);
 	}
+
+	
+	for(const auto& file: compilefiles){
+		allfiles.append(file.getCoreName()).append(".o");
+		allfiles.append(SPACE);
+	}
+	
 	execCmd("","lscl", allfiles);
 	execCmd("","chmod +x z.out","");
 }
@@ -306,20 +293,18 @@ int main(int argc,char* argv[])
 
 		return 0;
 	}
-
-   string exePath = getFilePath();
 	
 	if(args.isOnlyCompile) {
-	   toSFile(compilefiles,exePath);
+	   toSFile(compilefiles);
 	}
 	else if(args.isOnlyAss) {
-		toSFile(compilefiles,exePath);
-		toOFile(compilefiles,exePath);
+		toSFile(compilefiles);
+		toOFile(compilefiles);
 	}
 	else{
-		toSFile(compilefiles,exePath);
-		toOFile(compilefiles,exePath);
-		toExeFile(compilefiles,exePath);
+		toSFile(compilefiles);
+		toOFile(compilefiles);
+		toExeFile(compilefiles);
 	}
 
 	if(args.isSetOutput && !args.isOnlyCompile && !args.isOnlyAss){
