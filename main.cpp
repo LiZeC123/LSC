@@ -88,14 +88,12 @@ public:
 	bool isSaveTempFile = false;
 	
 	string outputName;
+
+	// 模块参数列表
+	vector<string> cmp;
+	vector<string> ass;
+	vector<string> lit;
 };
-
-
-// 各模块需要处理的参数列表, 主程序收到这些参数后直接转发给相应的模块
-vector<string> cmpRealList;
-vector<string> assRealList;
-vector<string> litRealList;
-
 
 // 检查是否是合法的输入文件
 bool checkType(const string& type)
@@ -123,54 +121,72 @@ void execCmd(const string& path, const string& cmd, const string& file)
 #endif
 }
 
-void printHelpInfo()
-{
-	printf("Lsc %s (on %s,%s)\n", __LSC_VERSION__,__DATE__, __TIME__);
-	printf("[GCC %d.%d.%d] on Ubuntu\n\n",__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__);
-	
-	printf("指令格式 lsc [options] file ...\n");
-	printf("-h 显示此信息\n");
-	printf("-o 指定输出的可执行文件名\n");
-	printf("-S 只进行编译\n");
-	printf("-C 只进行编译和汇编\n");
-	printf("-T 保留中间文件\n\n");
-
-	printf("Lsc iS Compiler!\n");
-}
-
 void printVersionInfo()
 {
 	printf("Lsc %s (on %s,%s)\n", __LSC_VERSION__,__DATE__, __TIME__);
-	printf("[GCC %d.%d.%d] on Ubuntu\n\n",__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__);
+	printf("[GCC %d.%d.%d] on Ubuntu\n",__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__);
+	printf("\n");
+	printf("Lsc iS Compiler!\n");
 }
 
-bool analyseModuleOptions(string option)
+void printHelpInfo()
+{	
+	printf("指令格式 lsc [options] file ...\n");
+	printf("Options:\n");
+	printf("  -h 显示此信息\n");
+	printf("  -v 显示编译器版本信息\n");
+	printf("  -o 指定输出的可执行文件名\n");
+	printf("  -S 只进行编译\n");
+	printf("  -C 只进行编译和汇编\n");
+	printf("  -T 保留中间文件\n");
+	printf("  -x 输出调试控制指令信息\n");
+}
+
+void printMoreOptions()
+{
+	printf("编译器指令:\n");
+	printf("  --printValTab       输出变量表\n");
+	printf("  --printFunTab       输出函数表\n");
+	printf("  --printStrTab       输出字符串表\n");
+	printf("  --printTokenStream  输出Token流\n");
+	printf("\n");
+	printf("汇编器指令:\n");
+	printf("  --printSymbolTable  输出符号表\n");
+	printf("\n");
+	printf("链接器指令:\n");
+	printf("  --printLinkInfo     输出链接信息\n");
+
+}
+
+
+bool analyseModuleOptions(string option,Args& args)
 {
 	// 各模块可支持的参数
 	const static set<string> cmpOptionArgs = {
-		"--printValTab","--printFunTab","--printStrTab","--printTab",
-		"--printInterInst","--printEqualInterInst","--printTokenStream"};
+		"--printValTab","--printFunTab","--printStrTab",
+		"--printTokenStream"};
 	const static set<string> assOptionArgs = {"--printSymbolTable"};
 	const static set<string> litOptionArgs = {"--printLinkInfo"};
 
 	if(cmpOptionArgs.find(option) != cmpOptionArgs.end()){
-		cmpRealList.push_back(option);
+		args.cmp.push_back(option);
 		return true;
 	}
 	else if(assOptionArgs.find(option) != assOptionArgs.end()){
-		assRealList.push_back(option);
+		args.ass.push_back(option);
 		return true;
 	}
 	else if(litOptionArgs.find(option) != litOptionArgs.end()){
-		litRealList.push_back(option);
+		args.lit.push_back(option);
 		return true;
 	}
 
 	return false;
 }
 
-void analyseOptions(Args& args, int argc, char* argv[])
+Args analyseOptions(int argc, char* argv[])
 {
+	Args args;
 	for(int i=0;i<argc;i++){
 		if(argv[i][0] == '-'){
 			string option(argv[i]);
@@ -187,9 +203,17 @@ void analyseOptions(Args& args, int argc, char* argv[])
 					printf("选项: -o 后必须指定文件名\n");
 				}
 			}
-			else if(option[1] == 'h') {
+			else if(option[1] == 'h'){
 				args.isHelped = true;
 				printHelpInfo();
+			}
+			else if(option[1] == 'v'){
+				args.isVersion = true;
+				printVersionInfo();
+			}
+			else if(option[1] == 'x'){
+				args.isHelped = true;
+				printMoreOptions();
 			}
 			else if(option[1] == 'S'){
 				args.isOnlyCompile = true;
@@ -200,18 +224,16 @@ void analyseOptions(Args& args, int argc, char* argv[])
 			else if(option[1] == 'T'){
 				args.isSaveTempFile = true;
 			}
-			else if(option[1] == 'V'){
-				args.isVersion = true;
-				printVersionInfo();
-			}
+
 			else{
-				bool isModuleOption = analyseModuleOptions(option);
+				bool isModuleOption = analyseModuleOptions(option,args);
 				if(!isModuleOption){
 					printf("选项: %s 无效\n",argv[i]);
 				}				
 			}
 		}
 	}
+	return args;
 }
 
 void analyseFile(vector<CompileFile>& compilefiles, int argc, char* argv[])
@@ -237,43 +259,56 @@ void analyseFile(vector<CompileFile>& compilefiles, int argc, char* argv[])
 }
 
 
-void toSFile(const vector<CompileFile>& compilefiles)
+void toSFile(const vector<CompileFile>& compilefiles,const vector<string>& options)
 {
+
+	string optionStr = " ";
+	for(const auto& option: options){
+		optionStr.append(option).append(" ");
+	}
+
 	for(const auto& file: compilefiles){
 		if(file.getType() == ".c" || file.getType() == ".i"){
-			execCmd("","lscc", file.getFullName());
+			execCmd("","lscc", file.getFullName()+optionStr);
 		}
 	}
 }
 
-void toOFile(const vector<CompileFile>& compilefiles)
+void toOFile(const vector<CompileFile>& compilefiles,const vector<string>& options)
 {
+	string optionStr = " ";
+	for(const auto& option: options){
+		optionStr.append(option).append(" ");
+	}
+
 	for(const auto& file: compilefiles){
 		if(file.getType() == ".c"|| file.getType() == ".i" || file.getType() == ".s"){
-			execCmd("","lsca", file.getCoreName()+".s");
+			execCmd("","lsca", file.getCoreName()+".s "+ optionStr);
 		}
 	}
 }
 
-void toExeFile(const vector<CompileFile>& compilefiles)
+void toExeFile(const vector<CompileFile>& compilefiles,const vector<string>& options)
 {
 	const static string libs[] = {
 		"/usr/include/lsc/start.o",
 		"/usr/include/lsc/lscio.o",
 		"/usr/include/lsc/lsclib.o"
 		};
-	const static string SPACE = " ";
 
 	string allfiles = "";
 	for(const auto& lib: libs){
-		allfiles.append(lib);
-		allfiles.append(SPACE);
+		allfiles.append(lib).append(" ");
 	}
 
 	
 	for(const auto& file: compilefiles){
 		allfiles.append(file.getCoreName()).append(".o");
-		allfiles.append(SPACE);
+		allfiles.append(" ");
+	}
+
+	for(const auto& option: options){
+		allfiles.append(option).append(" ");
 	}
 	
 	execCmd("","lscl", allfiles);
@@ -310,10 +345,9 @@ int main(int argc,char* argv[])
         return 0;
     }
 
-	Args args;
 	vector<CompileFile> compilefiles;
 
-	analyseOptions(args,argc,argv);
+	Args args = analyseOptions(argc,argv);
 	analyseFile(compilefiles,argc,argv);
 
 
@@ -326,20 +360,20 @@ int main(int argc,char* argv[])
 	}
 	
 	if(args.isOnlyCompile) {
-	   toSFile(compilefiles);
+	   	toSFile(compilefiles,args.cmp);
 	}
 	else if(args.isOnlyAss) {
-		toSFile(compilefiles);
-		toOFile(compilefiles);
+		toSFile(compilefiles,args.cmp);
+		toOFile(compilefiles,args.ass);
 	}
 	else{
-		toSFile(compilefiles);
-		toOFile(compilefiles);
-		toExeFile(compilefiles);
+		toSFile(compilefiles,args.cmp);
+		toOFile(compilefiles,args.ass);
+		toExeFile(compilefiles,args.lit);
 	}
 
 	if(args.isSetOutput && !args.isOnlyCompile && !args.isOnlyAss){
-		execCmd("","mv z.out "+args.outputName,"");
+		execCmd("","mv z.out",args.outputName);
 	}
 
 	if(!args.isSaveTempFile) {

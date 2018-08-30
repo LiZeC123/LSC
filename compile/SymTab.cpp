@@ -621,7 +621,7 @@ void Fun::toX86(FILE* file)
 void Fun::printSelf()
 {
     //输出type
-	printf("%s",tokenName[type]);
+	printf("%-6s",tokenName[type]);
 	//输出名字
 	printf(" %s",name.c_str());
 	//输出参数列表
