@@ -61,15 +61,17 @@ private:
     std::vector<Token*>* macroTokenList;    
 
 
-    std::vector<Scanner*> scanStack;        //保存scanner的顺序的栈,用于include指令
+    std::vector<Scanner*> scanStack;                //保存scanner的顺序的栈,用于include指令
 
 private:
     Token* getIdent();
     Token* getStr();
     Token* getChar();
     Token* getNum();
+    Token* readToken();
+    Token* nextMacroToken();
     void getMacro();
-
+    
     Scanner* loadIncludeFile();
     Scanner* includeStdFile(std::vector<Token*> words);
     Scanner* includeUserFile(std::string name);
