@@ -22,7 +22,10 @@ _OR_(KW_DO)_OR_(KW_IF)_OR_(KW_SWITCH)_OR_(KW_RETURN)_OR_(KW_BREAK)_OR_(KW_CONTIN
 
 using namespace std;
 
-Parser::Parser(Lexer& lex,SymTab& tab,GenIR& iir) : lexer(lex),symtab(tab),ir(iir) { }
+Parser::Parser(Lexer& lex,SymTab& tab,GenIR& iir) : lexer(lex),symtab(tab),ir(iir) 
+{ 
+    printToken = false;
+}
 
 void Parser::analyse()
 {
@@ -30,9 +33,18 @@ void Parser::analyse()
     program();
 }
 
+void Parser::setPrintToken()
+{
+    printToken = true;
+}
+
 void Parser::move()
 {
     look = lexer.nextToken();
+
+    if(printToken){
+        printf("%s\n",look->toString().c_str());
+    }
 }
 
 bool Parser::match(Symbol need)
