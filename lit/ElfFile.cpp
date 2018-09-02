@@ -362,18 +362,14 @@ void ElfFile::addSym(string name,Elf32_Sym*s)
 
 void ElfFile::printInfo()
 {
+	printf("文件名: %s\n",file.c_str());
 	printf("段表:\n");
 	for(auto it = shdrTab.begin();it != shdrTab.end();it++){
 		printf("%s \n",it->first.c_str());
 	}
-	printf("\n");
-
-	printf("符号表\n");
+	
+	printf("符号表:\n");
 	for(auto it = symTab.begin();it != symTab.end();it++){
 		printf("%s \n",it->first.c_str());
 	}
-	printf("\n");
-
-	
-
 }
