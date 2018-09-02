@@ -39,6 +39,7 @@ Macros::Macros(Scanner& sc) : scan(sc)
 {
     macros["__LINE__"] = nullptr;
     macros["__FILE__"] = nullptr;
+    last = nullptr;
 }
 
 bool Macros::isMacro(std::string name)
@@ -48,14 +49,21 @@ bool Macros::isMacro(std::string name)
 
 vector<Token*>* Macros::getRealToken(std::string name)
 {
+    // 如果上一轮有分配内存, 本轮释放
+    deleteLast();
+
     if(name == "__LINE__"){
-        return new vector<Token*>{ new Num(scan.getRow()) };
+        last = new vector<Token*>{ new Num(scan.getRow()) };
+        return last;
 
     }
     else if(name=="__FILE__"){
-        return new vector<Token*>{ new Str(scan.getFilename()) };
+        last = new vector<Token*>{ new Str(scan.getFilename()) };
+        return last;
     }
-    return macros.find(name)->second;
+    else{
+        return macros.find(name)->second;
+    }
 }
 
 void Macros::addMacro(std::string name,vector<Token*>* list)
@@ -67,6 +75,38 @@ void Macros::addMacro(std::string name,vector<Token*>* list)
         macros[name] = list;
     }
 }
+
+Macros::~Macros()
+{
+    for(auto it = macros.begin(); it != macros.end(); ++it){
+        auto vec = it->second;
+
+        // __LINE__ 等宏对应的内容为nullptr, 不需要释放
+        if(vec != nullptr){
+            for(auto v:(*vec)){
+                delete v;
+            }
+            delete vec;
+        }
+    }
+
+    if(last != nullptr){
+        delete last;
+    }
+}
+
+
+void Macros::deleteLast()
+{
+    if(last != nullptr){
+        for(auto token:(*last)){
+            delete token;
+        }
+    }
+    delete last;
+    last = nullptr;
+}
+
 
 
 Lexer::Lexer(Scanner* sc) : scanner(sc), macros(*sc)
@@ -227,13 +267,11 @@ Token* Lexer::nextToken()
         return m;
     }
 
-
     // 释放上一轮的符号
+    // token仅仅被readToken()赋值, 其他模块产生的Token由各自模块处理
     if(token != nullptr){
         delete token;
     }
-    
-    // readToken始终返回一个有效的符号
     token = readToken();
 
     // 如果是宏的第一个符号, 返回相应的Token
@@ -248,13 +286,11 @@ Token* Lexer::nextToken()
         scanner = scanStack.back();
         scanStack.pop_back();
 
-        // 恢复ch状态  TODO: 分析此处逻辑,补充注释
-        // 检查ch值是否未\n, 是则说明不需要scan()
+        // 恢复后当前符号是 > , 读取该符号后scanner状态恢复正常
         scan();
-        //???
+        
+        // 更换scanner以后, 重新读取符号
         return nextToken();
-
-        // Token相当于是一个记录, 因此管理自己的逻辑里面的内存即可,其他模块自行管理内存
     }
     
     return token;

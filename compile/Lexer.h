@@ -25,14 +25,17 @@ private:
 class Macros
 {
 public:
-    //TODO 从词法分析阶段替换有关的宏名
     Macros(Scanner& sc);
     bool isMacro(std::string name);
     std::vector<Token*>* getRealToken(std::string name);
     void addMacro(std::string name,std::vector<Token*>* list);
+    ~Macros();
 private:
     Scanner& scan;
     std::map<std::string,std::vector<Token*>*> macros;
+
+    std::vector<Token*>* last;  // 保存动态分配的宏, 例如 __LINE__
+    void deleteLast();
 };
 
 
