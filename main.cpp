@@ -7,7 +7,7 @@
 #define SIZE 256
 
 //#define __LSC_DEBUG__
-#define __LSC_VERSION__ "2.0.0"
+#define __LSC_VERSION__ "2.1.0"
 
 using namespace std;
 
