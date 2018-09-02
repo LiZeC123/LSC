@@ -1,34 +1,12 @@
-#! /bin/bash
-
-echo "Begin AtithmeticTest... "
-lsc ./test/arithmeticTest.c
-./z.out
-code=$?
-
-echo "Begin LogicTest... "
-lsc ./test/logicTest.c
+code=""
+for file in `ls ./test/*.c`;
+do
+echo $file;
+lsc $file;
 ./z.out
 code+=$?
+done
 
-echo "Begin PointerTest... "
-lsc ./test/pointerTest.c
-./z.out
-code+=$?
-
-echo "Begin CmdArgsTest... "
-lsc ./test/cmdArgsTest.c
-./z.out FisrtPart SecondPart TheLastPart
-code+=$?
-
-echo "Begin MemoryAllocTest"
-lsc ./test/memoryAllocTest.c
-./z.out
-code+=$?
-
-# 1. 数值计算
-# 2. 逻辑运算  > 看看文档
-# 3. 分支跳转检查
-# 4. 其他待补充
 echo
 echo "返回码为$code"
 exit $((code))

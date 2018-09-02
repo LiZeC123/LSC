@@ -11,6 +11,6 @@ int main(int argc, char* argv[]){
 		lscPrintStr(" ");
 		i++;
 	}
-
+	lscPrintStr("\n");
 	return 0;
 }
