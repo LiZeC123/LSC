@@ -1,19 +1,19 @@
 #include <lscio.h>
 #include <lsclib.h>
 
+#define SIZE 26
+
 int main()
 {
-    char* arr;
-
-    arr = lscmalloc(28);
+    char* arr = lscmalloc(SIZE+2);
 
     int i = 0;
-    while(i < 26){
+    while(i < SIZE){
         arr[i] = 'a'+i;
         i++;
     }
-    arr[26] = '\n';
-    arr[27] = '\0';
+    arr[SIZE]   = '\n';
+    arr[SIZE+1] = '\0';
 
     lscPrintStr(arr);
 

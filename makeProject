@@ -24,6 +24,10 @@ makeLibary(){
 	cd ..
 }
 
+makeMain(){
+	g++ main.cpp -o lsc -std=c++11 -Wall -Wextra
+}
+
 makeAll(){
 	echo "编译编译器模块..."
 	makeCompiler
@@ -34,7 +38,7 @@ makeAll(){
 	echo "编译标准库模块...."
 	makeLibary
 	echo "链接主程序..."
-	g++ main.cpp -o lsc -std=c++11	
+	makeMain
 	echo "编译完成"
 }
 
@@ -56,7 +60,6 @@ copyStdLib(){
 	sudo cp ./stdlib/start.o /usr/include/lsc/start.o
 	sudo cp ./stdlib/lscio.o /usr/include/lsc/lscio.o
 	sudo cp ./stdlib/lsclib.o /usr/include/lsc/lsclib.o
-
 }
 
 copyExeFile(){
@@ -73,6 +76,25 @@ removeExeFile(){
 	sudo rm /usr/local/bin/lscl
 }
 
+install(){
+	echo "编译项目代码..."
+	makeAll
+
+	echo "复制依赖文件到目录..."
+	sudo mkdir /usr/include/lsc
+	copyStdLib
+	copyExeFile
+
+	echo "安装完成"
+}
+
+uninstall(){
+	echo "删除依赖文件..."
+	sudo rm -rf /usr/include/lsc
+	removeExeFile
+	echo "卸载完成"
+}
+
 
 
 if [ $1x == "ass"x ]
@@ -87,37 +109,43 @@ then
 elif [ $1x == "lib"x ]
 then
 	makeLibary
+elif [ $1x == "main"x ]
+then
+	makeMain
 elif [ $1x == "clear"x ]
 then
 	makeClear
 elif [ $1x == "install"x ]
 then
-	makeAll
-	echo "复制依赖文件到目录..."
-	sudo mkdir /usr/include/lsc
-
-	copyStdLib
-
-	copyExeFile
-
-	echo "安装完成"
+	install
 elif [ $1x == "uninstall"x ]
 then
-	echo "删除依赖文件..."
-	sudo rm -rf /usr/include/lsc
-	removeExeFile
-	echo "卸载完成"
+	uninstall
+elif [ $1x == "reinstall"x ]
+then
+	uninstall
+	install
+elif [ $1x == "full-reinstall"x ]
+then
+	uninstall
+	echo "清除编译中间结果..."
+	makeClear
+	install
 else
+	echo "无效的参数: $1"
 	echo ""
 	echo "用法: ./makeProject [参数]"
 	echo "参数可以选择以下值:"
-	echo "install   编译并安装lsc编译系统"
-	echo "unistall  卸载lsc编译系统"
-	echo "ass       编译汇编器"
-	echo "cmp       编译编译器"
-	echo "lit       编译连接器"
-	echo "lib       编译标准库"
-	echo "clear     清除编译中间结果"	
+	echo "install     编译并安装lsc编译系统"
+	echo "uninstall   卸载lsc编译系统"
+	echo "reinstall   重装lsc编译系统"
+	echo "ass         编译汇编器"
+	echo "cmp         编译编译器"
+	echo "lit         编译连接器"
+	echo "lib         编译标准库"
+	echo "main		  编译主函数"
+	echo "clear       清除编译中间结果"	
+	echo ""
 fi
 
 

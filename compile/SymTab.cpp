@@ -621,7 +621,7 @@ void Fun::toX86(FILE* file)
 void Fun::printSelf()
 {
     //输出type
-	printf("%s",tokenName[type]);
+	printf("%-6s",tokenName[type]);
 	//输出名字
 	printf(" %s",name.c_str());
 	//输出参数列表
@@ -641,8 +641,13 @@ void Fun::printSelf()
     for(auto& i:v){
         i->printSelf();
     }
+}
 
-
+Fun::~Fun()
+{    
+    // 形参存放在变量表中,无需处理
+    // returnPoint存放在intercode中, 无需处理
+    // 直接由编译器调用各成员析构函数即可完成内存释放
 }
 
 SymTab::SymTab()
@@ -898,6 +903,27 @@ void SymTab::toX86(FILE* file)
             fprintf(file, "global %s\n", fun->getName().c_str());
             fprintf(file, "%s:\n", fun->getName().c_str());
             it->second->toX86(file);
+        }
+    }
+}
+
+SymTab::~SymTab()
+{
+    for(auto it = funTab.begin(); it != funTab.end();++it){
+        auto fun = it->second;
+        delete fun;
+    }
+
+    for(auto it = strTab.begin(); it != strTab.end(); ++it){
+        auto str = it->second;
+        delete str;
+    }
+
+    for(auto it = varTab.begin(); it != varTab.end(); ++it){
+        auto vec = it->second;
+
+        for(auto val: (*vec)){
+            delete val;
         }
     }
 }

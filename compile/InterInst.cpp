@@ -438,7 +438,7 @@ Fun* InterCode::getFun()
 	return fun;
 }
 
-vector<InterInst*>& InterCode::getCode()
+const vector<InterInst*> InterCode::getCode()
 {
     return code;
 }
@@ -452,8 +452,8 @@ void InterCode::printSelf()
 
 InterCode::~InterCode()
 {
-    for(auto& i:code){
-        delete i;
-    }
+	for(auto i:code){
+		delete i;
+	}
 }
 

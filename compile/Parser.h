@@ -9,7 +9,10 @@ class Parser
 {
 public:
     Parser(Lexer& lex,SymTab& tab,GenIR& iir);
-
+    Parser(const Parser&) = delete;
+    Parser& operator=(const Parser&) = delete;
+    
+    void setPrintToken();
     void analyse();
 
 private:
@@ -17,6 +20,7 @@ private:
     Lexer& lexer;
     SymTab& symtab;
     GenIR& ir;
+    bool printToken;
 private:
     void move();
     bool match(Symbol need);

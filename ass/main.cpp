@@ -1,4 +1,3 @@
-#include <iostream>
 #include "common.h"
 #include "Scanner.h"
 #include "Lexer.h"
@@ -7,17 +6,46 @@
 #include <string>
 using namespace std;
 
+class Args
+{
+public:
+    bool printSymbol = false;
+};
+
+Args analyseOptions(int argc, char* argv[])
+{
+    Args args;
+    for(int i=2; i < argc; i++){
+        string option(argv[i]);
+        if(option == "--printSymbolTable"){
+            args.printSymbol = true;
+        }
+    }
+
+    return args;
+}
+
+void printInfo(Args& args, SymTab& tab)
+{
+    if(args.printSymbol){
+        tab.printSymbolTable();
+    }
+}
+
+
 int main(int argc,char* argv[])
 {
     // 读取需要编译的文件名
     const char* filename;
-    if(argc == 2){
+    if(argc >= 2){
         filename = argv[1];
     }
     else{
+        printf("lsca: 输入文件不能为空");
         return 0;
     }
     
+    Args args = analyseOptions(argc,argv);
 
     string objtmp = "tempobj.tmp";
     FILE* fptmp = fopen(objtmp.c_str(),"w");
@@ -35,17 +63,14 @@ int main(int argc,char* argv[])
     FILE* fpObj = fopen(objFile.c_str(),"w");
 
     // 初始化模块
-    Scanner scanner = Scanner(filename);
-    Lexer lex       = Lexer(scanner);
-    SymTab tab      = SymTab();
-    Parser parser   = Parser(lex,tab,fptmp);
+    Scanner scanner(filename);
+    Lexer lex(scanner);
+    SymTab tab;
+    Parser parser(lex,tab,fptmp);
 
     parser.analyse();
 
-    
-
-    // cout << "符号表内容如下:" << endl;
-    // tab.printSymbolTable();
+    printInfo(args,tab);
 
     fclose(fptmp);
     fptmp = fopen(objtmp.c_str(),"r");
@@ -56,7 +81,6 @@ int main(int argc,char* argv[])
 
     remove(objtmp.c_str());     // 汇编完成,删除临时文件
 
-    //cout << "\n汇编完成!" << endl;
     return 0;
 }
 

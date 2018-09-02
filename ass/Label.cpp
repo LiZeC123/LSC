@@ -112,7 +112,7 @@ void Label::printSelf()
     printf("%s",externed?"Ex ":"   ");
     printf("%s",global?"G  ":"   ");
     printf("%s",equed?"Eq ":"   ");
-    printf("%5s/%11s ",segName.c_str(),lbName.c_str());
+    printf("%5s/%-11s ",segName.c_str(),lbName.c_str());
     printf("len = %1d times = %3d addr = 0x%-8x",len,times,addr);
     if(!cont.empty()){
         printf("src = ");

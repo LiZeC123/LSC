@@ -11,6 +11,8 @@ class GenIR
 {
 public:
     GenIR(SymTab& tab);
+    GenIR(const GenIR&) = delete;
+    GenIR& operator=(const GenIR&) = delete;
 
     void genFunHead(Fun* fun);
     void genFunTail(Fun* fun);
