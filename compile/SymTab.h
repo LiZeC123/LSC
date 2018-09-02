@@ -138,6 +138,8 @@ public:
 
     void printSelf();
 
+    ~Fun();
+
 private:
     bool externed;                  // 是否有extern声明
     Symbol type;                    // 返回类型
@@ -158,6 +160,8 @@ class SymTab
 {
 public:
     SymTab();
+    SymTab(SymTab&) = delete;  // 禁用拷贝
+    SymTab& operator=(const SymTab&) = delete;
     // 作用域管理
     void enter();
     void leave();
@@ -189,6 +193,8 @@ public:
     Fun* getCurrFun();
 
     void toX86(FILE* file);
+
+    ~SymTab();
 
 public:
     static Var* varVoid;

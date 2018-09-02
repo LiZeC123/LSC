@@ -48,16 +48,16 @@ class InterCode
 {
 public:
     InterCode(Fun* currFun);
-
+    InterCode(const InterCode&) = delete;
+    InterCode& operator=(const InterCode&) = delete;
     void addInst(InterInst* inst);
     Fun* getFun();
 
     void printSelf();
 
-    std::vector<InterInst*>& getCode();
+    const std::vector<InterInst*> getCode();
 
     ~InterCode();
-
 
 private:
 	std::vector<InterInst*>code;
