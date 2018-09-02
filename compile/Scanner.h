@@ -7,6 +7,8 @@ class Scanner
 {
 public:
     Scanner(const char* name);
+    Scanner(const Scanner&) = delete;
+    Scanner& operator=(const Scanner&) = delete;
     ~Scanner();
 
     int scan();                 // 扫描获得一个字符 

@@ -47,6 +47,8 @@ class Lexer
 {
 public:
     Lexer(Scanner* scanner);
+    Lexer(const Lexer&) = delete;
+    Lexer& operator=(const Lexer&) = delete;
     Token* nextToken();
     ~Lexer();
 

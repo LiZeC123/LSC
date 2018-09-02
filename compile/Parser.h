@@ -9,6 +9,9 @@ class Parser
 {
 public:
     Parser(Lexer& lex,SymTab& tab,GenIR& iir);
+    Parser(const Parser&) = delete;
+    Parser& operator=(const Parser&) = delete;
+    
     void setPrintToken();
     void analyse();
 
