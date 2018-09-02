@@ -80,9 +80,11 @@ void SymTab::exportSyms()
 
 void SymTab::printSymbolTable()
 {
+    printf("符号表内容如下:\n");
     for(auto& i:symTab){
         i.second->printSelf();
     }
+    printf("Ex: 外部符号 G: 全局符号  Eq: 常量\n");
 }
 
 ElfFile& SymTab::getFile()

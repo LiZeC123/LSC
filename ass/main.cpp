@@ -27,12 +27,9 @@ Args analyseOptions(int argc, char* argv[])
 
 void printInfo(Args& args, SymTab& tab)
 {
-    printf("符号表内容如下:\n");
     if(args.printSymbol){
         tab.printSymbolTable();
     }
-
-    printf("Ex: 外部符号 G: 全局符号  Eq: 常量\n");
 }
 
 
