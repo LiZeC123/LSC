@@ -36,7 +36,7 @@ Args analyseOptions(int argc, char* argv[])
     return args;
 }
 
-void printTables(Args args,SymTab tab)
+void printTables(Args args,SymTab& tab)
 {
     if(args.printValTab){
         printf("\n变量表内容如下:\n");
@@ -52,7 +52,7 @@ void printTables(Args args,SymTab tab)
     }
 }
 
-void genFile(const char* filename, SymTab tab)
+void genFile(const char* filename, SymTab& tab)
 {
     string asmFile = string(filename);
     std::size_t ipos = asmFile.rfind(".i");
@@ -92,12 +92,12 @@ int main(int argc,char* argv[])
     Args args = analyseOptions(argc,argv);
     
     // 初始化模块
-    Scanner scanner = Scanner(filename);
-    Error err       = Error(&scanner);
-    Lexer lex       = Lexer(&scanner);
-    SymTab tab      = SymTab();
-    GenIR ir        = GenIR(tab);
-    Parser parser   = Parser(lex,tab,ir);
+    Scanner scanner(filename);
+    Error err(&scanner);
+    Lexer lex(&scanner);
+    SymTab tab;
+    GenIR ir(tab);
+    Parser parser(lex,tab,ir);
 
     if(args.printToken){
         parser.setPrintToken();
