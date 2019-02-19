@@ -32,7 +32,8 @@
                 "/usr/include/x86_64-linux-gnu",
                 "/usr/include",
                 "/usr/include/linux",
-                "/usr/include/lsc"
+                "/usr/include/lsc",
+                "${workspaceFolder}/lar"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",

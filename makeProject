@@ -28,6 +28,12 @@ makeMain(){
 	g++ main.cpp -o lsc -std=c++11 -Wall -Wextra
 }
 
+makeLar(){
+	cd ./lar
+	make
+	cd ..
+}
+
 makeAll(){
 	echo "编译编译器模块..."
 	makeCompiler
@@ -112,6 +118,9 @@ then
 elif [ $1x == "main"x ]
 then
 	makeMain
+elif [ $1x == "lar"x ]
+then
+	makeLar
 elif [ $1x == "clear"x ]
 then
 	makeClear
