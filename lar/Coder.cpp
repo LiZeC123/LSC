@@ -1,5 +1,6 @@
 #include<iostream>
 #include "Coder.h"
+#include "BinTools.h"
 
 using namespace std;
 
@@ -30,38 +31,16 @@ Coder& Encoder::writeToFile(std::string filename)
 	FILE * out = fopen(filename.c_str(), "wb");
 	fwrite(&head, sizeof(HEAD), 1, out);
 
-	int i;
-	for (i = 0; i < bufSize; i += 8) {//8bit组成1byte
-		char byte = 0;
-		for (int j = 0; j < 8; j++) {
-			byte <<= 1;//先移位避免移位次数错误
-			if (buf[i + j] == '0') {
-				byte |= 0x0;
-			}
-			else {
-				byte |= 0x1;
-			}
+	BinWriter writer(out);
+	for(int i=0; i< bufSize;i++){
+		if(buf[i] == '0'){
+			writer.writeBit(0x0);
 		}
-		fwrite(&byte, sizeof(char), 1, out);
-	}
-
-	//写入剩下不足1byte的bit
-	if (i != bufSize) {
-		i -= 8;
-		char byte = 0;
-		for (; i < bufSize; i++) {
-			byte <<= 1;
-			if (buf[i] == '0') {
-				byte |= 0x0;
-			}
-			else {
-				byte |= 0x1;
-			}
+		else{
+			writer.writeBit(0x1);
 		}
-		byte <<= (bufSize - i);
-		fwrite(&byte, sizeof(char), 1, out);
-		printf("最后移动%d次\n", bufSize - i);
 	}
+	writer.flush();
 
 	fclose(out);
 	return *this;
@@ -70,6 +49,7 @@ Coder& Encoder::writeToFile(std::string filename)
 void Encoder::printInfo()
 {
 	int size = bufSize % 8 == 0 ? bufSize / 8 : bufSize / 8 + 1;
+	size += sizeof(HEAD);
 	printf("文件大小为%d字节\n", head.length);
 	printf("压缩后大小为%d字节\n", size);
 	printf("压缩比为%.2f%%\n", 100 * (double)size / head.length);

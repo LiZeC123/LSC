@@ -1,4 +1,4 @@
-OBJ = main.o Coder.o Huffman.o 
+OBJ = main.o BinTools.o Coder.o Huffman.o 
 WARNFLG = -Wall -Wextra
 DEBUG = -g
 STD = -std=c++11
