@@ -33,7 +33,7 @@ bool BinWriter::writeByte(int8_t byte)
         buf[tpos++] = byte;
     }
     else{
-        printf("WRANING: 比特位置未对齐\n");
+        printf("WRANING: 比特位置未对齐,从%dbit处开始写入一个字节\n",bpos);
         for(int i=0;i<8;i++){
             
             int8_t bit = (byte>>(7-i));
@@ -50,7 +50,7 @@ bool BinWriter::flush()
     tpos = 0;
 
     if(isSuccess && bpos != 0){
-        printf("WRANING: byteBuf存在数据, 并且写入到文件");
+        printf("INFO: byteBuf存在%dbit数据, 此数据补充末尾0后写入到文件\n",bpos);
         status = false;
         byteBuf <<= (8 - bpos);
         isSuccess = (1 == fwrite(&byteBuf,sizeof(int8_t),1,out));
@@ -74,7 +74,7 @@ bool BinWriter::writeToFileIfFull()
 void BinWriter::checkStatus()
 {
     if(!status){
-        printf("WRANING:bit部分数据已经填充末尾0并且写入, 此模块不应该继续写入数据");
+        printf("WRANING:bit部分数据已经填充末尾0并且写入, 此模块不应该继续写入数据\n");
     }
 }
 
