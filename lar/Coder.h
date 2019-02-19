@@ -7,8 +7,7 @@ int getWeight(std::string filename, int[]);
 
 class Coder{
 public:
-	virtual Coder& loadData(std::string filename) = 0;
-	virtual Coder& writeToFile(std::string filename) = 0;
+	virtual Coder& doCoder(std::string input,std::string output) = 0;
 	virtual void printInfo() = 0;
 	virtual ~Coder() { }
 protected:
@@ -22,24 +21,21 @@ protected:
 
 class Encoder : Coder {
 public:
-	Coder& loadData(std::string filename) override;
-	Coder& writeToFile(std::string filename) override;
+	Coder& doCoder(std::string input,std::string output) override;
 	void printInfo() override;
 	~Encoder();
 private:
 	HEAD genHead(std::string filename);
-	void fillBuf(std::string filename, char buf[], Haffman::Code code[]);
 private:
-	HEAD head;
-	char* buf;
-	int bufSize;
+	int bitCount = 0;
 };
 
 
 class Decoder : Coder {
 public:
-	Coder& loadData(std::string filename) override;
-	Coder& writeToFile(std::string filename) override;
+	Coder& doCoder(std::string input,std::string output) override;
+	Coder& loadData(std::string filename);
+	Coder& writeToFile(std::string filename);
 	void printInfo() override;
 	~Decoder();
 private:
