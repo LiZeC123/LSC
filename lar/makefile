@@ -9,7 +9,7 @@ lar: $(OBJ)
 	$(CC) $(CXXFLAGS) $(OBJ) -o lar
 test: lar
 	./lscc ../test/baseTest.c
-clean:
+clear:
 	rm -rf *.o
 	rm -rf *.lar
 	rm -rf lar
