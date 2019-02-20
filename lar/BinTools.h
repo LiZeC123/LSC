@@ -15,6 +15,7 @@ public:
     // 由于bit的不完整数据也会写入, 因此此函数只能在数据写入结束后调用一次
     bool flush();
 
+    ~BinWriter();
 private:
     bool writeToFileIfFull();
     void checkStatus();

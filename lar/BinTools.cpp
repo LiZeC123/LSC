@@ -54,11 +54,18 @@ bool BinWriter::flush()
         status = false;
         byteBuf <<= (8 - bpos);
         isSuccess = (1 == fwrite(&byteBuf,sizeof(int8_t),1,out));
+        bpos = 0;
     }
 
     return isSuccess;
 }
 
+BinWriter::~BinWriter()
+{
+    if(bpos != 0 || tpos != 0) {
+        printf("ERROR: BinWriter缓冲区未清空,请在写入结束后调用flush函数清空缓冲区\n");
+    }
+}
 
 bool BinWriter::writeToFileIfFull()
 {
