@@ -3,8 +3,6 @@
 #include"Huffman.h"
 #include"HufFile.h"
 
-int getWeight(std::string filename, int[]);
-
 class Coder{
 public:
 	virtual Coder& doCoder(std::string input,std::string output) = 0;
@@ -12,18 +10,14 @@ public:
 	virtual ~Coder() { }
 protected:
 	const static int N = 256;
-	//根据编码分配适当大小的缓冲区
-	int getBufSize(Haffman::Code code[]);
-	//生成哈夫曼编码
-
+	void initName(char name[]);
 };
 
 
-class Encoder : Coder {
+class Encoder : public Coder {
 public:
 	Coder& doCoder(std::string input,std::string output) override;
 	void printInfo() override;
-	~Encoder();
 private:
 	HEAD genHead(std::string filename);
 private:
@@ -31,19 +25,9 @@ private:
 };
 
 
-class Decoder : Coder {
+class Decoder : public Coder {
 public:
 	Coder& doCoder(std::string input,std::string output) override;
-	Coder& loadData(std::string filename);
-	Coder& writeToFile(std::string filename);
 	void printInfo() override;
 	~Decoder();
-private:
-	HEAD readHead(std::string filename);
-	void fillBuf(std::string filename);
-private:
-	HEAD head;
-	char* buf;
-	int bufSize;
-	Haffman::Tree* tree;
 };

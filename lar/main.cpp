@@ -4,7 +4,6 @@
 #include "HufFile.h"
 #include "Huffman.h"
 #include "Coder.h"
-//#define DEBUG
 
 using namespace std;
 
@@ -81,18 +80,12 @@ void printHelpInfo()
 
 void encode(string filename, string outputName)
 {
-	HEAD head;
-
-	Encoder encoder;
-	encoder.loadData(filename).writeToFile(outputName).printInfo();
+	Encoder().doCoder(filename,outputName).printInfo();
 }
 
 void decode(string filename, string outputName)
 {
-	HEAD head;
-
-	Decoder decoder;
-	decoder.loadData(filename).writeToFile(outputName).printInfo();
+	Decoder().doCoder(filename,outputName);
 }
 
 
