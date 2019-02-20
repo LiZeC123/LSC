@@ -57,6 +57,7 @@ void Encoder::initHeads()
 	itemTable = new Lar::Item[head.itemNum];
 	for(unsigned int idx = 0;idx < files.size();idx++){
 		FILE* in = fopen(files[idx].c_str(),"rb");
+		itemTable[idx].length = 0;
 		if (in != nullptr) {
 			int ch;
 			while ((ch = fgetc(in)) != EOF)
