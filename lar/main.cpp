@@ -14,7 +14,7 @@ public:
 	bool printHelp = false;
 	bool printInfo = false;
 	bool isSetOutput = false;
-	string outputName;
+	string larFileName;
 	vector<string> filenames;
 };
 
@@ -38,7 +38,7 @@ Args analyseOptions(int argc, char* argv[])
         else if(option == "-f"){
 			args.isSetOutput = true;
 			if(i+1<argc){
-				args.outputName = string(argv[i+1]);
+				args.larFileName = string(argv[i+1]);
 				i = i + 1;
 			}
 			else{
@@ -73,19 +73,23 @@ void printHelpInfo()
 	printf("  -h 显示此信息\n");
 	printf("  -c 压缩文件\n");
 	printf("  -x 解压缩文件\n");
-	printf("  -f 指定输出文件名\n");
+	printf("  -f 指定压缩文件名\n");
 	printf("  -v 输出详细信息\n");	
 }
 
 
-void encode(string filename, string outputName)
+void encode(vector<string> inputNames, string outputName)
 {
-	Encoder().doCoder(filename,outputName).printInfo();
+	Encoder encoder;
+	for(const auto& file: inputNames){
+		encoder.addFile(file);
+	}
+	encoder.doCoder(outputName).printInfo();
 }
 
-void decode(string filename, string outputName)
+void decode(string larFileName)
 {
-	Decoder().doCoder(filename,outputName);
+	Decoder().doCoder(larFileName);
 }
 
 
@@ -104,18 +108,18 @@ int main(int argc,char* argv[])
 	}
 	else if(args.isDecode){
 		if(args.isSetOutput){
-			decode(args.filenames[0],args.outputName);
+			decode(args.larFileName);
 		}
 		else{
-			decode(args.filenames[0],simpleReplaceName(args.outputName));
+			decode(simpleReplaceName(args.larFileName));
 		}
 	}
 	else if(args.isEncode){
 		if(args.isSetOutput){
-			encode(args.filenames[0],args.outputName);
+			encode(args.filenames,args.larFileName);
 		}
 		else{
-			encode(args.filenames[0],simpleReplaceName(args.outputName));
+			encode(args.filenames,simpleReplaceName(args.larFileName));
 		}
 	}
 }

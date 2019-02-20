@@ -4,6 +4,8 @@
 #include "Huffman.h"
 #include "HufFile.h"
 
+class BinReader;
+
 class Coder{
 public:
 	virtual Coder& doCoder(std::string input,std::string output) = 0;
@@ -38,7 +40,17 @@ private:
 
 class Decoder : public Coder {
 public:
+	Decoder& doCoder(std::string input);
 	Coder& doCoder(std::string input,std::string output) override;
 	void printInfo() override;
 	~Decoder();
+private:
+	void readHeads(FILE* in);
+	void writeFile(BinReader& reader, Haffman::Node* node, int fileIdx);
+private:
+	Lar::Head head;
+	Lar::Item* itemTable;
+	std::string* files;
+
+	size_t hasReadBits = 0;
 };

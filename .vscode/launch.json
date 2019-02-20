@@ -8,7 +8,7 @@
             "preLaunchTask": "makeLar",
             "program": "${workspaceRoot}/lar/lar",
             "args": [
-                "-x","-f","Coder.o","${workspaceRoot}/lar/a.lar"
+                "-x","-f","${workspaceRoot}/lar/a.lar"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
