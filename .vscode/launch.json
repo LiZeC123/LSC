@@ -30,7 +30,7 @@
             "preLaunchTask": "makeLar",
             "program": "${workspaceRoot}/lar/lar",
             "args": [
-                "-c","-f","a.lar","${workspaceRoot}/lar/Coder.o"
+                "-c","-f","a.lar","${workspaceRoot}/lar/Coder.o","${workspaceRoot}/lar/BinTools.o","${workspaceRoot}/lar/Huffman.o","${workspaceRoot}/lar/main.o"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

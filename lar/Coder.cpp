@@ -4,6 +4,30 @@
 
 using namespace std;
 
+Encoder& Encoder::addFile(std::string input)
+{
+	files.push_back(input);
+	return *this;
+}
+
+Encoder& Encoder::doCoder(std::string output)
+{
+	initHeads();
+	char name[N]; initName(name);
+
+	Haffman::Tree tree(head.weight,name,N);
+	Haffman::Code* code = tree.getCode();
+
+	FILE* out = fopen(output.c_str(),"wb");
+	writeHeads(out);
+	writeBody(code,out);
+
+	fclose(out);
+
+	return *this;
+}
+
+
 Coder& Encoder::doCoder(std::string input,std::string output)
 {
 	HEAD head = genHead(input);
@@ -32,7 +56,7 @@ Coder& Encoder::doCoder(std::string input,std::string output)
 	fclose(out);
 
 	int size = bitCount % 8 == 0 ? bitCount / 8 : bitCount / 8 + 1;
-	size += sizeof(HEAD);
+	size += sizeof(Lar::Head) + head.length*sizeof(Lar::Item); 
 	printf("文件大小为%d字节\n", head.length);
 	printf("压缩后大小为%d字节\n", size);
 	printf("压缩比为%.2f%%\n", 100 * (double)size / head.length);
@@ -43,13 +67,27 @@ Coder& Encoder::doCoder(std::string input,std::string output)
 
 void Encoder::printInfo()
 {
-	// int size = bufSize % 8 == 0 ? bufSize / 8 : bufSize / 8 + 1;
-	// size += sizeof(HEAD);
-	// printf("文件大小为%d字节\n", head.length);
-	// printf("压缩后大小为%d字节\n", size);
-	// printf("压缩比为%.2f%%\n", 100 * (double)size / head.length);
+	int size = bitCount % 8 == 0 ? bitCount / 8 : bitCount / 8 + 1;
+	size += sizeof(Lar::Head) + head.itemNum*sizeof(Lar::Item); 
+	for(const auto&file:files){
+		// 文件名实际占用空间还要加上末尾的\0
+		size += (file.size()+1);
+	}
+	
+	int length = 0;
+	for(int i=0;i<head.itemNum;i++){
+		length += itemTable[i].length;
+	}
+
+	printf("文件大小为%d字节\n", length);
+	printf("压缩后大小为%d字节\n", size);
+	printf("压缩比为%.2f%%\n", 100 * (double)size / length);
 }
 
+Encoder::~Encoder()
+{
+	delete[] itemTable;
+}
 
 HEAD Encoder::genHead(std::string filename)
 {
@@ -68,6 +106,64 @@ HEAD Encoder::genHead(std::string filename)
 
 	return head;
 }
+
+void Encoder::initHeads()
+{
+	head.itemNum = files.size();
+	itemTable = new Lar::Item[head.itemNum];
+	for(unsigned int idx = 0;idx < files.size();idx++){
+		FILE* in = fopen(files[idx].c_str(),"rb");
+		if (in != nullptr) {
+			int ch;
+			while ((ch = fgetc(in)) != EOF)
+			{
+				head.weight[ch]++;
+				itemTable[idx].length++;
+			}
+			fclose(in);
+		}
+		else {
+			printf("无法访问文件%s",files[idx].c_str());
+		}
+	}
+}
+
+void Encoder::writeHeads(FILE* out)
+{
+	fwrite(&head, sizeof(Lar::Head), 1, out);
+	fwrite(itemTable,sizeof(Lar::Item),head.itemNum,out);
+	for(auto& file:files){
+		// 将末尾的\0也写入
+		fwrite(file.c_str(),sizeof(char),file.size()+1,out);
+	}
+}
+
+void Encoder::writeBody(Haffman::Code* code, FILE* out)
+{
+	BinWriter writer(out);
+
+	for(auto& file: files){
+		FILE* in = fopen(file.c_str(),"rb");
+		if(in == nullptr){
+			printf("无法访问文件%s",file.c_str());
+			continue;
+		}
+
+		int ch;
+		while ((ch = fgetc(in)) != EOF)
+		{
+			for (int j = 0; j < code[ch].end; j++)
+			{
+				writer.writeBit(code[ch].bit[j]);
+				bitCount++;
+			}
+		}
+		fclose(in);
+	}
+
+	writer.flush();	
+}
+
 
 void Coder::initName(char name[])
 {
