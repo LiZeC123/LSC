@@ -8,7 +8,6 @@ class BinReader;
 
 class Coder{
 public:
-	virtual Coder& doCoder(std::string input,std::string output) = 0;
 	virtual void printInfo() = 0;
 	virtual ~Coder() { }
 protected:
@@ -21,11 +20,9 @@ class Encoder : public Coder {
 public:
 	Encoder& addFile(std::string input);
 	Encoder& doCoder(std::string output);
-	Coder& doCoder(std::string input,std::string output) override;
 	void printInfo() override;
 	~Encoder();
 private:
-	HEAD genHead(std::string filename);
 	void initHeads();
 	void writeHeads(FILE* out); // 写入全部的HEAD信息
 	void writeBody(Haffman::Code* code, FILE* out);
@@ -41,7 +38,6 @@ private:
 class Decoder : public Coder {
 public:
 	Decoder& doCoder(std::string input);
-	Coder& doCoder(std::string input,std::string output) override;
 	void printInfo() override;
 	~Decoder();
 private:

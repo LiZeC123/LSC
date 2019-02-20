@@ -89,7 +89,7 @@ void encode(vector<string> inputNames, string outputName)
 
 void decode(string larFileName)
 {
-	Decoder().doCoder(larFileName);
+	Decoder().doCoder(larFileName).printInfo();
 }
 
 

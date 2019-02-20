@@ -33,6 +33,7 @@
                 "/usr/include",
                 "/usr/include/linux",
                 "/usr/include/lsc",
+                "${workspaceFolder}/lar",
                 "${workspaceFolder}/lar"
             ],
             "defines": [],
