@@ -174,13 +174,17 @@ Token* Lexer::readToken()
                     t=new Token(ERR);
                 }
                 else if(ch=='*'){//多行注释,不允许嵌套注释
+                    bool endflag = false;
                     while(!scan(-1)){//一直扫描
                         if(ch=='*'){
-                            if(scan('/'))break;
+                            if(scan('/')){
+                                endflag = true;
+                                break;
+                            }
                         }
                     }
-                    if(ch==-1)//没正常结束注释
-                        LEXERROR(COMMENT_NO_END);
+                    if(!endflag)//没正常结束注释
+                        LEXERROR(COMMENT_NO_END);                        
                     t=new Token(ERR);
                 }
                 else
