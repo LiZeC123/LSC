@@ -1,23 +1,24 @@
 #pragma once
 #include <stdio.h>
+#include <string>
 /*******************************************************************************
                                    扫描器
 *******************************************************************************/
 class Scanner
 {
 public:
-    Scanner(const char* name);
+    Scanner(std::string name);
     Scanner(const Scanner&) = delete;
     Scanner& operator=(const Scanner&) = delete;
     ~Scanner();
 
     int scan();                 // 扫描获得一个字符 
-    const char* getFilename();  // 获得当前文件名
+    std::string getFilename();  // 获得当前文件名
     int getRow();               // 获得当前行号
     int getCol();               // 获得当前列号
 
 private:
-    const char * filename;
+    std::string filename;
     FILE* fin;
 
     int lineNum = 1;      // 行号

@@ -40,7 +40,7 @@ void Error::lexError(int code)
 	};
 	errorNum++;
     printf("%s<%d行,%d列> 词法错误:%s.\n",
-        scanner->getFilename(),
+        scanner->getFilename().c_str(),
         scanner->getRow(),scanner->getCol(),
         lexErrorTable[code]);
 }
@@ -54,7 +54,7 @@ void Error::lexWarm(int code)
     };
     warnNum++;
     printf("%s<%d行,%d列> 词法警告:%s.\n",
-        scanner->getFilename(),
+        scanner->getFilename().c_str(),
         scanner->getRow(),scanner->getCol(),
         lexWarnTable[code]);
 }
@@ -83,11 +83,11 @@ void Error::synError(int code, Token* token)
     errorNum++;
 
     if(code % 2 == 0){
-        printf("%s<第%d行> 语法错误:在 %s 之前丢失%s.\n",scanner->getFilename(),
+        printf("%s<第%d行> 语法错误:在 %s 之前丢失%s.\n",scanner->getFilename().c_str(),
             scanner->getRow(),token->toString().c_str(),synErrorTable[code/2]);
     }
     else{
-		printf("%s<第%d行> 语法错误:在 %s 处没有正确匹配%s.\n",scanner->getFilename(),
+		printf("%s<第%d行> 语法错误:在 %s 处没有正确匹配%s.\n",scanner->getFilename().c_str(),
             scanner->getRow(),token->toString().c_str(),synErrorTable[code/2]);
     }
 
@@ -102,7 +102,7 @@ void Error::semWarm(int code,string name)
 		"函数返回值类型不精确匹配"
 	};
 	warnNum++;
-	printf("%s<第%d行> 语义警告:%s %s.\n",scanner->getFilename(),scanner->getRow(),
+	printf("%s<第%d行> 语义警告:%s %s.\n",scanner->getFilename().c_str(),scanner->getRow(),
 		name.c_str(),semWarnTable[code]);
 }
 
@@ -134,6 +134,6 @@ void Error::semError(int code,string name)
 		"return语句和函数返回值类型不匹配"
 	};
 	errorNum++;
-	printf("%s<第%d行> 语义错误:%s %s.\n",scanner->getFilename(),scanner->getRow(),
+	printf("%s<第%d行> 语义错误:%s %s.\n",scanner->getFilename().c_str(),scanner->getRow(),
 		name.c_str(),semErrorTable[code]);
 }

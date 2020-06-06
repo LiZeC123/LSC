@@ -540,7 +540,7 @@ Scanner* Lexer::includeStdFile(vector<Token*> words){
         delete token;
     }
 
-    return new Scanner(name.c_str());
+    return new Scanner(name);
 }
 
 Scanner* Lexer::includeUserFile(string name)
@@ -553,7 +553,7 @@ Scanner* Lexer::includeUserFile(string name)
         filename.replace(n+1,len-n-1,name);
     }
 
-    return new Scanner(filename.c_str());
+    return new Scanner(filename);
 }
 
 
