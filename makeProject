@@ -143,7 +143,7 @@ else
 	echo "cmp         编译编译器"
 	echo "lit         编译连接器"
 	echo "lib         编译标准库"
-	echo "main		  编译主函数"
+	echo "main        编译主函数"
 	echo "clear       清除编译中间结果"	
 	echo ""
 fi
