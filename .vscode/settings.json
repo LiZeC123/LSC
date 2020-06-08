@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.asm": "asm",
         "string.h": "c",
         "stdlib.h": "c",
         "common.h": "c",
@@ -47,6 +48,13 @@
         "ratio": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp",
-        "lsclib.h": "c"
+        "lsclib.h": "c",
+        "atomic": "cpp",
+        "algorithm": "cpp",
+        "map": "cpp",
+        "memory_resource": "cpp",
+        "optional": "cpp",
+        "set": "cpp",
+        "string_view": "cpp"
     }
 }

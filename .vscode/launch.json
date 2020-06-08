@@ -49,7 +49,7 @@
             "preLaunchTask": "makeCompile",
             "program": "${workspaceFolder}/compile/lscc",
             "args": [
-                "${workspaceFolder}/test/arithmeticTest.c"
+                "${workspaceFolder}/test/01arithmeticTest.c"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
