@@ -10,13 +10,14 @@ int lscstr2int(char* buf,int maxLen)
 		++count;
 	}
 	
-	while(buf[count] != '\n' && count < maxLen){
+	while(buf[count] != '\n' && buf[count] != '\0' && count < maxLen){
 		int d = buf[count] - 48;
 		asw = asw * 10 + d;
 		++count;
 	}
-	
-	return asw;
+
+    
+	return op * asw;
 }
 
 int lscReadInt()
