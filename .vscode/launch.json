@@ -2,6 +2,50 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Lar Decode Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "makeLar",
+            "program": "${workspaceRoot}/lar/lar",
+            "args": [
+                "-x","-f","${workspaceRoot}/lar/a.lar"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Lar Encode Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "makeLar",
+            "program": "${workspaceRoot}/lar/lar",
+            "args": [
+                "-c","-f","a.lar","${workspaceRoot}/lar/Coder.o","${workspaceRoot}/lar/BinTools.o","${workspaceRoot}/lar/Huffman.o","${workspaceRoot}/lar/main.o"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "Lib Launch",
             "type": "cppdbg",
             "request": "launch",
