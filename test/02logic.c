@@ -23,11 +23,15 @@ int main()
     checkFalse(1 == 2, __LINE__);
     checkTrue(a == a, __LINE__);
     checkFalse(a == b, __LINE__);
+    checkTrue(1 != -1, __LINE__);
+    checkTrue(a != b, __LINE__);
 
     checkTrue(a > b, __LINE__);
     checkTrue(a >= b, __LINE__);
     checkFalse(a > a, __LINE__);
     checkTrue(a >= a, __LINE__);
+    checkTrue(-1 < 0, __LINE__);
+    checkTrue(-1 <= 0, __LINE__);
 
     checkTrue(1 == 1 && 2 == 2 && 2 > 1, __LINE__);
 

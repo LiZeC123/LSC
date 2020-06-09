@@ -23,6 +23,8 @@ void checkCharEquals(char a,char b,int line)
 
 void checkStringEquals(char* strA, char* strB, int line)
 {
+    char* strAp = strA;
+    char* strBp = strB;
     int equal = 1;
     while (*strA != '\0' && *strB != '\0')
     {
@@ -42,7 +44,7 @@ void checkStringEquals(char* strA, char* strB, int line)
     if(!equal){
         lscPrintStr(__FILE__);
         lscPrintStr(" <第");lscPrintInt(line);lscPrintStr("行> ");
-        lscPrintStr("checkStringEquals: ");lscPrintStr(strA);lscPrintStr(" != ");lscPrintStr(strB);
+        lscPrintStr("checkStringEquals: ");lscPrintStr(strAp);lscPrintStr(" != ");lscPrintStr(strBp);
         lscPrintStr("\n");
         exit(1);
     }
@@ -78,5 +80,3 @@ void checkUnreachable(int line)
     lscPrintStr("Unreachable Code Excuted");
     exit(1);
 }
-
-
