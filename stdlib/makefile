@@ -1,15 +1,20 @@
-OBJ = start.o lscio.o lsclib.o
+OBJ = start.o lscore.o lscio.o lsclib.o
 
-CC = ../ass/lsca
+CA = ../ass/lsca
+CC = ../compile/lscc
 
 
 lib:$(OBJ)
-	echo "Finish" > lib
+
 start.o:start.s
-	$(CC) start.s
-lscio.o: lscio.s
-	$(CC) lscio.s
+	$(CA) start.s
+lscio.o: lscio.c
+	$(CC) lscio.c
+	$(CA) lscio.s	
 lsclib.o: lsclib.s
-	$(CC) lsclib.s
+	$(CA) lsclib.s
+lscore.o: lscore.s
+	$(CA) lscore.s
 clear:
 	rm -rf *.o
+	rm -rf lscio.s
