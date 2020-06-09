@@ -1,14 +1,17 @@
 #! /bin/bash
 
-code=""
-for file in `ls ./test/*.c`;
-do
-echo $file;
-lsc $file;
-./z.out
-code+=$?
-done
-
-echo
-echo "返回码为$code"
-exit $((code))
+if [ $1x == "-n"x ]
+then
+	file=`find . -name  "${2}*.c"`
+    echo $file;
+    lsc $file;
+    ./z.out
+else
+    for file in `ls ./test/*.c`;
+    do
+        echo $file;
+        lsc $file;
+        ./z.out
+        code+=$?
+    done
+fi

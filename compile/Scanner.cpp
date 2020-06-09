@@ -1,10 +1,13 @@
 #include "common.h"
 #include "Scanner.h"
 #include "Error.h"
-Scanner::Scanner(const char* name)
+
+using namespace std;
+
+Scanner::Scanner(string name)
 {
-    this->filename = name;
-    this->fin = fopen(filename,"r");
+    this->filename = name; //需要对外传递的参数, 应该在内部拷贝一份
+    this->fin = fopen(filename.c_str(),"r");
 }
 
 int Scanner::scan()
@@ -48,7 +51,7 @@ int Scanner::scan()
     return ch;
 }
 
-const char* Scanner::getFilename()
+string Scanner::getFilename()
 {
     return filename;
 }

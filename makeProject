@@ -65,19 +65,20 @@ makeClear(){
 }
 
 copyStdLib(){
-	sudo cp ./stdlib/lscio.h  /usr/include/lsc/lscio.h
+	sudo cp ./stdlib/lscio.h   /usr/include/lsc/lscio.h
 	sudo cp ./stdlib/lsclib.h  /usr/include/lsc/lsclib.h
-	sudo cp ./stdlib/start.o /usr/include/lsc/start.o
-	sudo cp ./stdlib/lscio.o /usr/include/lsc/lscio.o
-	sudo cp ./stdlib/lsclib.o /usr/include/lsc/lsclib.o
+	sudo cp ./stdlib/start.o   /usr/include/lsc/start.o
+	sudo cp ./stdlib/lscore.o  /usr/include/lsc/lscore.o
+	sudo cp ./stdlib/lscio.o   /usr/include/lsc/lscio.o
+	sudo cp ./stdlib/lsclib.o  /usr/include/lsc/lsclib.o
 }
 
 copyExeFile(){
-	sudo cp ./lsc /usr/local/bin/lsc
+	sudo cp ./lsc          /usr/local/bin/lsc
 	sudo cp ./compile/lscc /usr/local/bin/lscc
-	sudo cp ./ass/lsca /usr/local/bin/lsca
-	sudo cp ./lit/lscl /usr/local/bin/lscl
-	sudo cp ./lar/lar /usr/local/bin/lar
+	sudo cp ./ass/lsca 	   /usr/local/bin/lsca
+	sudo cp ./lit/lscl     /usr/local/bin/lscl
+  sudo cp ./lar/lar      /usr/local/bin/lar
 }
 
 removeExeFile(){
@@ -158,8 +159,8 @@ else
 	echo "cmp         编译编译器"
 	echo "lit         编译连接器"
 	echo "lib         编译标准库"
-	echo "lar		  编译压缩模块"
-	echo "main		  编译主函数"
+	echo "lar         编译压缩模块"
+	echo "main        编译主函数"
 	echo "clear       清除编译中间结果"	
 	echo ""
 fi

@@ -292,6 +292,7 @@ void toExeFile(const vector<CompileFile>& compilefiles,const vector<string>& opt
 {
 	const static string libs[] = {
 		"/usr/include/lsc/start.o",
+		"/usr/include/lsc/lscore.o",
 		"/usr/include/lsc/lscio.o",
 		"/usr/include/lsc/lsclib.o"
 		};

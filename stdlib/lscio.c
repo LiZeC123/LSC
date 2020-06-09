@@ -1,6 +1,5 @@
 #include "lscio.h"
 
-// 2^31 = 2147483648
 int lscstr2int(char* buf,int maxLen)
 {
 	int count = 0;
@@ -11,18 +10,19 @@ int lscstr2int(char* buf,int maxLen)
 		++count;
 	}
 	
-	while(buf[count] != '\n' && count < maxLen){
+	while(buf[count] != '\n' && buf[count] != '\0' && count < maxLen){
 		int d = buf[count] - 48;
 		asw = asw * 10 + d;
 		++count;
 	}
-	
-	return asw;
+
+    
+	return op * asw;
 }
 
 int lscReadInt()
 {
-    char buf[10];
+    char buf[12];
     lscRead(buf,10);
     return lscstr2int(buf,10);
 }
@@ -41,7 +41,21 @@ void lscPrintStr(char* str)
 
 void lscint2str(char* buf,int i)
 {
-	char tmp[10];
+    if(i == 0) {
+        buf[0] = '0';
+        buf[1] = '\0';
+        return;
+    }
+
+    // 如果是负数, 则转成正数处理, 但是会导致-MAX错误, 影响不大, 暂时不处理这一情况
+    int negitive = 0;
+    if(i < 0) {
+        negitive = 1;
+        i = -i;
+    }
+
+    // 2^31 - 1 = 2147483647  
+	char tmp[12];
     int count = 0;
     while(i != 0){
         int d = i % 10;
@@ -51,6 +65,11 @@ void lscint2str(char* buf,int i)
     }
 	
     int idx = 0;
+
+    if(negitive) {
+        buf[idx++] = '-';
+    }
+
     --count;
 	while(count >= 0){
         buf[idx] = tmp[count];
@@ -62,7 +81,7 @@ void lscint2str(char* buf,int i)
 
 void lscPrintInt(int n)
 {
-    char buf[10];
+    char buf[12];
     lscint2str(buf,n);
     lscPrintStr(buf);
 }

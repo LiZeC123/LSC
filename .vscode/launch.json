@@ -49,12 +49,12 @@
             "name": "Lib Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/test/a.out",
+            "program": "${workspaceFolder}/test/a.out",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -69,14 +69,14 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "makeAss",
-            "program": "${workspaceRoot}/ass/lsca",
+            "program": "${workspaceFolder}/ass/lsca",
             "args": [
-                "${workspaceRoot}/stdlib/lsclib.s"
+                "${workspaceFolder}/stdlib/lsclib.s"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {
@@ -91,15 +91,16 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "makeCompile",
-            "program": "${workspaceRoot}/compile/lscc",
+            "program": "${workspaceFolder}/compile/lscc",
             "args": [
-                "${workspaceRoot}/test/arithmeticTest.c"
+                "${workspaceFolder}/test/01arithmeticTest.c"
             ],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -113,17 +114,17 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "makeLit",
-            "program": "${workspaceRoot}/lit/lscl",
+            "program": "${workspaceFolder}/lit/lscl",
             "args": [
                 "/usr/include/lsc/start.o",
                 "/usr/include/lsc/lscio.o",
                 "/usr/include/lsc/lsclib.o",
-                "${workspaceRoot}/test/macroTest.o"
+                "${workspaceFolder}/test/macroTest.o"
             ],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
                 {

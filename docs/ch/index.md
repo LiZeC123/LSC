@@ -26,3 +26,5 @@ Lsc项目开发文档
 - 标准库
     - [Lsc语言标准库](./stdlib/stdlib.md)
     - [动态内存分配](./stdlib/alloc.md)
+- 运行环境
+    - [在Win10子系统下运行程序](./win10.md)

@@ -8,8 +8,7 @@ Lsc Compiler Collection
 
 The Lsc Compiler Collection is the compiler system supporting lsc language, which includes compiler, assembler, linker for lsc, as well as libraies for this language(lscio, lsclib, ...). And lsc is a recursive acronym meaning of "LSC iS Compiler". 
 
-The lsc language is a C-like language that currently supports most of the features of the C language. It is hoped that through the development of this project, the knowledge and theory of the compilation principle, operating system and assembly language can be learned and practiced. And we can have a comprehensive and thorough understanding of the whole computer architecture.
-
+The lsc language is a C-like language that currently supports most of the basic features of the C language. 
 
 Documentations
 ------------
@@ -32,7 +31,7 @@ git clone git@github.com:LiZeC123/LSC.git
 - Make
 - GCC
 
-This project can only be compiled on linux.
+This project can only be compiled and run on linux.
 
 ### Build
 
