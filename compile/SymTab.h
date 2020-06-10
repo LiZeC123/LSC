@@ -201,8 +201,8 @@ public:
     static Var* one;
     static Var* four;
     
-    // 获得一个共用的表示Void的符号
-    static Var* getVoid();
+    static Var* getVoid();  // 获得一个共用的表示Void的符号
+    static Var* getTrue();  // 获得一个共用的表示True的符号
 
     std::vector<Var*> getGlobalVars();
     void genData(FILE* file);

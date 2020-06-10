@@ -58,7 +58,7 @@ void checkTrue(int value,int line)
     else{
         lscPrintStr(__FILE__);
         lscPrintStr(" <第");lscPrintInt(line);lscPrintStr("行> ");
-        lscPrintStr("checkTrue: is not True");
+        lscPrintStr("checkTrue: expression is not True");
         exit(1);
     }
 }
@@ -68,7 +68,7 @@ void checkFalse(int value,int line)
     if(value){
         lscPrintStr(__FILE__);
         lscPrintStr(" <第");lscPrintInt(line);lscPrintStr("行> ");
-        lscPrintStr("checkFalse: is not False");
+        lscPrintStr("checkFalse: expression is not False");
         exit(1);
     }
 }

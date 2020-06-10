@@ -867,6 +867,11 @@ Var* SymTab::getVoid()
     return SymTab::varVoid;
 }
 
+Var* SymTab::getTrue()
+{
+    return SymTab::one;
+}
+
 void SymTab::setGenIR(GenIR* ir)
 {
     this->ir = ir;

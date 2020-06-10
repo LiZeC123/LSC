@@ -512,7 +512,7 @@ void GenIR::genWhileCond(Var* cond,InterInst* _exit)
 {
     if(cond){
         if(cond->isVoid()){
-            // TODO: getTrue();
+            cond = SymTab::getTrue();
         }
         else if(cond->isRef()){
             cond = genAssign(cond);
@@ -527,6 +527,47 @@ void GenIR::genWhileTail(InterInst*& _while,InterInst*& _exit)
     symtab.addInst(new InterInst(OP_JMP,_while));
     symtab.addInst(_exit);
     pop();
+}
+
+void GenIR::genForHead(InterInst*& _for,InterInst*& _exit) 
+{
+    _for = new InterInst();
+    _exit = new InterInst();
+    symtab.addInst(_for);
+}
+
+void GenIR::genForCondBegin(Var*cond,InterInst*& _step,InterInst*& _block,InterInst* _exit) 
+{
+    _block = new InterInst();
+    _step = new InterInst();
+    if(cond){
+        if(cond->isVoid()){
+            cond = SymTab::getTrue();
+        }
+        else if(cond->isRef()){
+            cond = genAssign(cond);
+        }
+
+        symtab.addInst(new InterInst(OP_JF,_exit,cond));
+        symtab.addInst(new InterInst(OP_JMP, _block));
+    }
+
+    symtab.addInst(_step);
+    push(_step, _exit);
+    
+}
+
+void GenIR::genForCondEnd(InterInst* _for,InterInst* _block) 
+{
+    symtab.addInst(new InterInst(OP_JMP,_for));//继续循环
+	symtab.addInst(_block);//添加循环体标签
+}
+
+void GenIR::genForTail(InterInst*& _step,InterInst*& _exit) 
+{
+    symtab.addInst(new InterInst(OP_JMP,_step));//跳转到循环动作
+	symtab.addInst(_exit);//添加_exit标签
+	pop();//离开for
 }
 
 void GenIR::genBreak()

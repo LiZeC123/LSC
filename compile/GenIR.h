@@ -34,6 +34,11 @@ public:
     void genWhileHead(InterInst*&_while,InterInst*& _exit);
     void genWhileCond(Var* cond,InterInst* _exit);
     void genWhileTail(InterInst*& _while,InterInst*& _exit);
+    void genForHead(InterInst*& _for,InterInst*& _exit);
+    void genForCondBegin(Var*cond,InterInst*& _step,InterInst*& _block,InterInst* _exit);
+    void genForCondEnd(InterInst* _for,InterInst* _block);
+    void genForTail(InterInst*& _step,InterInst*& _exit);
+
 
     void genBreak();
     void genContinue();

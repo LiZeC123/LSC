@@ -408,12 +408,16 @@ void Parser::whilestat()
 void Parser::forstat()
 {
     symtab.enter();
+    InterInst *_for, *_exit, *_step, *_block;
     match(KW_FOR);
     if(!match(LPAREN)){
         recovery(FIRST_EXPR||firstIs(RPAREN),LPAREN_LOST,LPAREN_WRONG);
     }
     forinit();
-    altexpr();
+    ir.genForHead(_for,_exit);
+   
+    Var* cond = altexpr();
+    ir.genForCondBegin(cond, _step, _block, _exit);
     if(!match(SEMICON)){
         recovery(FIRST_EXPR||firstIs(RPAREN),SEMICON_LOST,SEMICON_WRONG);
     }
@@ -421,7 +425,11 @@ void Parser::forstat()
     if(!match(RPAREN)){
         recovery(firstIs(LBRACE),RPAREN_LOST,RPAREN_WRONG);
     }
+    ir.genForCondEnd(_for, _block);
+   
     block();
+    ir.genForTail(_step, _exit);
+   
     symtab.leave();
 }
 
@@ -434,6 +442,9 @@ void Parser::forinit()
     }
     else{
         altexpr();
+        if(!match(SEMICON)){
+            recovery(FIRST_EXPR||firstIs(RPAREN),SEMICON_LOST,SEMICON_WRONG);
+        }
     }
 }
 
@@ -545,15 +556,29 @@ void Parser::caselable()
 
 
 
-// <altexpr> -> <expr>
-// <altexpr> -> e
+// <altexpr> -> <expr> <altexprtail> | e
 Var* Parser::altexpr()
 {
     if(FIRST_EXPR){
-        return expr();
+        Var* value = expr();
+        Var* other = altexprtail();
+        return other->isVoid()? value : other;
     }
     else{
         // 空语句,返回特殊的Void变量
+        return SymTab::getVoid();
+    }
+}
+
+// <altexprtail> -> , <exp> <altexptail> | e
+Var* Parser::altexprtail()
+{
+    if(match(COMMA)) {
+        Var* value = expr();
+        Var* other = altexprtail();
+        return other->isVoid()? value : other;
+    }
+    else {
         return SymTab::getVoid();
     }
 }

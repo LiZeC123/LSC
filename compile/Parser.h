@@ -61,6 +61,7 @@ private:
 
     // 表达式
     Var* altexpr();
+    Var* altexprtail();
     Var* expr();
     Var* assexpr();
     Var* asstail(Var* lval);
