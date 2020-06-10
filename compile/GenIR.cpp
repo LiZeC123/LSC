@@ -98,7 +98,11 @@ bool GenIR::genVarInit(Var* var)
     }
 
     symtab.addInst(new InterInst(OP_DEC,var));
-    if(var->setInit()){
+
+    if(var->hasInitArr()) { //是否设置了数组初始化
+        genArrayInit(var, var->getInitData()->getInitArray());
+    }
+    else if(var->setInit()){ //是否设置了其他字面量初始数据
         genTwoOp(var,ASSIGN,var->getInitData());
     }
 
@@ -448,6 +452,18 @@ Var* GenIR::genArray(Var* array,Var* index)
     return genPtr(genAdd(array,index));
 }
 
+void GenIR::genArrayInit(Var* array, std::vector<Var*> arrVal)
+{
+    Var * tmp = new Var(symtab.getScopePath(), array);
+    tmp->setLeft(true);
+    symtab.addVar(tmp);
+    symtab.addInst(new InterInst(OP_AS,tmp,array));
+    for(Var* arg: arrVal) {
+        // *tmp = arg => a[i] = value
+        symtab.addInst(new InterInst(OP_SET, arg, tmp));
+        genIncL(tmp);
+    }
+}
 
 
 Var* GenIR::genCall(Fun* fun, std::vector<Var*>& args)

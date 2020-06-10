@@ -141,7 +141,7 @@ void Parser::idtail(bool isExtern,Symbol s,int ptrLevel,std::string name)
     }
 }
 
-// <defvar> -> [ <NUM> ]
+// <defvar> -> [ <NUM> ] <initArray>
 // <defvar> -> <init>
 Var* Parser::defvar(bool isExtern,Symbol s,int ptrLevel,std::string name)
 {
@@ -159,15 +159,16 @@ Var* Parser::defvar(bool isExtern,Symbol s,int ptrLevel,std::string name)
             recovery(firstIs(COMMA)_OR_(SEMICON),RBRACK_LOST,RBRACK_WRONG);
         }
 
-        return new Var(symtab.getScopePath(),isExtern, s, ptrLevel,name,len);
+        Var* initVal = initArray();    
+        return new Var(symtab.getScopePath(),isExtern, s, ptrLevel,name,len, initVal);
     }
-    else{
-        return init(isExtern,s,ptrLevel,name);
-    }
+
+    return init(isExtern,s,ptrLevel,name);
+    
 }
 
 
-// <init>    -> = <expr>
+// <init>    -> = <expr> | = {<initlist>}
 // <init>    -> e
 Var* Parser::init(bool isExtern,Symbol s,int ptrLevel,std::string name)
 {
@@ -178,6 +179,39 @@ Var* Parser::init(bool isExtern,Symbol s,int ptrLevel,std::string name)
     return new Var(symtab.getScopePath(),isExtern,s,ptrLevel,name,init);
 }
 
+// <initArray>  -> = {<exp><initArraytail>}
+Var* Parser::initArray()
+{
+    if(match(ASSIGN)) {
+        if(match(LBRACE)) {
+            Var* init = new Var();
+            init->setName("<array>");
+            init->setLeft(true);
+            
+            Var* value = expr();
+            init->getInitArray().push_back(value);
+            init->setType(value->getType());
+            initArraytail(init->getInitArray());
+
+            if(!match(RBRACE)) {
+                recovery(true, RBRACE_LOST,RBRACE_WRONG);
+            }
+
+            return init;
+        }
+    }
+    return nullptr;
+}
+
+// <literaltail> -> , <exp><literaltail> | e
+void Parser::initArraytail(std::vector<Var*>& initVals)
+{
+    if(match(COMMA)){
+        Var * value = expr();
+        initVals.push_back(value);
+        initArraytail(initVals);
+    }
+}
 
 // <deflist> -> ,<def>
 // <deflist> -> ;

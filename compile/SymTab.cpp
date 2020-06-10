@@ -55,7 +55,7 @@ Var::Var(Token *literal)
     }
 }
 
-Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,int len)
+Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,int len, Var* init)
 {
     baseInit();
     this->scopePath = scopePath;
@@ -64,6 +64,7 @@ Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::str
     setPtr(ptrLevel);
     setName(name);
     setArray(len);
+    initData = init;
 }
 
 Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,Var* init)
@@ -134,7 +135,7 @@ bool Var::setInit()
         }
     }
     else{
-        // 否在说明是表达式,需要生成代码进行计算
+        // 否则说明是表达式,需要生成代码进行计算
         if(scopePath.size() == 1){
             Error::semError(GLB_INIT_ERR,name);
         }
@@ -185,6 +186,11 @@ Symbol Var::getType()
 Var* Var::getInitData()
 {
     return initData;
+}
+
+std::vector<Var*>& Var::getInitArray()
+{
+    return arrVal;
 }
 
 int Var::getOffset()
@@ -291,6 +297,11 @@ bool Var::getIsPtr()
 bool Var::isInit()
 {
     return inited;
+}
+
+bool Var::hasInitArr()
+{
+    return initData != nullptr && !initData->arrVal.empty();
 }
 
 void Var::setExterned(bool isExtern)

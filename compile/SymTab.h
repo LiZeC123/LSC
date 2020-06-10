@@ -17,7 +17,7 @@ public:
     Var(Token* literal);
 
     // 初始化一个数组
-    Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,int len);
+    Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,int len, Var* init=nullptr);
     
     // 初始化普通的变量,指针
     Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,Var* init);
@@ -37,6 +37,7 @@ public:
     bool getLeft();
     Symbol getType();
     Var* getInitData();
+    std::vector<Var*>& getInitArray();
     int getOffset();
     Var* getStep();         // 获得相应的变量长度,并返回一个表示该长度的特殊整数变量
     Var* getPointer();      // 获得当前变量对应的指针
@@ -54,6 +55,7 @@ public:
     bool getArray();        // 是否是数组
     bool getIsPtr();        // 是否是指针类型
     bool isInit();
+    bool hasInitArr();
  
 
     bool setInit();         // 生成器调用的初始化方法
@@ -94,6 +96,7 @@ private:
         char charVal;
     };
     std::string strVal;             // 字符串常量初始值
+    std::vector<Var*> arrVal;       // 数组初始值
 
     
     std::string ptrVal;             // 字符指针初始值

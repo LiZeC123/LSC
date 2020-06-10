@@ -35,6 +35,8 @@ private:
     void  idtail(bool isExtern,Symbol s,int ptrLevel,std::string name);
     Var* defvar(bool isExtern,Symbol s,int ptrLevel,std::string name);
     Var* init(bool isExtern,Symbol s,int ptrLevel,std::string name);
+    Var* initArray();
+    void initArraytail(std::vector<Var*>& initVals);
     void deflist(bool isExtern,Symbol s);
 
     // 函数

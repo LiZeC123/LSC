@@ -25,6 +25,7 @@ public:
     Var* genOneLeftOp(Symbol op,Var* val);
     Var* genOneRightOp(Var* val,Symbol op);
     Var* genArray(Var* array,Var* index);
+    void genArrayInit(Var* array, std::vector<Var*> arrVal);
     Var* genCall(Fun* fun, std::vector<Var*>& args);
 
     void genIfHead(Var* cond,InterInst*& _else);
