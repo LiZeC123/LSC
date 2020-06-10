@@ -147,6 +147,9 @@ then
 	echo "清除编译中间结果..."
 	makeClear
 	install
+elif [ $1x == "all"x ]
+then
+	makeAll
 else
 	echo "无效的参数: $1"
 	echo ""
@@ -155,6 +158,7 @@ else
 	echo "install     编译并安装lsc编译系统"
 	echo "uninstall   卸载lsc编译系统"
 	echo "reinstall   重装lsc编译系统"
+	echo "all         编译整个项目"
 	echo "ass         编译汇编器"
 	echo "cmp         编译编译器"
 	echo "lit         编译连接器"
