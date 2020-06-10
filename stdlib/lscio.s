@@ -121,7 +121,7 @@ lscint2str:
 	mov eax,0
 	mov al,48
 	mov ebx,[ebp-12]
-	mov [ebx],eax
+	mov [ebx],al
 	mov eax,1
 	mov ebx,1
 	imul ebx
@@ -136,7 +136,7 @@ lscint2str:
 	mov eax,0
 	mov al,0
 	mov ebx,[ebp-24]
-	mov [ebx],eax
+	mov [ebx],al
 	jmp .L38
 	jmp .L47
 .L40:
@@ -241,7 +241,7 @@ lscint2str:
 	mov eax,0
 	mov al,45
 	mov ebx,[ebp-72]
-	mov [ebx],eax
+	mov [ebx],al
 	jmp .L69
 .L64:
 .L69:
@@ -296,7 +296,7 @@ lscint2str:
 	mov eax,0
 	mov al,[ebp-96]
 	mov ebx,[ebp-76]
-	mov [ebx],eax
+	mov [ebx],al
 	jmp .L70
 .L71:
 	mov eax,[ebp-60]
@@ -313,7 +313,7 @@ lscint2str:
 	mov eax,0
 	mov al,0
 	mov ebx,[ebp-68]
-	mov [ebx],eax
+	mov [ebx],al
 .L38:
 	mov esp,ebp
 	pop ebp
