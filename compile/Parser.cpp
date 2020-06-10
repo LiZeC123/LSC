@@ -474,7 +474,7 @@ void Parser::dowhilestat()
 }
 
 
-// <ifstat>     -> if ( <expr> ) <block> <elsestat>
+// <ifstat>     -> if ( <expr> ) <block> <iftail>
 void Parser::ifstat()
 {
     symtab.enter();
@@ -496,20 +496,31 @@ void Parser::ifstat()
 
     InterInst* _exit;
     ir.genElseHead(_else,_exit);
-    if(firstIs(KW_ELSE)){
-        elsestat();
-    }
+    
+    iftail();
+
     ir.genElseTail(_exit);
     
 }
 
-// <elsestat>   -> else <block> | e
-void Parser::elsestat()
+// <iftail>     -> else <elseifstat> | e
+void Parser::iftail()
 {
     if(match(KW_ELSE)){
         symtab.enter();
-        block();
+        elseifstat();
         symtab.leave();
+    }
+}
+
+// <elseifstat> -> <ifstat> | <block>
+void Parser::elseifstat()
+{
+    if(look->sym == KW_IF){
+        ifstat();
+    }
+    else{
+        block();
     }
 }
 

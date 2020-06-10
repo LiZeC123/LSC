@@ -54,7 +54,8 @@ private:
 	void forstat();
 	void forinit();
 	void ifstat();
-	void elsestat();
+    void iftail();
+    void elseifstat();
 	void switchstat();
     void casestat();
     void caselable();

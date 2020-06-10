@@ -1,6 +1,6 @@
 #include "00testhelper.h"
 
-void TestBase()
+void TestLoopBase()
 {
     int acc = 0;
     int count = 10;
@@ -16,6 +16,69 @@ void TestBase()
         acc = acc + i;
     }
     checkEquals(acc, 5050, __LINE__);
+}
+
+void TestIfBase()
+{
+    int acc = 0;
+    if (acc == 0)
+    {
+        checkTrue(acc == 0, __LINE__);
+    }
+
+    if (acc == 0)
+    {
+        checkTrue(acc == 0, __LINE__);
+    }
+    else
+    {
+        checkUnreachable(__LINE__);
+    }
+
+    if (acc == 1)
+    {
+        checkUnreachable(__LINE__);
+    }
+    else
+    {
+        checkTrue(acc == 0, __LINE__);
+    }
+
+    acc = 1;
+    if (acc == 0)
+    {
+        checkUnreachable(__LINE__);
+    }
+    else if (acc == 1)
+    {
+        checkEquals(acc, 1, __LINE__);
+    }
+    else if (acc == 2)
+    {
+        checkUnreachable(__LINE__);
+    }
+    else
+    {
+        checkUnreachable(__LINE__);
+    }
+
+    acc = 12;
+    if (acc == 0)
+    {
+        checkUnreachable(__LINE__);
+    }
+    else if (acc == 1)
+    {
+        checkUnreachable(__LINE__);
+    }
+    else if (acc == 2)
+    {
+        checkUnreachable(__LINE__);
+    }
+    else
+    {
+        checkEquals(acc, 12, __LINE__);
+    }
 }
 
 void TestExpression()
@@ -144,7 +207,8 @@ void TestMutilLoopControl()
 
 int main()
 {
-    TestBase();
+    TestLoopBase();
+    TestIfBase();
     TestExpression();
     TestControl();
     TestMultiLoop();
