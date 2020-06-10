@@ -500,11 +500,21 @@ Fun::Fun(bool isExtern,Symbol type,int ptrLevel,std::string name,std::vector<Var
     for(unsigned int i=0,argOff=8;i<para.size();i++,argOff+=4){
         paraVar[i]->setOffset(argOff);
     }
+    
+    // 检查是否有可变参数, 可变参数只能是最后一个参数
+    if(para.size() > 0 && para[para.size() -1]->getName() == "<vararg>") {
+        this->vararg = true;
+    }
 }
 
 bool Fun::getExtern()
 {
     return externed;
+}
+
+bool Fun::hasVarArg()
+{
+    return vararg;
 }
 
 void Fun::setExtern(bool isExtern)
@@ -556,7 +566,13 @@ bool Fun::match(Fun* f)
         Error::semWarm(FUN_RET_CONFLICT,f->getName());
     }
 
-    return match(f->paraVar);
+    // 如果存在可变参数, 则不检查参数是否完全一致
+    if(this->hasVarArg() || f->hasVarArg()) {
+        return true;
+    }
+    else {
+        return match(f->paraVar);
+    }
 }
 
 bool Fun::match(std::vector<Var*>& paraVar)
@@ -833,7 +849,11 @@ Fun* SymTab::getFun(std::string name, std::vector<Var*>& args)
 {
     if(funTab.find(name) != funTab.end()){
         Fun* last = funTab[name];
-        if(last->match(args)){
+        if(last->hasVarArg()){
+            // 具有可变参数的函数不检查参数是否匹配
+            return last;
+        }
+        else if(last->match(args)){
             return last;
         }
         else{

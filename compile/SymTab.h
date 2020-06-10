@@ -131,6 +131,7 @@ public:
     int getPtrLevel();
 
     bool getExtern();
+    bool hasVarArg();
     void setExtern(bool isExtern);
     Symbol getType();
     std::string getName();
@@ -145,6 +146,7 @@ public:
 
 private:
     bool externed;                  // 是否有extern声明
+    bool vararg;                    // 是否包含可变参数
     Symbol type;                    // 返回类型
     int ptrLevel;                   // 指针等级
     std::string name;               // 函数名

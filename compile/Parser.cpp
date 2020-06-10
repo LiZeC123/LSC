@@ -317,16 +317,23 @@ Var* Parser::paradatatail(Symbol s,string name,int ptrLevel)
 }
 
 
-// <paralist> -> ,<paradata><paralist>
+// <paralist> -> ,<type><paradata><paralist> | , ...
 // <paralist> -> e
 void Parser::paralist(std::vector<Var*>& para)
 {
     if(match(COMMA)){
-        Symbol s = type();
-        Var* var = paradata(s);
-        symtab.addVar(var);
-        para.push_back(var);
-        paralist(para);
+        if(FIRST_TYPE){
+            Symbol s = type();
+            Var* var = paradata(s);
+            symtab.addVar(var);
+            para.push_back(var);
+            paralist(para);
+        } else if(match(POINT) && match(POINT) && match(POINT)) {
+            Var* var = new Var();
+            var->setName("<vararg>");
+            symtab.addVar(var);
+            para.push_back(var);
+        }
     }
 }
 
