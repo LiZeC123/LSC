@@ -366,7 +366,8 @@ void InterInst::toX86(InterCode* inst,FILE* file)
 	case OP_SET:
 		loadVar("eax","al",result,file);
 		loadVar("ebx","bl",arg1,file);	
-		emit("mov [ebx],eax");
+		//写入的时候, 根据数据的类型, 可能写入四字节(exa)或一字节(al)
+		emit("mov [ebx],%s", result->isChar() ? "al": "eax"); 
 		break;	
 	case OP_GET:
 		loadVar("eax","al",arg1,file);
