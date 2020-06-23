@@ -33,10 +33,10 @@ int lscp2i(int *point);
 
 int main(int argc, char* argv[]) 
 {
-    for(int i=0;i<argc;i++){
-        lscPrintStr(argv[i]);
-        lscPrintStr("\n");
-    }
-    return 0;
+    // for(int i=0;i<argc;i++){
+    //     lscPrintStr(argv[i]);
+    //     lscPrintStr("\n");
+    // }
+    // return 0;
 }
 
