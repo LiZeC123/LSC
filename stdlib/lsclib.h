@@ -23,6 +23,13 @@ char* lscmalloc(int size);
 void lscfree(char* addr);
 
 
+/**
+ * [函数名] lscp2i
+ * [效果] 将指针类型转化为数值类型
+ * [参数] point : 需要获得取值的指针
+ * [返回值] 指针的具体取值
+ */
+int lscp2i(int* point);
 
 // 考虑补充随机函数, 测试用例中应该考虑添加标准库的相关测试
 // 文件读取相关函数, 

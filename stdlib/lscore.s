@@ -73,3 +73,11 @@ lscfree:
     mov esp,ebp
 	pop ebp
 	ret
+global lscp2i
+lscp2i:
+	push ebp
+	mov ebp,esp
+	mov eax [ebp+8]		; 将输入的数据原样输出
+    mov esp,ebp
+	pop ebp
+	ret

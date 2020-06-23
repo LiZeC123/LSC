@@ -57,5 +57,9 @@ int main()
     TestBase();
     TestRead();
     testWrite();
+
+    // 添加对指针数组的测试
+
+
     return 0;
 }
