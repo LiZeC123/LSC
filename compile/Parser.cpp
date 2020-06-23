@@ -297,19 +297,17 @@ Var* Parser::paradata(Symbol s)
 Var* Parser::paradatatail(Symbol s,string name,int ptrLevel)
 {
     if(match(LBRACK)){
-        // 函数参数列表中的数组可以没有指定长度
-        // 所以不需要错误处理,并且以大于0数值作为初始值(否则,在写入符号表时会报错)
-        int len = 1;
+        // 函数参数列表中的数组可以没有指定长度, 即使指定长度也忽略
         if(firstIs(NUM)){
-            len = ((Num*)look)->val;
             move();
         }
 
         if(!match(RBRACK)){
             recovery(firstIs(COMMA),RBRACK_LOST,RBRACK_WRONG);
         }
-
-        return new Var(symtab.getScopePath(),false,s,ptrLevel,name,len);
+        // 由于数组作为参数传入函数时已经取地址, 因此这里再定义为数组类型, 否则访问时会再次取地址
+        // 定义成相应的指针类型即可
+        return new Var(symtab.getScopePath(),false,s,ptrLevel+1,name,nullptr);
     }
     else{
         return new Var(symtab.getScopePath(),false,s,ptrLevel,name,nullptr);
