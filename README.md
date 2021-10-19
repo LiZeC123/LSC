@@ -1,10 +1,12 @@
 Lsc Compiler Collection
 ==========================
-[![AUR](https://img.shields.io/aur/license/yaourt.svg)](https://github.com/LiZeC123/LSC/blob/master/LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com) 
-[![GitHub issues](https://img.shields.io/github/issues/LiZeC123/LSC.svg)](https://github.com/LiZeC123/LSC/issues)
-[![GitHub tag](https://img.shields.io/github/tag/LiZeC123/LSC.svg)](https://github.com/LiZeC123/LSC/tags)
-[![Build Status](https://api.travis-ci.org/LiZeC123/LSC.svg?branch=master)](https://travis-ci.org/LiZeC123/LSC)
+![](https://github.com/LiZeC123/LSC/actions/workflows/build-test.yml/badge.svg)
+![](https://img.shields.io/github/license/LiZeC123/LSC)
+![](https://img.shields.io/github/issues/LiZeC123/LSC)
+![](https://img.shields.io/github/v/tag/LiZeC123/LSC)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/LiZeC123/LSC)
+![GitHub last commit](https://img.shields.io/github/last-commit/LiZeC123/LSC)
+
 
 The Lsc Compiler Collection is the compiler system supporting lsc language, which includes compiler, assembler, linker for lsc, as well as libraies for this language(lscio, lsclib, ...). And lsc is a recursive acronym meaning of "LSC iS Compiler". 
 
