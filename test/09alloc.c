@@ -69,6 +69,7 @@ void TestCrossFunction()
     char* arr = AllocFunction();
     char *base = "abcdefghijklmnopqrstuvwxyz";
     checkStringEquals(arr, base, __LINE__);
+    lscfree(arr);
 }
 
 int main()

@@ -40,6 +40,11 @@ int main()
     int e = 983;
     int f = 283;
 
+    c = e - b - a;
+    d = e + b + a;
+    checkEquals(c, 342, __LINE__);
+    checkEquals(d, 1624, __LINE__);
+
     c = e + f * (a + b) - a + e / f;
     d = 983 + 283 * (155 + 486) - 155 + 983 / 283;
 
