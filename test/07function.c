@@ -41,6 +41,8 @@ void TestBase()
 {
     int f = f1();
     int g = f2(42, -1);
+    checkEquals(f, 42, __LINE__);
+    checkEquals(g, 1, __LINE__);
     checkEquals(f + g, 42 + 1, __LINE__);
 
     checkEquals(f3(0, 100, 2), 102, __LINE__);
@@ -156,7 +158,6 @@ int main()
     TestReturnPoint();
 
     TestRecursive();
-    
 
     return 0;
 }

@@ -18,9 +18,10 @@ void TestBase()
     lscfree(arr);
 }
 
+#define T_SIZE 1024
+
 void TestMany()
 {
-#define T_SIZE 1024
     char *arr[T_SIZE];
 
     for (int i = 0; i < T_SIZE; i++)
@@ -51,9 +52,29 @@ void TestMany()
     }
 }
 
+char* AllocFunction()
+{
+    char *arr = lscmalloc(SIZE + 2);
+    for (int i = 0; i < SIZE; i++)
+    {
+        arr[i] = 'a' + i;
+    }
+    arr[SIZE] = '\0';
+    return arr;
+}
+
+void TestCrossFunction()
+{
+    // 测试离开作用域后内存是否能够使用
+    char* arr = AllocFunction();
+    char *base = "abcdefghijklmnopqrstuvwxyz";
+    checkStringEquals(arr, base, __LINE__);
+}
+
 int main()
 {
     TestBase();
     TestMany();
+    TestCrossFunction();
     return 0;
 }
