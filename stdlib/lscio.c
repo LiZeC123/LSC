@@ -80,9 +80,35 @@ void lscint2str(char *buf, int i)
     buf[idx] = '\0';
 }
 
+void lscpointer2str(int value, char* buf)
+{
+    buf[0] = '0';
+    buf[1] = 'x';
+    for (int i = 0; i < 8; i++)
+    {
+        int v = value % 16;
+        char c;
+        if( v < 10) {
+            c = '0' + v;
+        } else {
+            c = 'a' + (v - 10);
+        }
+        buf[9 - i] = c;
+        value = value / 16;
+    }
+    buf[10] = '\0';
+}
+
 void lscPrintInt(int n)
 {
     char buf[12];
     lscint2str(buf, n);
+    lscPrintStr(buf);
+}
+
+void lscPrintPointer(char* p)
+{
+    char buf[12];
+    lscpointer2str((int)p, buf);
     lscPrintStr(buf);
 }

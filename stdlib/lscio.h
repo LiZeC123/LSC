@@ -37,6 +37,14 @@ void lscPrintStr(char* str);
 void lscPrintInt(int n);
 
 /**
+ * [函数名] lscPrintPointer
+ * [效果] 向标准输出写入一个地址值
+ * [参数] n    : 待输出的地址
+ * [返回值] 无 
+ */
+void lscPrintPointer(char* p);
+
+/**
  * [函数名] lscReadInt
  * [效果] 从标准输入读取一个数字
  * [返回值] 读取到的数字
@@ -61,3 +69,13 @@ int lscstr2int(char* buf,int maxLen);
  * [返回值] 无 
  */
 void lscint2str(char* buf,int n);
+
+
+/**
+ * [函数名] lscint2str
+ * [效果] 将数字转化为16进制地址值
+ * [参数] buf  : 存放数字转换后的字符串
+ * [参数] n    : 待转换的数字
+ * [返回值] 无 
+ */
+void lscpointer2str(int value, char* buf);

@@ -15,7 +15,28 @@ lscPrintInt:
 	push eax
 	call lscPrintStr
 	add esp,4
-.L84:
+.L112:
+	mov esp,ebp
+	pop ebp
+	ret
+global lscPrintPointer
+lscPrintPointer:
+	push ebp
+	mov ebp,esp
+	sub esp,52
+	mov eax,[ebp+8]
+	mov [ebp-52],eax
+	lea eax,[ebp-48]
+	push eax
+	mov eax,[ebp-52]
+	push eax
+	call lscpointer2str
+	add esp,8
+	lea eax,[ebp-48]
+	push eax
+	call lscPrintStr
+	add esp,4
+.L113:
 	mov esp,ebp
 	pop ebp
 	ret
@@ -315,6 +336,147 @@ lscint2str:
 	mov ebx,[ebp-68]
 	mov [ebx],al
 .L38:
+	mov esp,ebp
+	pop ebp
+	ret
+global lscpointer2str
+lscpointer2str:
+	push ebp
+	mov ebp,esp
+	sub esp,68
+	mov eax,0
+	mov ebx,1
+	imul ebx
+	mov [ebp-4],eax
+	mov eax,[ebp+12]
+	mov ebx,[ebp-4]
+	add eax,ebx
+	mov [ebp-8],eax
+	mov eax,[ebp-8]
+	mov eax,[eax]
+	mov [ebp-12],al
+	mov eax,0
+	mov al,48
+	mov ebx,[ebp-8]
+	mov [ebx],al
+	mov eax,1
+	mov ebx,1
+	imul ebx
+	mov [ebp-16],eax
+	mov eax,[ebp+12]
+	mov ebx,[ebp-16]
+	add eax,ebx
+	mov [ebp-20],eax
+	mov eax,[ebp-20]
+	mov eax,[eax]
+	mov [ebp-24],al
+	mov eax,0
+	mov al,120
+	mov ebx,[ebp-20]
+	mov [ebx],al
+	mov eax,0
+	mov [ebp-28],eax
+.L91:
+	mov eax,[ebp-28]
+	mov ebx,8
+	mov ecx,0
+	cmp eax,ebx
+	setl cl
+	mov [ebp-32],ecx
+	mov eax,[ebp-32]
+	cmp eax,0
+	je .L92
+	jmp .L94
+.L95:
+	mov eax,[ebp-28]
+	mov [ebp-36],eax
+	mov eax,[ebp-28]
+	mov ebx,1
+	add eax,ebx
+	mov [ebp-28],eax
+	jmp .L91
+.L94:
+	mov eax,[ebp+8]
+	mov ebx,16
+	mov edx,0
+	idiv ebx
+	mov [ebp-40],edx
+	mov eax,[ebp-40]
+	mov [ebp-44],eax
+	mov eax,[ebp-44]
+	mov ebx,10
+	mov ecx,0
+	cmp eax,ebx
+	setl cl
+	mov [ebp-52],ecx
+	mov eax,[ebp-52]
+	cmp eax,0
+	je .L99
+	mov eax,0
+	mov al,48
+	mov ebx,[ebp-44]
+	add eax,ebx
+	mov [ebp-56],eax
+	mov eax,[ebp-56]
+	mov [ebp-48],al
+	jmp .L101
+.L99:
+	mov eax,[ebp-44]
+	mov ebx,10
+	sub eax,ebx
+	mov [ebp-52],eax
+	mov eax,0
+	mov al,97
+	mov ebx,[ebp-52]
+	add eax,ebx
+	mov [ebp-56],eax
+	mov eax,[ebp-56]
+	mov [ebp-48],al
+.L101:
+	mov eax,9
+	mov ebx,[ebp-28]
+	sub eax,ebx
+	mov [ebp-52],eax
+	mov eax,[ebp-52]
+	mov ebx,1
+	imul ebx
+	mov [ebp-56],eax
+	mov eax,[ebp+12]
+	mov ebx,[ebp-56]
+	add eax,ebx
+	mov [ebp-60],eax
+	mov eax,[ebp-60]
+	mov eax,[eax]
+	mov [ebp-64],al
+	mov eax,0
+	mov al,[ebp-48]
+	mov ebx,[ebp-60]
+	mov [ebx],al
+	mov eax,[ebp+8]
+	mov ebx,16
+	mov edx,0
+	idiv ebx
+	mov [ebp-68],eax
+	mov eax,[ebp-68]
+	mov [ebp+8],eax
+	jmp .L95
+.L92:
+	mov eax,10
+	mov ebx,1
+	imul ebx
+	mov [ebp-28],eax
+	mov eax,[ebp+12]
+	mov ebx,[ebp-28]
+	add eax,ebx
+	mov [ebp-32],eax
+	mov eax,[ebp-32]
+	mov eax,[eax]
+	mov [ebp-36],al
+	mov eax,0
+	mov al,0
+	mov ebx,[ebp-32]
+	mov [ebx],al
+.L84:
 	mov esp,ebp
 	pop ebp
 	ret

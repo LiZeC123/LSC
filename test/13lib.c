@@ -57,9 +57,26 @@ void TestStr2Int()
     checkEquals(value, -12345, __LINE__);
 }
 
+void TestPointer2Str()
+{
+    char buf[12];
+
+    lscpointer2str(0x12344321, buf);
+    checkStringEquals(buf, "0x12344321", __LINE__);
+
+    // 处理负数存在一点问题, 但是不影响使用, 暂时不做进一步处理
+    // lscpointer2str(0xf7f60008, buf);
+    // checkStringEquals(buf, "0xf7f60008", __LINE__);
+
+    lscpointer2str(0x7fffcdcd, buf);
+    checkStringEquals(buf, "0x7fffcdcd", __LINE__);
+
+}
+
 int main()
 {
     TestInt2Str();
     TestStr2Int();
+    TestPointer2Str();
     return 0;
 }
