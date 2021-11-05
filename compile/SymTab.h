@@ -51,6 +51,7 @@ public:
     bool isRef();           // 是否是引用
     bool isChar();          // 是否是字符类型
     //bool isConst();         // 是否是常量
+    bool isCastType();      // 是否为强制类型转换标志
     bool notConst();        // 是否不是常量
     bool getArray();        // 是否是数组
     bool getIsPtr();        // 是否是指针类型
@@ -71,6 +72,9 @@ public:
     void setPoint(Var* ptr);
     void setOffset(int offset);
     void setPtrLevel(int level);
+    
+    void setCast(bool isCast);
+    void cast(Var* castype);
 
     void value();
     void printSelf();
@@ -85,6 +89,7 @@ private:
     std::string name;               // 变量名
     //bool isPtr;                     // 是否是指针
     bool isArray;                   // 是否是数组
+    bool isCast;                    // 是否为强制类型转换标志
     int arraySize;                  // 数组长度
     bool isLeft;                    // 是否是左值
 

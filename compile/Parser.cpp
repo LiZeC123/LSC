@@ -813,7 +813,8 @@ Symbol Parser::lop()
     return op;
 }
 
-// <val>    -> <elem><rop>       
+// <val>    -> <elem><rop> 
+// <val>    -> <elem><expr> 强制类型转换   
 Var* Parser::val()
 {
     Var* val = elem();
@@ -821,6 +822,11 @@ Var* Parser::val()
     if(firstIs(INC)_OR_(DEC)){
         op = rop();
         return ir.genOneRightOp(val,op);
+    }
+
+    if(val->isCastType() && (FIRST_EXPR)) {
+        Var* rval = expr();
+        return ir.genCastOp(val, rval);
     }
 
     return val;
@@ -835,7 +841,7 @@ Symbol Parser::rop()
 }
 
 // <elem>   -> <ID><idexpr>
-// <elem>   -> ( <expr> )
+// <elem>   -> ( <expr> ) | ( <castype> )
 // <elem>   -> <literal>
 Var* Parser::elem()
 {
@@ -846,7 +852,11 @@ Var* Parser::elem()
         val = idexpr(name);
     }
     else if(match(LPAREN)){
-        val = expr();
+        if(FIRST_TYPE) {
+            val = castype();
+        } else {
+            val = expr();
+        }
         
         if(!match(RPAREN)){
             recovery(LVAL_OP,RPAREN_LOST,RPAREN_WRONG);
@@ -857,6 +867,22 @@ Var* Parser::elem()
     }
 
     return val;
+}
+
+// <castype> -> <type> <mulss>
+Var* Parser::castype()
+{
+    Symbol s = type();
+    int ptrLevel = 0;
+    while(match(MUL)) {
+        ptrLevel++;
+    }
+
+    Var* type = new Var();
+    type->setType(s);
+    type->setPtrLevel(ptrLevel);
+    type->setCast(true);
+    return type;
 }
 
 // <idexpr> -> [ <expr> ] | ( <realarg> ) | e

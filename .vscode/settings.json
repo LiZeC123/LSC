@@ -55,6 +55,7 @@
         "memory_resource": "cpp",
         "optional": "cpp",
         "set": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "00testhelper.h": "c"
     }
 }

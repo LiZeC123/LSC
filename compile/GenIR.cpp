@@ -408,6 +408,14 @@ Var* GenIR::genOneLeftOp(Symbol op,Var* val)
     return val;
 }
 
+Var* GenIR::genCastOp(Var* castype, Var* val)
+{
+    // 复制表达式对应变量并转化为需要的类型
+    Var* tmp = genCopy(val);
+    tmp->cast(castype);
+    return tmp;
+}
+
 Var* GenIR::genOneRightOp(Var* val,Symbol op)
 {
     if(!val){

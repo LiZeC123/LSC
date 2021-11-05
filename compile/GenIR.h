@@ -23,6 +23,7 @@ public:
 
     Var* genTwoOp(Var* lval,Symbol op,Var* rval);
     Var* genOneLeftOp(Symbol op,Var* val);
+    Var* genCastOp(Var* castype, Var* val);
     Var* genOneRightOp(Var* val,Symbol op);
     Var* genArray(Var* array,Var* index);
     void genArrayInit(Var* array, std::vector<Var*> arrVal);

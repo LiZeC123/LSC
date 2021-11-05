@@ -83,6 +83,7 @@ private:
     Symbol muls();
     Var* factor();
     Symbol lop();
+    Var* castype();
     Var* val();
     Symbol rop();
     Var* elem();

@@ -161,6 +161,7 @@ void Var::baseInit()
     ptr = nullptr;
     size = 0;
     offset = 0;
+    isCast = false;
 }
 
 string Var::getName()
@@ -274,6 +275,11 @@ bool Var::isChar()
     return (type == KW_CHAR) && isBase();
 }
 
+bool Var::isCastType()
+{
+    return isCast;
+}
+
 // bool Var::isConst()
 // {
 //     return literal && isBase();
@@ -381,6 +387,17 @@ void Var::setOffset(int offset)
 void Var::setPtrLevel(int level)
 {
     this->ptrLevel = level;
+}
+
+void Var::setCast(bool isCast)
+{
+    this->isCast = isCast;
+}
+
+void Var::cast(Var* castype)
+{
+    this->setType(castype->type);
+    this->setPtrLevel(castype->ptrLevel);
 }
 
 void Var::value()
