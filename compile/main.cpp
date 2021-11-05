@@ -42,12 +42,14 @@ void printTables(Args args,SymTab& tab)
         printf("\n变量表内容如下:\n");
         tab.printValTab();
     }
-    else if(args.printFunTab){
-        printf("函数表内容如下:\n");
+
+    if(args.printFunTab){
+        printf("\n函数表内容如下:\n");
         tab.printFunTab();
     }
-    else if(args.printStrTab){
-        printf("字符串表内容如下:\n");
+
+    if(args.printStrTab){
+        printf("\n字符串表内容如下:\n");
         tab.printStrTab();
     }
 }
