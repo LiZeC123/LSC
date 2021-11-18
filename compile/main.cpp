@@ -12,6 +12,7 @@ public:
     bool printFunTab = false;
     bool printStrTab = false;
     bool printToken  = false;
+    bool printStats  = false;
 };
 
 Args analyseOptions(int argc, char* argv[])
@@ -30,6 +31,9 @@ Args analyseOptions(int argc, char* argv[])
         }
         else if(option == "--printTokenStream"){
             args.printToken = true;
+        }
+        else if(option == "--stat") {
+            args.printStats = true;
         }
     }
 
@@ -116,11 +120,11 @@ int main(int argc,char* argv[])
     // 生成汇编代码文件
     genFile(filename,tab);
 
-    if(err.getErrorNum() > 0){
+    if(err.getErrorNum() > 0 && args.printStats){
         printf("\n编译完成!\n");
-        printf("%d 错误 %d 警告\n",err.getErrorNum(),err.getWarnNum());
+        printf("%d 错误 %d 警告\n",err.getErrorNum(), err.getWarnNum());
     }
     
-    return 0;
+    return err.getErrorNum() + err.getWarnNum();
 }
 

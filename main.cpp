@@ -114,7 +114,11 @@ void execCmd(const string& path, const string& cmd, const string& file)
 {
 	static char cmdBuf[2048];
 	sprintf(cmdBuf, "%s%s %s", path.c_str(),cmd.c_str(),file.c_str());
-	system(cmdBuf);
+	int v = system(cmdBuf);
+	if( v != 0 ) {
+		printf("执行:%s 返回值为%d, 终止编译过程.", cmdBuf, WEXITSTATUS(v));
+		exit(0);
+	}
 
 #ifdef __LSC_DEBUG__
 	printf("Run Shell Command -> %s\n",cmdBuf);
@@ -123,7 +127,7 @@ void execCmd(const string& path, const string& cmd, const string& file)
 
 void printVersionInfo()
 {
-	printf("Lsc %s (on %s,%s)\n", __LSC_VERSION__,__DATE__, __TIME__);
+	printf("Lsc %s (on %s, %s)\n", __LSC_VERSION__,__DATE__, __TIME__);
 	printf("[GCC %d.%d.%d] on Ubuntu\n",__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__);
 	printf("\n");
 	printf("Lsc iS Compiler!\n");
