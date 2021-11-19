@@ -7,6 +7,43 @@
 #include "InterInst.h"
 #include "GenIR.h"
 
+class Type
+{
+public:
+    // 创建一个表示基本类型的Type
+    Type(Symbol s);
+
+    // 创建一个表示结构体类型的Type
+    Type(std::string structName);
+
+    // 总体上替换原本的Symbol即可, 但是在数据生成方面可能需要再考虑考虑如何处理
+private:
+    Symbol type;
+    std::string name;
+};
+
+
+class StructTab
+{
+    // 肯定是有一个 结构体表 来存储结构体的基本信息的
+    // 变量需要持有一个结构体类型的引用, 结构体表中也要有相应的数据
+
+    // map<Type, 成员列表>
+    // 因为Var变量具有类型，变量名，偏移值，所以可以记录成员变量
+};
+
+// 变量  值 类型
+//
+// 变量： 类型， 值指针， 是否外部
+// 值： 类型，数值
+// 类型： 数据类型， 指针等级， 是否数组
+// 表示字面量的部分肯定是最容易拆分出来的，但是重构过程可以后续在做
+
+// 因为结构体可以嵌套， 所以不适合放入type中分析，否则无法判断当前是定义阶段还是使用阶段
+// 或者就不检查有没有定义，反正指针类型不影响内存分配，等定义完成，类型也有了
+
+// 数组生成了什么代码，数组的长度有什么作用?
+
 class Var
 {
 public:
@@ -39,8 +76,8 @@ public:
     Var* getInitData();
     std::vector<Var*>& getInitArray();
     int getOffset();
-    Var* getStep();         // 获得相应的变量长度,并返回一个表示该长度的特殊整数变量
-    Var* getPointer();      // 获得当前变量对应的指针
+    Var* getStep();         // 获得++操作实际需要移动的长度， 返回一个表示该长度的特殊整数变量
+    Var* getPointer();      // 获得当前的指针变量对应的实际变量
     int getPtrLevel();      // 获得指针等级
     string getPtrVal();     // 获得初始值变量
     string getStrVal();     // 获得初始字符串的值

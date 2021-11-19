@@ -23,8 +23,9 @@ typedef enum {
     KW_SWITCH,KW_CASE,KW_DEFAULT,   //swicth-case-deault
     KW_WHILE,KW_DO,KW_FOR,          //循环
     KW_BREAK,KW_CONTINUE,KW_RETURN, //break,continue,return
-    MACRO,                          //宏标记
-    BUILD_MACRO,KW_INCLUDE,KW_DEFINE//预定义宏,include,define
+    MACRO, BUILD_MACRO,             //宏标记, 预定义宏
+    KW_INCLUDE,KW_DEFINE,           //include,define
+    KW_STRUCT,                      //struct
 } Symbol;
 
 // 所有的词法错误码

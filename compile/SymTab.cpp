@@ -201,6 +201,8 @@ int Var::getOffset()
 
 Var* Var::getStep()
 {
+    // t->getStep() ==> sizeof(*t) 所以指针等级要降低
+    // 对于基础类型，这个就表示+1，对于指针类型，对应实际类型的长度
     int level = this->ptrLevel+this->getArray();
     if(this->isBase()){
         return SymTab::one;

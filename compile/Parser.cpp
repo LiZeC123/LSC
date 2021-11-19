@@ -82,6 +82,7 @@ void Parser::segment()
 }
 
 // <type>    -> int | void | char 
+//           -> struct <ident>
 Symbol Parser::type()
 {
     Symbol temp = KW_INT;
@@ -89,6 +90,15 @@ Symbol Parser::type()
         temp = look->sym;
         move();
         return temp;
+    } else if(match(KW_STRUCT)) {
+        if(firstIs(IDENT)) {
+          string structName = ((ID*)look)->name;
+          move();
+          // 由于自定义类型, 因此不能返回Symbol, 可以加入一个新的类, 表示类型, 例如Type
+        } else {
+            //recover 给定了struct关键字,但是没有给定后续ID的情况, 需要额外处理左大括号的情况, 因为不支持匿名结构体
+        }
+        return KW_INT;
     }
     else{
         recovery(firstIs(MUL)_OR_(IDENT),TYPE_LOST,TYPE_WRONG);
@@ -96,7 +106,7 @@ Symbol Parser::type()
     }
 }
 
-// <def>   ->  <ID><idtail>
+// <def>   ->  <mulss><ID><idtail>
 // <mulss> ->  * <mulss>
 // <mulss> -> e
 void Parser::def(bool isExtern,Symbol s)
@@ -117,8 +127,9 @@ void Parser::def(bool isExtern,Symbol s)
     idtail(isExtern,s,ptrLevel,name);
 }
 
-// <idtail>  -> <defvar><deflist>
-// <idtail>  -> ( <para> ) <funtail>
+// <idtail>  -> ( <para> ) <funtail>    # 函数声明 / 函数调用
+//           -> { <memberlist> };       # 结构体定义
+//           -> <defvar><deflist>       # 变量声明
 void Parser::idtail(bool isExtern,Symbol s,int ptrLevel,std::string name)
 {
     if(match(LPAREN)){
@@ -132,8 +143,9 @@ void Parser::idtail(bool isExtern,Symbol s,int ptrLevel,std::string name)
         Fun* fun = new Fun(isExtern,s,ptrLevel,name,paraList);
         funtail(fun);
         symtab.leave();
-    }
-    else{
+    } else if (match(LBRACE)) {
+        //TODO: 创建并记录成员变量表
+    } else {
         Var* var = defvar(isExtern,s,ptrLevel,name);
         symtab.addVar(var);
 

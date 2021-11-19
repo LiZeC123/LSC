@@ -56,6 +56,8 @@
         "optional": "cpp",
         "set": "cpp",
         "string_view": "cpp",
-        "00testhelper.h": "c"
+        "00testhelper.h": "c",
+        "random": "cpp",
+        "00testhelper_std.h": "c"
     }
 }
