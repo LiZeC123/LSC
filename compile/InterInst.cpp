@@ -31,7 +31,8 @@ const char* OPNameTable[] =
 	"OP_PROC",                                
 	"OP_CALL",                                
 	"OP_RET",                               
-	"OP_RETV"                    
+	"OP_RETV",
+	"OP_ACCESS"                    
 };
 
 void InterInst::init()
@@ -374,6 +375,12 @@ void InterInst::toX86(InterCode* inst,FILE* file)
 		emit("mov eax,[eax]");
 		storeVar("eax","al",result,file);
 		break;
+	case OP_ACCESS:
+		leaVar("eax",arg1,file);
+		loadVar("ebx", "bl", arg2, file);
+		emit("add eax, ebx");
+		storeVar("eax","al",result,file);
+		break;
 	}
 }
 
@@ -420,6 +427,7 @@ void InterInst::printSelf()
 		case OP_LEA:result->value();printf(" = ");printf("&");arg1->value();break;
 		case OP_SET:printf("*");arg1->value();printf(" = ");result->value();break;
 		case OP_GET:result->value();printf(" = ");printf("*");arg1->value();break;
+		case OP_ACCESS:result->value();printf(" = ");arg1->value();printf("->");arg2->value();break;
 	}
 	printf("\n");
 }

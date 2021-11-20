@@ -6,7 +6,10 @@
 class SymTab;
 class Var;
 class Fun;
+class Type;
+class Struct;
 class InterInst;
+
 class GenIR
 {
 public:
@@ -28,6 +31,7 @@ public:
     Var* genArray(Var* array,Var* index);
     void genArrayInit(Var* array, std::vector<Var*> arrVal);
     Var* genCall(Fun* fun, std::vector<Var*>& args);
+    Var* genOffset(Var* base, Type* member, int offset);
 
     void genIfHead(Var* cond,InterInst*& _else);
     void genIfTail(InterInst*& _else);

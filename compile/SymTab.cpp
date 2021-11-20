@@ -96,6 +96,37 @@ void Type::defStruct(std::string name, std::vector<Var*> members)
     }
 }
 
+Struct* Type::getStruct(std::string name)
+{
+    if(structTab.find(name) != structTab.end()) {
+        return  structTab[name];
+    } else {
+        return nullptr;
+    }
+}
+
+int Type::getOffset(Type* base, std::string member)
+{
+    
+    string name = base->getName();
+    if(structTab.find(name) != structTab.end()) {
+        return structTab[name]->getOffset(member);
+    }
+    //TODO: 检查是否为结构体类, 并适当处理
+    throw runtime_error("Get Offset Of Undefined Type. Base=" + name + "member="+member);
+}
+
+Type* Type::getMemberType(Type* base, std::string member)
+{
+    string name = base->getName();
+    if(structTab.find(name) != structTab.end()) {
+        return structTab[name]->getMemberType(member);
+    }
+    //TODO: 检查是否为结构体类, 并适当处理
+    throw runtime_error("Get Offset Of Undefined Type. Base=" + name + "member="+member);
+}
+
+
 void Type::printStruct()
 {
     for (auto it=structTab.begin(); it!=structTab.end(); it++) {
@@ -109,6 +140,7 @@ void Type::printStruct()
 Struct::Struct(std::vector<Var*> members)
 {
     for(auto v: members){
+        //TODO: 同名变量检查
         this->addVar(v);
     }
     size += (4 - size % 4) % 4;
@@ -118,6 +150,29 @@ int Struct::getSize()
 {
     return size;
 }
+
+int Struct::getOffset(string name)
+{
+    for(Var* v: members) {
+        if(v->getName() == name) {
+            return v->getOffset();
+        }
+    }
+
+    throw runtime_error("Get Unknown Offset: " + name);
+}
+
+Type* Struct::getMemberType(std::string name)
+{
+    for(Var* v: members) {
+        if(v->getName() == name) {
+            return v->getType();
+        }
+    }
+
+    throw runtime_error("Get Unknown Type: " + name);
+}
+
 
 void Struct::printSelf()
 {

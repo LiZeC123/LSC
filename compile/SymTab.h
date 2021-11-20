@@ -8,14 +8,19 @@
 #include "GenIR.h"
 
 
+class Struct;
+class Type;
 class Var;
+class Fun;
+
 
 class Struct
 {
 public:
     Struct(std::vector<Var*> members);
     int getSize();
-
+    int getOffset(std::string name);
+    Type* getMemberType(std::string name);
     void printSelf();
 private:
     void addVar(Var* member);
@@ -46,6 +51,9 @@ public:
     // 结构体管理
     static void decStruct(std::string structName);
     static void defStruct(std::string structName, std::vector<Var*> members);
+    static Struct* getStruct(std::string name);
+    static int getOffset(Type* base, std::string member);
+    static Type* getMemberType(Type* base, std::string member);
     static void printStruct();
 private:
     Symbol type;

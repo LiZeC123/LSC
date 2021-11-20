@@ -141,6 +141,8 @@ Var* GenIR::genLea(Var* val)
     }
 
     if(val->isRef()){
+        // 如果val是Ref,则说明val相当于是一个执行了取指针值的变量(*p)
+        // 那么对这种变量取地址就等价于直接取里面存储的指针,即 &(*p) ==> p
         return val->getPointer();
     }
     else{
@@ -496,6 +498,21 @@ Var* GenIR::genCall(Fun* fun, std::vector<Var*>& args)
         symtab.addVar(ret); // 将返回值的声明延迟到函数调用以后 TODO: why?
         return ret;
     }
+}
+
+Var* GenIR::genOffset(Var* base, Type* member, int offset)
+{
+    if(!base || offset < 0) {
+        return nullptr;
+    }
+
+    Var* tmp = new Var(symtab.getScopePath(), base);
+    symtab.addInst(new InterInst(OP_ACCESS, tmp, base, new Var(offset)));
+    tmp->setType(member);
+    tmp->setPtrLevel(1);
+    symtab.addVar(tmp);
+
+    return genPtr(tmp);
 }
 
 void GenIR::genIfHead(Var* cond,InterInst*& _else)

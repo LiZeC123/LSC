@@ -864,7 +864,7 @@ Symbol Parser::lop()
 }
 
 // <val>    -> <elem><rop> 
-// <val>    -> <elem><expr> 强制类型转换   
+// <val>    -> <elem><expr>     # 强制类型转换   
 Var* Parser::val()
 {
     Var* val = elem();
@@ -935,7 +935,10 @@ Var* Parser::castype()
     return type;
 }
 
-// <idexpr> -> [ <expr> ] | ( <realarg> ) | e
+// <idexpr> -> [ <expr> ] 
+//          -> ( <realarg> ) 
+//          -> .<ID><elem>
+//          -> e
 Var* Parser::idexpr(string name)
 {
     Var* val = nullptr;
@@ -960,6 +963,20 @@ Var* Parser::idexpr(string name)
         }
         Fun* fun = symtab.getFun(name,args);
         return ir.genCall(fun,args);
+    }
+    else if(firstIs(POINT)) {
+        //TODO: 箭头符号
+        Var* base = symtab.getVal(name);
+        int offset = 0;
+        Type* baseType = base->getType();
+        while(match(POINT)) {
+            string member = ((ID*)look)->name;
+            move();
+            offset += Type::getOffset(baseType, member);
+            baseType = Type::getMemberType(baseType, member);
+        }
+
+        return ir.genOffset(base, baseType, offset);
     }
     else{
         // 没有其他后缀,是普通的变量

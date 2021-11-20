@@ -1,4 +1,4 @@
-// #include "00testhelper.h"
+#include "00testhelper.h"
 
 struct Point2D
 {
@@ -24,12 +24,29 @@ struct StructA
 };
 
 
+struct LinkedNode
+{
+    int data;
+    struct LinkedNode *next;
+};
+
+struct TreeNode
+{
+    int value;
+    struct TreeNode *left;
+    struct TreeNode *right;
+};
+
 
 int main(int argc, char *argv)
 {
-    // struct Point2D p2d;
-    // struct Point3D p3d;
-    // int x;
+    struct Point2D p2d;
+    p2d.x = 3;
+    p2d.y = 4;
+    int x = p2d.x;
+    int y = p2d.y;
+    int abs = p2d.x * p2d.x + p2d.y * p2d.y;
+    lscPrintInt(abs);
     return 0;
 }
 
@@ -74,15 +91,3 @@ int main(int argc, char *argv)
 // 翻转二叉树并比对结果是否一致
 // 层序输出二叉树
 
-// struct LinkedNode
-// {
-//     int data;
-//     struct LinkedNode *next;
-// };
-
-// struct TreeNode
-// {
-//     int value;
-//     struct TreeNode *left;
-//     struct TreeNode *right;
-// };

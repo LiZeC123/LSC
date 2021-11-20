@@ -144,7 +144,8 @@ enum Operator
 	OP_PROC,                                //调用过程 
 	OP_CALL,                                //调用函数 
 	OP_RET,                                 //直接返回
-	OP_RETV                                 //带数据返回 
+	OP_RETV,                                //带数据返回 
+    OP_ACCESS,                              //结构体访问操作
 };
 
 #endif // COMMON_H
