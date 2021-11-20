@@ -77,39 +77,41 @@ void Parser::program()
 void Parser::segment()
 {
     bool isExtern = match(KW_EXTERN);
-    Symbol s = type();
+    Type* s = type();
     def(isExtern,s);
 }
 
 // <type>    -> int | void | char 
 //           -> struct <ident>
-Symbol Parser::type()
+Type* Parser::type()
 {
-    Symbol temp = KW_INT;
     if(FIRST_TYPE){
-        temp = look->sym;
+        Symbol t = look->sym;
         move();
-        return temp;
+        return new Type(t);
     } else if(match(KW_STRUCT)) {
         if(firstIs(IDENT)) {
-          string structName = ((ID*)look)->name;
-          move();
-          // 由于自定义类型, 因此不能返回Symbol, 可以加入一个新的类, 表示类型, 例如Type
+            string structName = ((ID*)look)->name;
+            move();
+            return new Type(structName);
         } else {
-            //recover 给定了struct关键字,但是没有给定后续ID的情况, 需要额外处理左大括号的情况, 因为不支持匿名结构体
+            // 如果是*, 说明声明变量是缺少了结构体类型
+            // 如果是{. 说明声明结构体时缺少了结构体名, 而目前不支持匿名结构体
+            recovery(firstIs(MUL)_OR_(LBRACE),TYPE_LOST,TYPE_WRONG);
         }
-        return KW_INT;
     }
     else{
         recovery(firstIs(MUL)_OR_(IDENT),TYPE_LOST,TYPE_WRONG);
-        return KW_INT;  // 错误情况,返回int
+        
     }
+
+    return nullptr;  
 }
 
 // <def>   ->  <mulss><ID><idtail>
 // <mulss> ->  * <mulss>
 // <mulss> -> e
-void Parser::def(bool isExtern,Symbol s)
+void Parser::def(bool isExtern, Type* s)
 {
     int ptrLevel = 0;
     while(match(MUL)){
@@ -124,13 +126,13 @@ void Parser::def(bool isExtern,Symbol s)
     else{
         recovery(firstIs(SEMICON)_OR_(ASSIGN)_OR_(COMMA), ID_LOST,ID_WRONG);
     }
-    idtail(isExtern,s,ptrLevel,name);
+    idtail(isExtern, s, ptrLevel, name);
 }
 
 // <idtail>  -> ( <para> ) <funtail>    # 函数声明 / 函数调用
 //           -> { <memberlist> };       # 结构体定义
 //           -> <defvar><deflist>       # 变量声明
-void Parser::idtail(bool isExtern,Symbol s,int ptrLevel,std::string name)
+void Parser::idtail(bool isExtern, Type* s, int ptrLevel, string name)
 {
     if(match(LPAREN)){
         symtab.enter();
@@ -140,11 +142,13 @@ void Parser::idtail(bool isExtern,Symbol s,int ptrLevel,std::string name)
             recovery(firstIs(LBRACE)_OR_(SEMICON),RPAREN_LOST,RPAREN_WRONG);
         }
         // 创建函数
-        Fun* fun = new Fun(isExtern,s,ptrLevel,name,paraList);
+        Fun* fun = new Fun(isExtern, s, ptrLevel, name, paraList);
         funtail(fun);
         symtab.leave();
     } else if (match(LBRACE)) {
         //TODO: 创建并记录成员变量表
+
+
     } else {
         Var* var = defvar(isExtern,s,ptrLevel,name);
         symtab.addVar(var);
@@ -155,7 +159,7 @@ void Parser::idtail(bool isExtern,Symbol s,int ptrLevel,std::string name)
 
 // <defvar> -> [ <NUM> ] <initArray>
 // <defvar> -> <init>
-Var* Parser::defvar(bool isExtern,Symbol s,int ptrLevel,std::string name)
+Var* Parser::defvar(bool isExtern, Type* s, int ptrLevel, string name)
 {
     if(match(LBRACK)){
         int len = 0;
@@ -182,7 +186,7 @@ Var* Parser::defvar(bool isExtern,Symbol s,int ptrLevel,std::string name)
 
 // <init>    -> = <expr> | = {<initlist>}
 // <init>    -> e
-Var* Parser::init(bool isExtern,Symbol s,int ptrLevel,std::string name)
+Var* Parser::init(bool isExtern, Type* s, int ptrLevel, string name)
 {
     Var* init = nullptr;
     if(match(ASSIGN)){
@@ -227,7 +231,7 @@ void Parser::initArraytail(std::vector<Var*>& initVals)
 
 // <deflist> -> ,<def>
 // <deflist> -> ;
-void Parser::deflist(bool isExtern,Symbol s)
+void Parser::deflist(bool isExtern, Type* s)
 {
     if(match(COMMA)){
         def(isExtern,s);
@@ -272,7 +276,7 @@ void Parser::para(std::vector<Var*>& para)
         return;
     }
     
-    Symbol s = type();
+    Type* s = type();
     Var* var = paradata(s);
     symtab.addVar(var);
     para.push_back(var);
@@ -283,7 +287,7 @@ void Parser::para(std::vector<Var*>& para)
 // <paradata> -> <mulss> <ID> <paradatatail>
 // <mulss> ->  * <mulss>
 // <mulss> -> e
-Var* Parser::paradata(Symbol s)
+Var* Parser::paradata(Type* s)
 {
     string name;
     int ptrLevel = 0;
@@ -306,7 +310,7 @@ Var* Parser::paradata(Symbol s)
 
 // <paradatatail> -> [ <num> ]
 // <paradatatail> -> e
-Var* Parser::paradatatail(Symbol s,string name,int ptrLevel)
+Var* Parser::paradatatail(Type* s,string name,int ptrLevel)
 {
     if(match(LBRACK)){
         // 函数参数列表中的数组可以没有指定长度, 即使指定长度也忽略
@@ -333,7 +337,7 @@ void Parser::paralist(std::vector<Var*>& para)
 {
     if(match(COMMA)){
         if(FIRST_TYPE){
-            Symbol s = type();
+            Type* s = type();
             Var* var = paradata(s);
             symtab.addVar(var);
             para.push_back(var);
@@ -386,8 +390,8 @@ void Parser::subprogram()
 void Parser::localdef()
 {
     string name;
-    Symbol s = type();
-    def(false,s);
+    Type* s = type();
+    def(false, s);
 }
 
 // <statement> -> <altexpr>;
@@ -884,7 +888,7 @@ Var* Parser::elem()
 // <castype> -> <type> <mulss>
 Var* Parser::castype()
 {
-    Symbol s = type();
+    Type* s = type();
     int ptrLevel = 0;
     while(match(MUL)) {
         ptrLevel++;

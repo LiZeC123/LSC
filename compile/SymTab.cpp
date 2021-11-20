@@ -1,23 +1,86 @@
-#include "SymTab.h"
-#include "Error.h"
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include <assert.h>
+#include "SymTab.h"
+#include "Error.h"
+
 using namespace std;
-
-
-// 引用Token.cpp中的符号数组,用于打印符号名
-extern const char * tokenName[];
 
 Var* SymTab::varVoid = nullptr;
 Var* SymTab::one = nullptr;
 Var* SymTab::four = nullptr;
 
+Type::Type(Symbol s)
+{
+    if(s == KW_INT || s == KW_CHAR || s== KW_VOID) {
+        this->type = s;
+    } else {
+        throw runtime_error("UnKnow Type Symbol: " + s);
+    }
+}
+
+Type::Type(std::string structName)
+{
+    this->type = KW_STRUCT;
+    this->name = structName;
+}
+
+bool Type::isBaseType()
+{
+    return !isStructType();
+}
+
+bool Type::isStructType()
+{
+    return this->type == KW_STRUCT;
+}
+
+Symbol Type::getType()
+{
+    return type;
+}
+
+string Type::getName()
+{
+    return name;
+}
+
+int Type::getSize()
+{
+    if(type == KW_INT) {
+        return 4;
+    } else if(type == KW_CHAR) {
+        return 1;
+    } else if (type == KW_VOID) {
+        // TODO: void 类型没有大小, 需要报错
+        throw runtime_error("Void Type Cannot Get Size");
+    } else {
+        //TODO: 结构体计算大小
+        throw runtime_error("Struct Type Cannot Get Size");
+    }
+}
+
+string Type::getShowName()
+{
+    if(type == KW_INT) {
+        return "int";
+    } else if(type == KW_CHAR) {
+        return "char";
+    } else if(type == KW_VOID) {
+        return "void";
+    } else {
+        return "struct " + name;
+    }
+}
+
+
+
 Var::Var()
 {
     baseInit();
     literal = false;
-    type = KW_VOID;
+    type = new Type(KW_VOID);
     name = "<void>";
     isLeft = false;
     intVal = 0;
@@ -33,17 +96,17 @@ Var::Var(Token *literal)
     switch (literal->sym)
     {
     case NUM:
-        setType(KW_INT);
+        setType(new Type(KW_INT));
         name = "<int>";
         intVal = ((Num*)literal)->val;
         break;
     case CH:
-        setType(KW_CHAR);
+        setType(new Type(KW_CHAR));
         name = "<char>";
         charVal = ((Char*)literal)->ch;
         break;
     case STR:
-        setType(KW_CHAR);
+        setType(new Type(KW_CHAR));
         name = GenIR::genLb(true);
         strVal = ((Str*)literal)->str;
         setArray(strVal.size()+1);
@@ -55,7 +118,7 @@ Var::Var(Token *literal)
     }
 }
 
-Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,int len, Var* init)
+Var::Var(std::vector<int> scopePath,bool isExtern,Type* s,int ptrLevel,std::string name,int len, Var* init)
 {
     baseInit();
     this->scopePath = scopePath;
@@ -67,7 +130,7 @@ Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::str
     initData = init;
 }
 
-Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,Var* init)
+Var::Var(std::vector<int> scopePath,bool isExtern,Type* s,int ptrLevel,std::string name,Var* init)
 {
     baseInit();
     this->scopePath = scopePath;
@@ -78,7 +141,7 @@ Var::Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::str
     initData = init;
 }
 
-Var::Var(std::vector<int> scopePath,Symbol s,int ptrLevel)
+Var::Var(std::vector<int> scopePath,Type* s,int ptrLevel)
 {
     baseInit();
     this->scopePath = scopePath;
@@ -93,8 +156,7 @@ Var::Var(std::vector<int> scopePath, Var* val)
     baseInit();
     this->scopePath = scopePath;
     setType(val->getType());
-    setPtr(val->ptrLevel+val->isArray);     // 如果是数组,指针等级+1,但不拷贝数组属性
-    //setPtr(val->isArray || val->isPtr);
+    setPtr(val->ptrLevel+val->isArray());     // 如果是数组, 转化为指针
     setName(GenIR::genLb());
     setLeft(false);
 }
@@ -105,7 +167,7 @@ Var::Var(int val)
 	setName("<int>");//特殊变量名字
 	literal=true;
 	setLeft(false);
-	setType(KW_INT);
+	setType(new Type(KW_INT));
 	intVal=val;//记录数字数值
 }
 
@@ -125,7 +187,7 @@ bool Var::setInit()
     else if(initData->literal){
         // 如果是常量,直接进行初始化
         inited = true;
-        if(initData->isArray){
+        if(initData->isArray()){
             // 如果既是常量又是数组,则必定为字符串
             // 字符串指针初始值等于常量串名(eg .L2)
             ptrVal = initData->name;
@@ -153,13 +215,11 @@ void Var::baseInit()
     scopePath.push_back(-1);
     externed = false;
     ptrLevel = 0;
-    isArray = false;
     arraySize = 0;
     isLeft = true; // 变量默认是可以作为左值
     initData = nullptr;
     inited = false;
     ptr = nullptr;
-    size = 0;
     offset = 0;
     isCast = false;
 }
@@ -176,10 +236,25 @@ vector<int>& Var::getPath()
 
 int Var::getSize()
 {
-    return size;
+    if(externed){
+        return 0;
+    }
+    
+    int size = 0;
+    if(ptrLevel >= 0) {
+        size = 4;
+    } else {
+        size = type->getSize();
+    }
+
+    if(this->isArray()) {
+        return size * arraySize;   
+    } else {
+        return size;
+    }
 }
 
-Symbol Var::getType()
+Type* Var::getType()
 {
     return type;
 }
@@ -201,20 +276,23 @@ int Var::getOffset()
 
 Var* Var::getStep()
 {
-    // t->getStep() ==> sizeof(*t) 所以指针等级要降低
-    // 对于基础类型，这个就表示+1，对于指针类型，对应实际类型的长度
-    int level = this->ptrLevel+this->getArray();
+    // 获得++操作实际需要移动的长度, 对于基础类型就是+1
+    // 对于基础指针, 就是数据类型的长度, 可能+1或者+4
+    // 对于高阶指针, 则因为指针尺寸都相同所以都是+4
+    int level = this->ptrLevel+this->isArray();
     if(this->isBase()){
         return SymTab::one;
     }
     else if(level == 1){
-        if(this->type == KW_CHAR){
+        Symbol type = this->type->getType();
+        if(type == KW_CHAR){
             return SymTab::one;
         }
-        else if(this->type==KW_INT){
+        else if(type==KW_INT){
             return SymTab::four;
         }
         else{
+            //TODO: 结构体指针正确的计算偏移值
             return nullptr;
         }
     }
@@ -258,12 +336,12 @@ int Var::getVal()
 
 bool Var::isBase()
 {
-    return (ptrLevel==0)&&(!isArray);
+    return (ptrLevel==0)&&(!isArray());
 }
 
 bool Var::isVoid()
 {
-    return (type == KW_VOID);
+    return (type->getType() == KW_VOID);
 }
 
 bool Var::isRef()
@@ -274,7 +352,7 @@ bool Var::isRef()
 
 bool Var::isChar()
 {
-    return (type == KW_CHAR) && isBase();
+    return (type->getType() == KW_CHAR) && isBase();
 }
 
 bool Var::isCastType()
@@ -282,19 +360,14 @@ bool Var::isCastType()
     return isCast;
 }
 
-// bool Var::isConst()
-// {
-//     return literal && isBase();
-// }
-
 bool Var::notConst()
 {
     return !literal;
 }
 
-bool Var::getArray()
+bool Var::isArray()
 {
-    return isArray;
+    return arraySize != 0;
 }
 
 bool Var::getIsPtr()
@@ -314,39 +387,22 @@ bool Var::hasInitArr()
 
 void Var::setExterned(bool isExtern)
 {
-    if(isExtern){
-        externed = true;
-        size = 0;
-    }
+    this->externed = isExtern;
 }
 
-void Var::setType(Symbol s)
+void Var::setType(Type* s)
 {
     type = s;
-    if(type == KW_VOID){
+    if(type->getType() == KW_VOID){
         // 变量类型不能为void
         Error::semError(VOID_VAR,"");
-        type = KW_INT;
-    }
-    if(!externed && type==KW_INT){
-        size = 4;
-    }
-    else if(!externed && type==KW_CHAR){
-        size = 1;
     }
 }
 
 
 void Var::setPtr(int ptrLevel)
 {
-    // 如果是指针,则更新有关字段,否则不需要任何操作
-    if(ptrLevel >= 0){
-        this->ptrLevel = ptrLevel;
-        if(!externed){
-            // 指针全部都是4字节
-            size = 4;
-        }
-    }
+    this->ptrLevel = ptrLevel;
 }
 
 
@@ -362,12 +418,8 @@ void Var::setArray(int len)
         Error::semError(ARRAY_LEN_INVALID,name);
     }
     else{
-        isArray = true;
         isLeft = false;
         arraySize = len;
-        if(!externed){
-            size = size*len;
-        }
     }
 }
 
@@ -405,11 +457,11 @@ void Var::cast(Var* castype)
 void Var::value()
 {
     if(literal){
-        if(type == KW_INT){
+        if(type->getType() == KW_INT){
             printf("%d",intVal);
         }
-        else if(type == KW_CHAR){
-            if(isArray){
+        else if(type->getType() == KW_CHAR){
+            if(isArray()){
                 printf("%s",name.c_str());
             }
             else{
@@ -465,7 +517,7 @@ void Var::printSelf()
 {
 	if(externed)printf("externed ");
 	//输出type
-	printf("%s",tokenName[type]);
+    printf("%s", type->getShowName().c_str());
 	//输出指针
     if(ptrLevel > 0){
         for(int i=0;i<ptrLevel;i++){
@@ -475,11 +527,12 @@ void Var::printSelf()
 	//输出名字
 	printf(" %s",name.c_str());
 	//输出数组
-	if(isArray)printf("[%d]",arraySize);
+	if(isArray())printf("[%d]",arraySize);
 	//输出初始值
 	if(inited){
 		printf(" = ");
-		switch(type){
+        Symbol t = type->getType();
+		switch(t){
 			case KW_INT:printf("%d",intVal);break;
 			case KW_CHAR:
 				if(ptrLevel==1)printf("<%s>",ptrVal.c_str()); //  被字符串初始化的常量是char*类型
@@ -489,7 +542,7 @@ void Var::printSelf()
                 break;
 		}
 	}
-	printf("; size=%d scope=\"",size);	
+	printf("; size=%d scope=\"", getSize());	
 	for(unsigned int i=0;i<scopePath.size();i++){
 		printf("/%d",scopePath[i]);
 	}
@@ -506,7 +559,7 @@ void Var::printSelf()
     printf("\n");
 }
 
-Fun::Fun(bool isExtern,Symbol type,int ptrLevel,std::string name,std::vector<Var*> para) :
+Fun::Fun(bool isExtern, Type* type,int ptrLevel,std::string name,std::vector<Var*> para) :
     intercode(this)
 {
     externed = isExtern;
@@ -541,7 +594,7 @@ void Fun::setExtern(bool isExtern)
     externed = isExtern;
 }
 
-Symbol Fun::getType()
+Type* Fun::getType()
 {
     return type;
 }
@@ -580,7 +633,7 @@ bool Fun::match(Fun* f)
         return false;
     }
 
-    if(f->type != this->type){
+    if(f->type->getType() != this->type->getType()){
         // 报告语义警告,返回类型不匹配
         Error::semWarm(FUN_RET_CONFLICT,f->getName());
     }
@@ -604,7 +657,7 @@ bool Fun::match(std::vector<Var*>& paraVar)
     for(unsigned int i=0;i<len;i++){
         // 部分类型可以兼容使用,例如int* 与int[]
         if(GenIR::checkTypeMatch(paraVar[i],this->paraVar[i])){
-            if(paraVar[i]->getType() != this->paraVar[i]->getType()){
+            if(paraVar[i]->getType()->getType() != this->paraVar[i]->getType()->getType()){
                 Error::semWarm(FUN_DEC_CONFLICT,name);
             }
         }
@@ -667,7 +720,7 @@ void Fun::toX86(FILE* file)
 void Fun::printSelf()
 {
     //输出type
-	printf("%-6s",tokenName[type]);
+	printf("%-6s", type->getShowName().c_str());
 	//输出名字
 	printf(" %s",name.c_str());
 	//输出参数列表
@@ -1011,26 +1064,23 @@ void SymTab::genData(FILE* file)
         fprintf(file,"global %s\n",var->getName().c_str());
         fprintf(file,"\t%s " ,var->getName().c_str());
 
-        int typeSize;
+        bool wordType = false;  //是否必须为4字节数据, 指针和int数据都必须以4字节为单位写入
         if(var->getIsPtr()){
-            // 如果是指针,则一律是4字节大小
-            typeSize = 4;
-        }
-        else{
-            typeSize = var->getType() == KW_CHAR ? 1 : 4;
+            wordType = true;
+        } else {
+            Type* t = var->getType();
+            wordType = (t->getType() == KW_INT);
         }
 
-        if(var->getArray()){
-            fprintf(file,"times %d",var->getSize()/typeSize);
-        }
-
-        if(var->getIsPtr()){
-            // 同理,指针始终使用dd长度
-            const char* type = "dd";
+        if(var->isArray()) {
+            // 因为数组无法直接初始化,  因此无论什么类别的数组都可视为字节数组
+            fprintf(file, "times %d db 0", var->getSize());
+        } else if(wordType) {
+            const char* type = "dd ";
             fprintf(file,"%s " ,type);
         }
-        else{
-            const char* type = var->getType() == KW_CHAR ? "db" : "dd";
+        else {
+            const char* type = "db ";
             fprintf(file,"%s " ,type);
         }
 

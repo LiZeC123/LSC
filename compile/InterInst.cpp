@@ -99,7 +99,7 @@ void InterInst::loadVar(string reg32,string reg8,Var* var,FILE* file)
 	if(var->notConst()){
 		int offset = var->getOffset();
 		if(offset == 0){						// 全局变量
-			if(!var->getArray()){				
+			if(!var->isArray()){				
 				emit("mov %s,[%s]",reg,name);	// 普通变量,例如 mov eax,[var]
 			}
 			else{
@@ -107,7 +107,7 @@ void InterInst::loadVar(string reg32,string reg8,Var* var,FILE* file)
 			}
 		}
 		else{									// 局部变量
-			if(!var->getArray()){
+			if(!var->isArray()){
 				emit("mov %s,[ebp%+d]",reg,offset);		// 普通变量,例如 mov eax,[ebp-4]
 			}
 			else{

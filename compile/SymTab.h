@@ -16,7 +16,15 @@ public:
     // 创建一个表示结构体类型的Type
     Type(std::string structName);
 
-    // 总体上替换原本的Symbol即可, 但是在数据生成方面可能需要再考虑考虑如何处理
+    bool isBaseType();
+    bool isStructType();
+    
+
+    Symbol getType();
+    std::string getName();
+    int getSize();
+
+    std::string getShowName();
 private:
     Symbol type;
     std::string name;
@@ -30,6 +38,8 @@ class StructTab
 
     // map<Type, 成员列表>
     // 因为Var变量具有类型，变量名，偏移值，所以可以记录成员变量
+private:
+    std::map<std::string, std::vector<Var*>> structs;   // 记录结构体的成员声明信息
 };
 
 // 变量  值 类型
@@ -44,6 +54,8 @@ class StructTab
 
 // 数组生成了什么代码，数组的长度有什么作用?
 
+
+
 class Var
 {
 public:
@@ -54,13 +66,13 @@ public:
     Var(Token* literal);
 
     // 初始化一个数组
-    Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,int len, Var* init=nullptr);
+    Var(std::vector<int> scopePath, bool isExtern, Type* s, int ptrLevel, std::string name, int len, Var* init=nullptr);
     
     // 初始化普通的变量,指针
-    Var(std::vector<int> scopePath,bool isExtern,Symbol s,int ptrLevel,std::string name,Var* init);
+    Var(std::vector<int> scopePath, bool isExtern, Type* s, int ptrLevel, std::string name, Var* init);
 
     // 临时变量
-    Var(std::vector<int> scopePath,Symbol s,int ptrLevel);
+    Var(std::vector<int> scopePath, Type* s,int ptrLevel);
 
     // 变量拷贝
     Var(std::vector<int> scopePath, Var* val);
@@ -72,7 +84,7 @@ public:
     std::vector<int>& getPath();
     int getSize();
     bool getLeft();
-    Symbol getType();
+    Type* getType();
     Var* getInitData();
     std::vector<Var*>& getInitArray();
     int getOffset();
@@ -87,10 +99,9 @@ public:
     bool isVoid();          // 是否是Void,特殊类型,表示空
     bool isRef();           // 是否是引用
     bool isChar();          // 是否是字符类型
-    //bool isConst();         // 是否是常量
     bool isCastType();      // 是否为强制类型转换标志
     bool notConst();        // 是否不是常量
-    bool getArray();        // 是否是数组
+    bool isArray();         // 是否是数组
     bool getIsPtr();        // 是否是指针类型
     bool isInit();
     bool hasInitArr();
@@ -101,7 +112,7 @@ public:
     // 所以必须按照下面的顺序依次使用以下函数(不需要的函数不用调用)
     void baseInit();                            // 默认初始化
     void setExterned(bool isExtern);
-    void setType(Symbol s);
+    void setType(Type* s);
     void setPtr(int ptrLevel);
     void setName(std::string name);
     void setArray(int len);
@@ -122,12 +133,10 @@ private:
 
 
     bool externed;                  // 是否有extern声明
-    Symbol type;                    // 变量类型
+    Type* type;                     // 变量类型
     std::string name;               // 变量名
-    //bool isPtr;                     // 是否是指针
-    bool isArray;                   // 是否是数组
     bool isCast;                    // 是否为强制类型转换标志
-    int arraySize;                  // 数组长度
+    int arraySize;                  // 如果变量是数组类型时的数组长度
     bool isLeft;                    // 是否是左值
 
 
@@ -146,7 +155,6 @@ private:
     int ptrLevel;                   // 指针等级,例如int**等级为2
 
 
-    int size;                       // 变量大小
     int offset;                     // 变量的栈帧偏移值
 
 };
@@ -154,7 +162,7 @@ private:
 class Fun
 {
 public:
-    Fun(bool isExtern,Symbol type,int ptrLevel,std::string name,std::vector<Var*> para);
+    Fun(bool isExtern, Type* type, int ptrLevel, std::string name, std::vector<Var*> para);
 
     void enterScope();              // 进入一个新的作用域
     void leaveScope();              // 退出作用域并计算栈帧大小
@@ -175,7 +183,7 @@ public:
     bool getExtern();
     bool hasVarArg();
     void setExtern(bool isExtern);
-    Symbol getType();
+    Type* getType();
     std::string getName();
     int getMaxDep();
     int getParaValSize();           // 获得函数参数占用的空间大小
@@ -189,7 +197,7 @@ public:
 private:
     bool externed;                  // 是否有extern声明
     bool vararg;                    // 是否包含可变参数
-    Symbol type;                    // 返回类型
+    Type* type;                     // 返回类型
     int ptrLevel;                   // 指针等级
     std::string name;               // 函数名
     std::vector<Var*> paraVar;      // 参数列表
