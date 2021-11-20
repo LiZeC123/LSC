@@ -11,6 +11,8 @@ Var* SymTab::varVoid = nullptr;
 Var* SymTab::one = nullptr;
 Var* SymTab::four = nullptr;
 
+map<string, Struct*> Type::structTab;
+
 Type::Type(Symbol s)
 {
     if(s == KW_INT || s == KW_CHAR || s== KW_VOID) {
@@ -56,8 +58,13 @@ int Type::getSize()
         // TODO: void 类型没有大小, 需要报错
         throw runtime_error("Void Type Cannot Get Size");
     } else {
-        //TODO: 结构体计算大小
-        throw runtime_error("Struct Type Cannot Get Size");
+        if(structTab.find(name) != structTab.end()){
+            return structTab[name]->getSize();
+        }
+        else {
+            //TODO: 未定义结构体的处理
+            throw runtime_error("Struct Type Cannot Get Size");
+        }
     }
 }
 
@@ -75,6 +82,60 @@ string Type::getShowName()
 }
 
 
+void Type::decStruct(std::string name)
+{
+    if(structTab.find(name) == structTab.end()) {
+        // structTab[name] = 
+    }
+}
+
+void Type::defStruct(std::string name, std::vector<Var*> members)
+{
+    if(structTab.find(name) == structTab.end()) {
+        structTab[name] = new Struct(members);
+    }
+}
+
+void Type::printStruct()
+{
+    for (auto it=structTab.begin(); it!=structTab.end(); it++) {
+        printf("struct %s { \n", it->first.c_str());
+        it->second->printSelf();
+        printf("}; size=%d\n", it->second->getSize());
+    }
+}
+
+
+Struct::Struct(std::vector<Var*> members)
+{
+    for(auto v: members){
+        this->addVar(v);
+    }
+    size += (4 - size % 4) % 4;
+}
+
+int Struct::getSize()
+{
+    return size;
+}
+
+void Struct::printSelf()
+{
+    for(Var* v: members) {
+        v->printSelf();
+    }
+}
+
+
+void Struct::addVar(Var* member) 
+{
+    if(!member->isChar()){
+        size += (4 - size % 4) % 4;
+    }
+    member->setOffset(size);
+    members.push_back(member);
+    size += member->getSize();
+}
 
 Var::Var()
 {
@@ -241,7 +302,7 @@ int Var::getSize()
     }
     
     int size = 0;
-    if(ptrLevel >= 0) {
+    if(ptrLevel > 0) {
         size = 4;
     } else {
         size = type->getSize();

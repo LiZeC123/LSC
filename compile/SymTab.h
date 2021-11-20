@@ -7,6 +7,23 @@
 #include "InterInst.h"
 #include "GenIR.h"
 
+
+class Var;
+
+class Struct
+{
+public:
+    Struct(std::vector<Var*> members);
+    int getSize();
+
+    void printSelf();
+private:
+    void addVar(Var* member);
+private:
+    std::vector<Var*> members;
+    int size;
+};
+
 class Type
 {
 public:
@@ -25,22 +42,18 @@ public:
     int getSize();
 
     std::string getShowName();
+
+    // 结构体管理
+    static void decStruct(std::string structName);
+    static void defStruct(std::string structName, std::vector<Var*> members);
+    static void printStruct();
 private:
     Symbol type;
     std::string name;
+
+    static std::map<std::string, Struct*> structTab; // 结构体表
 };
 
-
-class StructTab
-{
-    // 肯定是有一个 结构体表 来存储结构体的基本信息的
-    // 变量需要持有一个结构体类型的引用, 结构体表中也要有相应的数据
-
-    // map<Type, 成员列表>
-    // 因为Var变量具有类型，变量名，偏移值，所以可以记录成员变量
-private:
-    std::map<std::string, std::vector<Var*>> structs;   // 记录结构体的成员声明信息
-};
 
 // 变量  值 类型
 //
@@ -51,9 +64,6 @@ private:
 
 // 因为结构体可以嵌套， 所以不适合放入type中分析，否则无法判断当前是定义阶段还是使用阶段
 // 或者就不检查有没有定义，反正指针类型不影响内存分配，等定义完成，类型也有了
-
-// 数组生成了什么代码，数组的长度有什么作用?
-
 
 
 class Var

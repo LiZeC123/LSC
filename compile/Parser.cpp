@@ -5,7 +5,7 @@
 #define _OR_(T) || look->sym == T       // 与上面的宏连用,组成更复杂的条件语句
 
 //类型的First集
-#define FIRST_TYPE firstIs(KW_INT)_OR_(KW_CHAR)_OR_(KW_VOID)
+#define FIRST_TYPE firstIs(KW_INT)_OR_(KW_CHAR)_OR_(KW_VOID)_OR_(KW_STRUCT)
 //表达式First集
 #define FIRST_EXPR firstIs(LPAREN)_OR_(NUM)_OR_(CH)_OR_(STR)_OR_(IDENT)_OR_(NOT)         \
 _OR_(SUB)_OR_(LEA)_OR_(MUL)_OR_(INC)_OR_(DEC)
@@ -85,7 +85,7 @@ void Parser::segment()
 //           -> struct <ident>
 Type* Parser::type()
 {
-    if(FIRST_TYPE){
+    if(firstIs(KW_INT)_OR_(KW_CHAR)_OR_(KW_VOID)){
         Symbol t = look->sym;
         move();
         return new Type(t);
@@ -108,29 +108,45 @@ Type* Parser::type()
     return nullptr;  
 }
 
-// <def>   ->  <mulss><ID><idtail>
-// <mulss> ->  * <mulss>
-// <mulss> -> e
+// <def>    -> { <memberlist> };       # 结构体定义
+//          -> <mulss><ID><idtail>
+// <mulss>  -> * <mulss>
+//          -> e
 void Parser::def(bool isExtern, Type* s)
 {
-    int ptrLevel = 0;
-    while(match(MUL)){
-        ptrLevel++;
-    }
+    if (match(LBRACE)) {
+        vector<Var*> memberList;
+        member(memberList);
 
-    string name;
-    if(firstIs(IDENT)){
-        name = ((ID*)look)->name;
-        move();
+        if(!match(RBRACE)) {
+            recovery(firstIs(SEMICON), RBRACE_LOST, RBRACE_WRONG);
+        }
+
+        Type::defStruct(s->getName(), memberList);
+
+        if(!match(SEMICON)) {
+            recovery(false, SEMICON_LOST, SEMICON_WRONG);
+        }
+        
+    } else {
+        int ptrLevel = 0;
+        while(match(MUL)){
+            ptrLevel++;
+        }
+
+        string name;
+        if(firstIs(IDENT)){
+            name = ((ID*)look)->name;
+            move();
+        }  else{
+            recovery(firstIs(SEMICON)_OR_(ASSIGN)_OR_(COMMA), ID_LOST,ID_WRONG);
+        }
+
+        idtail(isExtern, s, ptrLevel, name);
     }
-    else{
-        recovery(firstIs(SEMICON)_OR_(ASSIGN)_OR_(COMMA), ID_LOST,ID_WRONG);
-    }
-    idtail(isExtern, s, ptrLevel, name);
 }
 
 // <idtail>  -> ( <para> ) <funtail>    # 函数声明 / 函数调用
-//           -> { <memberlist> };       # 结构体定义
 //           -> <defvar><deflist>       # 变量声明
 void Parser::idtail(bool isExtern, Type* s, int ptrLevel, string name)
 {
@@ -145,16 +161,34 @@ void Parser::idtail(bool isExtern, Type* s, int ptrLevel, string name)
         Fun* fun = new Fun(isExtern, s, ptrLevel, name, paraList);
         funtail(fun);
         symtab.leave();
-    } else if (match(LBRACE)) {
-        //TODO: 创建并记录成员变量表
-
-
     } else {
         Var* var = defvar(isExtern,s,ptrLevel,name);
         symtab.addVar(var);
-
         deflist(isExtern,s);
     }
+}
+
+// <memberlist> -> <type><paradata>; <membertail> 
+void Parser::member(vector<Var*>& members) 
+{
+    Type* s = type();
+    Var* var = paradata(s);
+    members.push_back(var);
+    
+    if(!match(SEMICON)){
+        recovery(FIRST_TYPE, SEMICON_LOST, SEMICON_WRONG);
+    }
+
+    membertail(members);
+}
+
+// <membertail> -> <type><def><membertail>
+//              -> e
+void Parser::membertail(vector<Var*>& members)
+{
+    if(FIRST_TYPE) {
+        member(members);
+    } 
 }
 
 // <defvar> -> [ <NUM> ] <initArray>

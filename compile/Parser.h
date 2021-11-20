@@ -39,11 +39,16 @@ private:
     void initArraytail(std::vector<Var*>& initVals);
     void deflist(bool isExtern, Type* s);
 
-    // 函数
+    // 函数参数
     void para(std::vector<Var*>& para);
     Var* paradata(Type* s);
     Var* paradatatail(Type* s,string name,int ptrLevel);
     void paralist(std::vector<Var*>& para);
+    
+    // 结构体
+    void member(std::vector<Var*>& members);
+    void membertail(std::vector<Var*>& members);
+
     void funtail(Fun* fun);
     void block();
     void subprogram();

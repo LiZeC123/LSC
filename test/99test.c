@@ -1,7 +1,35 @@
-#include "00testhelper.h"
+// #include "00testhelper.h"
+
+struct Point2D
+{
+    int x;
+    int y;
+};
+
+struct Point3D
+{
+    int x;
+    int y;
+    int z;
+};
+
+struct StructA
+{
+    int mA;
+    char mB;
+    char mC;
+    int mD;
+    char mE;
+    int mF;
+};
+
+
 
 int main(int argc, char *argv)
 {
+    // struct Point2D p2d;
+    // struct Point3D p3d;
+    // int x;
     return 0;
 }
 
@@ -17,28 +45,9 @@ int main(int argc, char *argv)
 //     int Y;
 // } C;
 
-// struct Point2D
-// {
-//     int x;
-//     int y;
-// };
 
-// struct Point3D
-// {
-//     int x;
-//     int y;
-//     int z;
-// };
 
-// struct StructA
-// {
-//     int mA;
-//     char mB;
-//     char mC;
-//     int mD;
-//     char mE;
-//     int mF;
-// };
+
 
 
 
