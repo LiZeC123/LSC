@@ -26,22 +26,16 @@
         {
             "name": "Linux",
             "includePath": [
-                "/usr/include/x86_64-linux-gnu/c++/5",
-                "/usr/include/c++/5",
                 "/usr/local/include",
                 "/usr/include/x86_64-linux-gnu",
-                "/usr/include",
-                "/usr/include/linux",
                 "/usr/include/lsc",
-                "${workspaceFolder}/lar",
-                "${workspaceFolder}/lar"
+                "/usr/include",
+                "/usr/include/linux"
             ],
             "defines": [],
-            "intelliSenseMode": "clang-x64",
+            "intelliSenseMode": "linux-gcc-x64",
             "browse": {
                 "path": [
-                    "/usr/include/x86_64-linux-gnu/c++/5",
-                    "/usr/include/c++/5",
                     "/usr/local/include",
                     "/usr/include/x86_64-linux-gnu",
                     "/usr/include",
