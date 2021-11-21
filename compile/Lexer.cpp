@@ -25,6 +25,7 @@ KeyWords::KeyWords()
     keywords["include"] = KW_INCLUDE;
     keywords["define"] = KW_DEFINE;
     keywords["struct"] = KW_STRUCT;
+    keywords["sizeof"] = KW_SIZEOF;
 }
 
 Symbol KeyWords::getSym(std::string name)

@@ -26,6 +26,7 @@ typedef enum {
     MACRO, BUILD_MACRO,             //宏标记, 预定义宏
     KW_INCLUDE,KW_DEFINE,           //include,define
     KW_STRUCT,                      //struct
+    KW_SIZEOF,                      //sizeof
 } Symbol;
 
 // 所有的词法错误码

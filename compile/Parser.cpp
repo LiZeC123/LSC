@@ -891,8 +891,9 @@ Symbol Parser::rop()
 }
 
 // <elem>   -> <ID><idexpr>
-// <elem>   -> ( <expr> ) | ( <castype> )
-// <elem>   -> <literal>
+//          -> ( <expr> ) | ( <castype> )
+//          -> <literal>
+//          -> sizeof ( <type> | <elem> )
 Var* Parser::elem()
 {
     Var* val = nullptr;
@@ -906,6 +907,23 @@ Var* Parser::elem()
             val = castype();
         } else {
             val = expr();
+        }
+        
+        if(!match(RPAREN)){
+            recovery(LVAL_OP,RPAREN_LOST,RPAREN_WRONG);
+        }
+    }
+    else if(match(KW_SIZEOF)) {
+        if(!match(LPAREN)) {
+            recovery(FIRST_TYPE, LPAREN_LOST, LPAREN_WRONG);
+        }
+
+        if(FIRST_TYPE) {
+            Type* t = type();
+            val = new Var(t->getSize());
+        } else {
+            Var* v  = elem();
+            val = new Var(v->getSize());
         }
         
         if(!match(RPAREN)){
