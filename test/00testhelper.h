@@ -80,3 +80,7 @@ void checkUnreachable(int line)
     lscPrintStr("Unreachable Code Excuted\n");
     exit(1);
 }
+
+void wrap() {
+    lscPrintStr("\n");
+}

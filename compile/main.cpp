@@ -11,6 +11,7 @@ public:
     bool printValTab = false;
     bool printFunTab = false;
     bool printStrTab = false;
+    bool printStruct = false;
     bool printToken  = false;
     bool printStats  = false;
 };
@@ -35,6 +36,9 @@ Args analyseOptions(int argc, char* argv[])
         else if(option == "--stat") {
             args.printStats = true;
         }
+        else if(option == "--printStruct") {
+            args.printStruct = true;
+        }
     }
 
     return args;
@@ -55,6 +59,11 @@ void printTables(Args args,SymTab& tab)
     if(args.printStrTab){
         printf("\n字符串表内容如下:\n");
         tab.printStrTab();
+    }
+
+    if(args.printStruct) {
+        printf("\n结构体表内容如下:\n");
+        Type::printStruct();
     }
 }
 

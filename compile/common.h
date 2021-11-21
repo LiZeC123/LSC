@@ -17,14 +17,17 @@ typedef enum {
     LPAREN,RPAREN,                  //()
     LBRACK,RBRACK,                  //[]
     LBRACE,RBRACE,                  //{}
-    COMMA,COLON,SEMICON,POINT,      //逗号,冒号,分号,小数点
+    COMMA,COLON,SEMICON,            //逗号,冒号,分号
+    POINT, ARROW,                   //小数点, 箭头符号
     ASSIGN,                         //赋值
     KW_IF,KW_ELSE,                  //if-else
     KW_SWITCH,KW_CASE,KW_DEFAULT,   //swicth-case-deault
     KW_WHILE,KW_DO,KW_FOR,          //循环
     KW_BREAK,KW_CONTINUE,KW_RETURN, //break,continue,return
-    MACRO,                          //宏标记
-    BUILD_MACRO,KW_INCLUDE,KW_DEFINE//预定义宏,include,define
+    MACRO, BUILD_MACRO,             //宏标记, 预定义宏
+    KW_INCLUDE,KW_DEFINE,           //include,define
+    KW_STRUCT,                      //struct
+    KW_SIZEOF,                      //sizeof
 } Symbol;
 
 // 所有的词法错误码
@@ -143,7 +146,8 @@ enum Operator
 	OP_PROC,                                //调用过程 
 	OP_CALL,                                //调用函数 
 	OP_RET,                                 //直接返回
-	OP_RETV                                 //带数据返回 
+	OP_RETV,                                //带数据返回 
+    OP_ACCESS,                              //结构体访问操作
 };
 
 #endif // COMMON_H

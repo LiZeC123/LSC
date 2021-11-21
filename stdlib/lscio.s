@@ -4,14 +4,14 @@ global lscPrintInt
 lscPrintInt:
 	push ebp
 	mov ebp,esp
-	sub esp,48
+	sub esp,12
 	mov eax,[ebp+8]
 	push eax
-	lea eax,[ebp-48]
+	lea eax,[ebp-12]
 	push eax
 	call lscint2str
 	add esp,8
-	lea eax,[ebp-48]
+	lea eax,[ebp-12]
 	push eax
 	call lscPrintStr
 	add esp,4
@@ -23,16 +23,16 @@ global lscPrintPointer
 lscPrintPointer:
 	push ebp
 	mov ebp,esp
-	sub esp,52
+	sub esp,16
 	mov eax,[ebp+8]
-	mov [ebp-52],eax
-	lea eax,[ebp-48]
+	mov [ebp-16],eax
+	lea eax,[ebp-12]
 	push eax
-	mov eax,[ebp-52]
+	mov eax,[ebp-16]
 	push eax
 	call lscpointer2str
 	add esp,8
-	lea eax,[ebp-48]
+	lea eax,[ebp-12]
 	push eax
 	call lscPrintStr
 	add esp,4
@@ -94,21 +94,21 @@ global lscReadInt
 lscReadInt:
 	push ebp
 	mov ebp,esp
-	sub esp,52
+	sub esp,16
 	mov eax,10
 	push eax
-	lea eax,[ebp-48]
+	lea eax,[ebp-12]
 	push eax
 	call lscRead
 	add esp,8
 	mov eax,10
 	push eax
-	lea eax,[ebp-48]
+	lea eax,[ebp-12]
 	push eax
 	call lscstr2int
 	add esp,8
-	mov [ebp-52],eax
-	mov eax,[ebp-52]
+	mov [ebp-16],eax
+	mov eax,[ebp-16]
 	jmp .L29
 .L29:
 	mov esp,ebp
@@ -118,7 +118,7 @@ global lscint2str
 lscint2str:
 	push ebp
 	mov ebp,esp
-	sub esp,96
+	sub esp,60
 	mov eax,[ebp+12]
 	mov ebx,0
 	mov ecx,0
@@ -184,15 +184,15 @@ lscint2str:
 .L49:
 .L51:
 	mov eax,0
-	mov [ebp-56],eax
+	mov [ebp-20],eax
 .L52:
 	mov eax,[ebp+12]
 	mov ebx,0
 	mov ecx,0
 	cmp eax,ebx
 	setne cl
-	mov [ebp-60],ecx
-	mov eax,[ebp-60]
+	mov [ebp-24],ecx
+	mov eax,[ebp-24]
 	cmp eax,0
 	je .L53
 	jmp .L55
@@ -201,139 +201,139 @@ lscint2str:
 	mov ebx,10
 	mov edx,0
 	idiv ebx
-	mov [ebp-64],eax
-	mov eax,[ebp-64]
+	mov [ebp-28],eax
+	mov eax,[ebp-28]
 	mov [ebp+12],eax
 	jmp .L52
 .L55:
-	mov eax,[ebp-56]
-	mov [ebp-68],eax
-	mov eax,[ebp-56]
+	mov eax,[ebp-20]
+	mov [ebp-32],eax
+	mov eax,[ebp-20]
 	mov ebx,1
 	add eax,ebx
-	mov [ebp-56],eax
-	mov eax,[ebp-68]
+	mov [ebp-20],eax
+	mov eax,[ebp-32]
 	mov ebx,1
 	imul ebx
-	mov [ebp-72],eax
-	lea eax,[ebp-52]
-	mov ebx,[ebp-72]
+	mov [ebp-36],eax
+	lea eax,[ebp-16]
+	mov ebx,[ebp-36]
 	add eax,ebx
-	mov [ebp-76],eax
+	mov [ebp-40],eax
 	mov eax,[ebp+12]
 	mov ebx,10
 	mov edx,0
 	idiv ebx
-	mov [ebp-84],edx
-	mov eax,[ebp-84]
+	mov [ebp-48],edx
+	mov eax,[ebp-48]
 	mov ebx,48
 	add eax,ebx
-	mov [ebp-88],eax
-	mov eax,[ebp-76]
+	mov [ebp-52],eax
+	mov eax,[ebp-40]
 	mov eax,[eax]
-	mov [ebp-80],al
-	mov eax,[ebp-88]
-	mov ebx,[ebp-76]
+	mov [ebp-44],al
+	mov eax,[ebp-52]
+	mov ebx,[ebp-40]
 	mov [ebx],eax
 	jmp .L56
 .L53:
 	mov eax,0
-	mov [ebp-60],eax
+	mov [ebp-24],eax
 	mov eax,[ebp-4]
 	cmp eax,0
 	je .L64
-	mov eax,[ebp-60]
-	mov [ebp-64],eax
-	mov eax,[ebp-60]
+	mov eax,[ebp-24]
+	mov [ebp-28],eax
+	mov eax,[ebp-24]
 	mov ebx,1
 	add eax,ebx
-	mov [ebp-60],eax
-	mov eax,[ebp-64]
+	mov [ebp-24],eax
+	mov eax,[ebp-28]
 	mov ebx,1
 	imul ebx
-	mov [ebp-68],eax
+	mov [ebp-32],eax
 	mov eax,[ebp+8]
-	mov ebx,[ebp-68]
+	mov ebx,[ebp-32]
 	add eax,ebx
-	mov [ebp-72],eax
-	mov eax,[ebp-72]
+	mov [ebp-36],eax
+	mov eax,[ebp-36]
 	mov eax,[eax]
-	mov [ebp-76],al
+	mov [ebp-40],al
 	mov eax,0
 	mov al,45
-	mov ebx,[ebp-72]
+	mov ebx,[ebp-36]
 	mov [ebx],al
 	jmp .L69
 .L64:
 .L69:
-	mov eax,[ebp-56]
+	mov eax,[ebp-20]
 	mov ebx,1
 	sub eax,ebx
-	mov [ebp-56],eax
+	mov [ebp-20],eax
 .L70:
-	mov eax,[ebp-56]
+	mov eax,[ebp-20]
 	mov ebx,0
 	mov ecx,0
 	cmp eax,ebx
 	setge cl
-	mov [ebp-64],ecx
-	mov eax,[ebp-64]
+	mov [ebp-28],ecx
+	mov eax,[ebp-28]
 	cmp eax,0
 	je .L71
-	mov eax,[ebp-60]
-	mov [ebp-68],eax
-	mov eax,[ebp-60]
+	mov eax,[ebp-24]
+	mov [ebp-32],eax
+	mov eax,[ebp-24]
 	mov ebx,1
 	add eax,ebx
-	mov [ebp-60],eax
-	mov eax,[ebp-68]
+	mov [ebp-24],eax
+	mov eax,[ebp-32]
 	mov ebx,1
 	imul ebx
-	mov [ebp-72],eax
+	mov [ebp-36],eax
 	mov eax,[ebp+8]
-	mov ebx,[ebp-72]
+	mov ebx,[ebp-36]
 	add eax,ebx
-	mov [ebp-76],eax
-	mov eax,[ebp-56]
-	mov [ebp-84],eax
-	mov eax,[ebp-56]
+	mov [ebp-40],eax
+	mov eax,[ebp-20]
+	mov [ebp-48],eax
+	mov eax,[ebp-20]
 	mov ebx,1
 	sub eax,ebx
-	mov [ebp-56],eax
-	mov eax,[ebp-84]
+	mov [ebp-20],eax
+	mov eax,[ebp-48]
 	mov ebx,1
 	imul ebx
-	mov [ebp-88],eax
-	lea eax,[ebp-52]
-	mov ebx,[ebp-88]
+	mov [ebp-52],eax
+	lea eax,[ebp-16]
+	mov ebx,[ebp-52]
 	add eax,ebx
-	mov [ebp-92],eax
-	mov eax,[ebp-92]
+	mov [ebp-56],eax
+	mov eax,[ebp-56]
 	mov eax,[eax]
-	mov [ebp-96],al
-	mov eax,[ebp-76]
+	mov [ebp-60],al
+	mov eax,[ebp-40]
 	mov eax,[eax]
-	mov [ebp-80],al
+	mov [ebp-44],al
 	mov eax,0
-	mov al,[ebp-96]
-	mov ebx,[ebp-76]
+	mov al,[ebp-60]
+	mov ebx,[ebp-40]
 	mov [ebx],al
 	jmp .L70
 .L71:
-	mov eax,[ebp-60]
+	mov eax,[ebp-24]
 	mov ebx,1
 	imul ebx
-	mov [ebp-64],eax
+	mov [ebp-28],eax
 	mov eax,[ebp+8]
-	mov ebx,[ebp-64]
+	mov ebx,[ebp-28]
 	add eax,ebx
-	mov [ebp-68],eax
-	mov eax,[ebp-68]
+	mov [ebp-32],eax
+	mov eax,[ebp-32]
 	mov eax,[eax]
-	mov [ebp-72],al
+	mov [ebp-36],al
 	mov eax,0
 	mov al,0
-	mov ebx,[ebp-68]
+	mov ebx,[ebp-32]
 	mov [ebx],al
 .L38:
 	mov esp,ebp

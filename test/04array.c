@@ -1,6 +1,6 @@
 #include "00testhelper.h"
 
-void TestBase()
+void BaseTest()
 {
     int arr[3];
     arr[0] = 101;
@@ -54,7 +54,7 @@ void testWrite()
 
 int main()
 {
-    TestBase();
+    BaseTest();
     TestRead();
     testWrite();
 

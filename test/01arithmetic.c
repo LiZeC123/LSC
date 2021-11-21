@@ -50,4 +50,8 @@ int main()
 
     checkEquals(c, 182234, __LINE__);
     checkEquals(d, 182234, __LINE__);
+
+    // 测试sizeof
+    checkEquals(sizeof(a), 4, __LINE__);
+    checkEquals(sizeof(155), 4, __LINE__);
 }

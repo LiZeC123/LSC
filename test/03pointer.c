@@ -95,6 +95,13 @@ int arrayTest()
     checkCharEquals(*arr[2],'c',__LINE__);
 }
 
+void sizeOfTest()
+{
+    char arr[7];
+    checkEquals(sizeof("123456"), 7, __LINE__);
+    checkEquals(sizeof(arr), 7, __LINE__);
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -105,6 +112,8 @@ int main(int argc, char *argv[])
     mutilPointerWriteTest();
 
     arrayTest();
+
+    sizeOfTest();
 
     return 0;
 }

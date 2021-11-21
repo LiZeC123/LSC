@@ -24,6 +24,8 @@ KeyWords::KeyWords()
     keywords["return"] = KW_RETURN;
     keywords["include"] = KW_INCLUDE;
     keywords["define"] = KW_DEFINE;
+    keywords["struct"] = KW_STRUCT;
+    keywords["sizeof"] = KW_SIZEOF;
 }
 
 Symbol KeyWords::getSym(std::string name)
@@ -163,7 +165,17 @@ Token* Lexer::readToken()
             case '+':
                 t=new Token(scan('+')?INC:ADD);break;
             case '-':
-                t=new Token(scan('-')?DEC:SUB);break;
+                scan();
+                if(ch == '-'){
+                    t = new Token(DEC);
+                    scan();
+                } else if(ch == '>'){
+                    t = new Token(ARROW);
+                    scan();
+                } else {
+                    t = new Token(SUB);
+                }
+                break;
             case '*':
                 t=new Token(MUL);scan();break;
             case '/':

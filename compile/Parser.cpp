@@ -5,7 +5,7 @@
 #define _OR_(T) || look->sym == T       // 与上面的宏连用,组成更复杂的条件语句
 
 //类型的First集
-#define FIRST_TYPE firstIs(KW_INT)_OR_(KW_CHAR)_OR_(KW_VOID)
+#define FIRST_TYPE firstIs(KW_INT)_OR_(KW_CHAR)_OR_(KW_VOID)_OR_(KW_STRUCT)
 //表达式First集
 #define FIRST_EXPR firstIs(LPAREN)_OR_(NUM)_OR_(CH)_OR_(STR)_OR_(IDENT)_OR_(NOT)         \
 _OR_(SUB)_OR_(LEA)_OR_(MUL)_OR_(INC)_OR_(DEC)
@@ -77,49 +77,78 @@ void Parser::program()
 void Parser::segment()
 {
     bool isExtern = match(KW_EXTERN);
-    Symbol s = type();
+    Type* s = type();
     def(isExtern,s);
 }
 
 // <type>    -> int | void | char 
-Symbol Parser::type()
+//           -> struct <ident>
+Type* Parser::type()
 {
-    Symbol temp = KW_INT;
-    if(FIRST_TYPE){
-        temp = look->sym;
+    if(firstIs(KW_INT)_OR_(KW_CHAR)_OR_(KW_VOID)){
+        Symbol t = look->sym;
         move();
-        return temp;
+        return new Type(t);
+    } else if(match(KW_STRUCT)) {
+        if(firstIs(IDENT)) {
+            string structName = ((ID*)look)->name;
+            move();
+            return new Type(structName);
+        } else {
+            // 如果是*, 说明声明变量是缺少了结构体类型
+            // 如果是{. 说明声明结构体时缺少了结构体名, 而目前不支持匿名结构体
+            recovery(firstIs(MUL)_OR_(LBRACE),TYPE_LOST,TYPE_WRONG);
+        }
     }
     else{
         recovery(firstIs(MUL)_OR_(IDENT),TYPE_LOST,TYPE_WRONG);
-        return KW_INT;  // 错误情况,返回int
+        
     }
+
+    return nullptr;  
 }
 
-// <def>   ->  <ID><idtail>
-// <mulss> ->  * <mulss>
-// <mulss> -> e
-void Parser::def(bool isExtern,Symbol s)
+// <def>    -> { <memberlist> };       # 结构体定义
+//          -> <mulss><ID><idtail>
+// <mulss>  -> * <mulss>
+//          -> e
+void Parser::def(bool isExtern, Type* s)
 {
-    int ptrLevel = 0;
-    while(match(MUL)){
-        ptrLevel++;
-    }
+    if (match(LBRACE)) {
+        vector<Var*> memberList;
+        member(memberList);
 
-    string name;
-    if(firstIs(IDENT)){
-        name = ((ID*)look)->name;
-        move();
+        if(!match(RBRACE)) {
+            recovery(firstIs(SEMICON), RBRACE_LOST, RBRACE_WRONG);
+        }
+
+        Type::defStruct(s->getName(), memberList);
+
+        if(!match(SEMICON)) {
+            recovery(false, SEMICON_LOST, SEMICON_WRONG);
+        }
+        
+    } else {
+        int ptrLevel = 0;
+        while(match(MUL)){
+            ptrLevel++;
+        }
+
+        string name;
+        if(firstIs(IDENT)){
+            name = ((ID*)look)->name;
+            move();
+        }  else{
+            recovery(firstIs(SEMICON)_OR_(ASSIGN)_OR_(COMMA), ID_LOST,ID_WRONG);
+        }
+
+        idtail(isExtern, s, ptrLevel, name);
     }
-    else{
-        recovery(firstIs(SEMICON)_OR_(ASSIGN)_OR_(COMMA), ID_LOST,ID_WRONG);
-    }
-    idtail(isExtern,s,ptrLevel,name);
 }
 
-// <idtail>  -> <defvar><deflist>
-// <idtail>  -> ( <para> ) <funtail>
-void Parser::idtail(bool isExtern,Symbol s,int ptrLevel,std::string name)
+// <idtail>  -> ( <para> ) <funtail>    # 函数声明 / 函数调用
+//           -> <defvar><deflist>       # 变量声明
+void Parser::idtail(bool isExtern, Type* s, int ptrLevel, string name)
 {
     if(match(LPAREN)){
         symtab.enter();
@@ -129,21 +158,42 @@ void Parser::idtail(bool isExtern,Symbol s,int ptrLevel,std::string name)
             recovery(firstIs(LBRACE)_OR_(SEMICON),RPAREN_LOST,RPAREN_WRONG);
         }
         // 创建函数
-        Fun* fun = new Fun(isExtern,s,ptrLevel,name,paraList);
+        Fun* fun = new Fun(isExtern, s, ptrLevel, name, paraList);
         funtail(fun);
         symtab.leave();
-    }
-    else{
+    } else {
         Var* var = defvar(isExtern,s,ptrLevel,name);
         symtab.addVar(var);
-
         deflist(isExtern,s);
     }
 }
 
+// <memberlist> -> <type><paradata>; <membertail> 
+void Parser::member(vector<Var*>& members) 
+{
+    Type* s = type();
+    Var* var = paradata(s);
+    members.push_back(var);
+    
+    if(!match(SEMICON)){
+        recovery(FIRST_TYPE, SEMICON_LOST, SEMICON_WRONG);
+    }
+
+    membertail(members);
+}
+
+// <membertail> -> <type><def><membertail>
+//              -> e
+void Parser::membertail(vector<Var*>& members)
+{
+    if(FIRST_TYPE) {
+        member(members);
+    } 
+}
+
 // <defvar> -> [ <NUM> ] <initArray>
 // <defvar> -> <init>
-Var* Parser::defvar(bool isExtern,Symbol s,int ptrLevel,std::string name)
+Var* Parser::defvar(bool isExtern, Type* s, int ptrLevel, string name)
 {
     if(match(LBRACK)){
         int len = 0;
@@ -170,7 +220,7 @@ Var* Parser::defvar(bool isExtern,Symbol s,int ptrLevel,std::string name)
 
 // <init>    -> = <expr> | = {<initlist>}
 // <init>    -> e
-Var* Parser::init(bool isExtern,Symbol s,int ptrLevel,std::string name)
+Var* Parser::init(bool isExtern, Type* s, int ptrLevel, string name)
 {
     Var* init = nullptr;
     if(match(ASSIGN)){
@@ -215,7 +265,7 @@ void Parser::initArraytail(std::vector<Var*>& initVals)
 
 // <deflist> -> ,<def>
 // <deflist> -> ;
-void Parser::deflist(bool isExtern,Symbol s)
+void Parser::deflist(bool isExtern, Type* s)
 {
     if(match(COMMA)){
         def(isExtern,s);
@@ -260,7 +310,7 @@ void Parser::para(std::vector<Var*>& para)
         return;
     }
     
-    Symbol s = type();
+    Type* s = type();
     Var* var = paradata(s);
     symtab.addVar(var);
     para.push_back(var);
@@ -271,7 +321,7 @@ void Parser::para(std::vector<Var*>& para)
 // <paradata> -> <mulss> <ID> <paradatatail>
 // <mulss> ->  * <mulss>
 // <mulss> -> e
-Var* Parser::paradata(Symbol s)
+Var* Parser::paradata(Type* s)
 {
     string name;
     int ptrLevel = 0;
@@ -294,7 +344,7 @@ Var* Parser::paradata(Symbol s)
 
 // <paradatatail> -> [ <num> ]
 // <paradatatail> -> e
-Var* Parser::paradatatail(Symbol s,string name,int ptrLevel)
+Var* Parser::paradatatail(Type* s,string name,int ptrLevel)
 {
     if(match(LBRACK)){
         // 函数参数列表中的数组可以没有指定长度, 即使指定长度也忽略
@@ -321,7 +371,7 @@ void Parser::paralist(std::vector<Var*>& para)
 {
     if(match(COMMA)){
         if(FIRST_TYPE){
-            Symbol s = type();
+            Type* s = type();
             Var* var = paradata(s);
             symtab.addVar(var);
             para.push_back(var);
@@ -374,8 +424,8 @@ void Parser::subprogram()
 void Parser::localdef()
 {
     string name;
-    Symbol s = type();
-    def(false,s);
+    Type* s = type();
+    def(false, s);
 }
 
 // <statement> -> <altexpr>;
@@ -814,7 +864,7 @@ Symbol Parser::lop()
 }
 
 // <val>    -> <elem><rop> 
-// <val>    -> <elem><expr> 强制类型转换   
+// <val>    -> <elem><expr>     # 强制类型转换   
 Var* Parser::val()
 {
     Var* val = elem();
@@ -841,8 +891,9 @@ Symbol Parser::rop()
 }
 
 // <elem>   -> <ID><idexpr>
-// <elem>   -> ( <expr> ) | ( <castype> )
-// <elem>   -> <literal>
+//          -> ( <expr> ) | ( <castype> )
+//          -> <literal>
+//          -> sizeof ( <type> | <elem> )
 Var* Parser::elem()
 {
     Var* val = nullptr;
@@ -862,6 +913,23 @@ Var* Parser::elem()
             recovery(LVAL_OP,RPAREN_LOST,RPAREN_WRONG);
         }
     }
+    else if(match(KW_SIZEOF)) {
+        if(!match(LPAREN)) {
+            recovery(FIRST_TYPE, LPAREN_LOST, LPAREN_WRONG);
+        }
+
+        if(FIRST_TYPE) {
+            Type* t = type();
+            val = new Var(t->getSize());
+        } else {
+            Var* v  = elem();
+            val = new Var(v->getSize());
+        }
+        
+        if(!match(RPAREN)){
+            recovery(LVAL_OP,RPAREN_LOST,RPAREN_WRONG);
+        }
+    }
     else{
         val = literal();
     }
@@ -872,7 +940,7 @@ Var* Parser::elem()
 // <castype> -> <type> <mulss>
 Var* Parser::castype()
 {
-    Symbol s = type();
+    Type* s = type();
     int ptrLevel = 0;
     while(match(MUL)) {
         ptrLevel++;
@@ -885,7 +953,10 @@ Var* Parser::castype()
     return type;
 }
 
-// <idexpr> -> [ <expr> ] | ( <realarg> ) | e
+// <idexpr> -> [ <expr> ] 
+//          -> ( <realarg> ) 
+//          -> <member><membertail>         
+//          -> e
 Var* Parser::idexpr(string name)
 {
     Var* val = nullptr;
@@ -911,6 +982,10 @@ Var* Parser::idexpr(string name)
         Fun* fun = symtab.getFun(name,args);
         return ir.genCall(fun,args);
     }
+    else if(firstIs(POINT)_OR_(ARROW)) {
+        Var* base = symtab.getVal(name);
+        return member(base);
+    }
     else{
         // 没有其他后缀,是普通的变量
         val = symtab.getVal(name);
@@ -918,6 +993,38 @@ Var* Parser::idexpr(string name)
 
     return val;
 }
+
+// <member> -> .<ID><membertail>    # 成员变量访问
+//          -> -><ID><membertail>   # 箭头操作符访问 
+Var* Parser::member(Var* base)
+{
+    bool isArrow = false;
+    if(firstIs(ARROW)) {
+        isArrow = true;
+    } 
+    move();
+
+    string member = ((ID*)look)->name;
+    move();
+
+    Type* baseType = base->getType();
+    Var* memberType = Type::getMember(baseType, member);
+    int offset = Type::getOffset(baseType, member);
+    Var* tmp = ir.genOffset(base, memberType, offset, isArrow);
+    return membertail(tmp);
+}
+
+// <membertail> -> <member><membertail>
+//              -> e
+Var* Parser::membertail(Var* base)
+{
+    if(firstIs(POINT)_OR_(ARROW)) {
+        return member(base);
+    }
+
+    return base;
+}
+
 
 // <realarg> -> <arg><arglist>
 
