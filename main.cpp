@@ -116,7 +116,7 @@ void execCmd(const string& path, const string& cmd, const string& file)
 	sprintf(cmdBuf, "%s%s %s", path.c_str(),cmd.c_str(),file.c_str());
 	int v = system(cmdBuf);
 	if( v != 0 ) {
-		printf("执行:%s 返回值为%d, 终止编译过程.", cmdBuf, WEXITSTATUS(v));
+		printf("执行:%s 返回值为%d, 终止编译过程.\n", cmdBuf, WEXITSTATUS(v));
 		exit(0);
 	}
 
