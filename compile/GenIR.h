@@ -31,7 +31,7 @@ public:
     Var* genArray(Var* array,Var* index);
     void genArrayInit(Var* array, std::vector<Var*> arrVal);
     Var* genCall(Fun* fun, std::vector<Var*>& args);
-    Var* genOffset(Var* base, Type* member, int offset);
+    Var* genOffset(Var* base, Var* memberType, int offset, bool isArrow);
 
     void genIfHead(Var* cond,InterInst*& _else);
     void genIfTail(InterInst*& _else);

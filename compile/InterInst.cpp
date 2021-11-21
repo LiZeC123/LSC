@@ -376,7 +376,7 @@ void InterInst::toX86(InterCode* inst,FILE* file)
 		storeVar("eax","al",result,file);
 		break;
 	case OP_ACCESS:
-		leaVar("eax",arg1,file);
+		loadVar("eax", "al", arg1, file);
 		loadVar("ebx", "bl", arg2, file);
 		emit("add eax, ebx");
 		storeVar("eax","al",result,file);
@@ -427,7 +427,7 @@ void InterInst::printSelf()
 		case OP_LEA:result->value();printf(" = ");printf("&");arg1->value();break;
 		case OP_SET:printf("*");arg1->value();printf(" = ");result->value();break;
 		case OP_GET:result->value();printf(" = ");printf("*");arg1->value();break;
-		case OP_ACCESS:result->value();printf(" = ");arg1->value();printf("->");arg2->value();break;
+		case OP_ACCESS:result->value();printf(" = ");arg1->value();printf("+Offset:");arg2->value();break;
 	}
 	printf("\n");
 }

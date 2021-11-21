@@ -116,14 +116,14 @@ int Type::getOffset(Type* base, std::string member)
     throw runtime_error("Get Offset Of Undefined Type. Base=" + name + "member="+member);
 }
 
-Type* Type::getMemberType(Type* base, std::string member)
+Var* Type::getMember(Type* base, std::string member)
 {
     string name = base->getName();
     if(structTab.find(name) != structTab.end()) {
-        return structTab[name]->getMemberType(member);
+        return structTab[name]->getMember(member);
     }
     //TODO: 检查是否为结构体类, 并适当处理
-    throw runtime_error("Get Offset Of Undefined Type. Base=" + name + "member="+member);
+    throw runtime_error("Get Offset Of Undefined Member. Base=" + name + "member="+member);
 }
 
 
@@ -162,15 +162,15 @@ int Struct::getOffset(string name)
     throw runtime_error("Get Unknown Offset: " + name);
 }
 
-Type* Struct::getMemberType(std::string name)
+Var* Struct::getMember(std::string name)
 {
     for(Var* v: members) {
         if(v->getName() == name) {
-            return v->getType();
+            return v;
         }
     }
 
-    throw runtime_error("Get Unknown Type: " + name);
+    throw runtime_error("Get Unknown Member: " + name);
 }
 
 

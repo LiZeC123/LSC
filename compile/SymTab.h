@@ -20,7 +20,7 @@ public:
     Struct(std::vector<Var*> members);
     int getSize();
     int getOffset(std::string name);
-    Type* getMemberType(std::string name);
+    Var* getMember(std::string name);
     void printSelf();
 private:
     void addVar(Var* member);
@@ -53,7 +53,7 @@ public:
     static void defStruct(std::string structName, std::vector<Var*> members);
     static Struct* getStruct(std::string name);
     static int getOffset(Type* base, std::string member);
-    static Type* getMemberType(Type* base, std::string member);
+    static Var* getMember(Type* base, std::string member);
     static void printStruct();
 private:
     Symbol type;

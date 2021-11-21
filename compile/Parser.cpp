@@ -955,7 +955,7 @@ Var* Parser::castype()
 
 // <idexpr> -> [ <expr> ] 
 //          -> ( <realarg> ) 
-//          -> .<ID><elem>
+//          -> <member><membertail>         
 //          -> e
 Var* Parser::idexpr(string name)
 {
@@ -982,19 +982,9 @@ Var* Parser::idexpr(string name)
         Fun* fun = symtab.getFun(name,args);
         return ir.genCall(fun,args);
     }
-    else if(firstIs(POINT)) {
-        //TODO: 箭头符号
+    else if(firstIs(POINT)_OR_(ARROW)) {
         Var* base = symtab.getVal(name);
-        int offset = 0;
-        Type* baseType = base->getType();
-        while(match(POINT)) {
-            string member = ((ID*)look)->name;
-            move();
-            offset += Type::getOffset(baseType, member);
-            baseType = Type::getMemberType(baseType, member);
-        }
-
-        return ir.genOffset(base, baseType, offset);
+        return member(base);
     }
     else{
         // 没有其他后缀,是普通的变量
@@ -1003,6 +993,38 @@ Var* Parser::idexpr(string name)
 
     return val;
 }
+
+// <member> -> .<ID><membertail>    # 成员变量访问
+//          -> -><ID><membertail>   # 箭头操作符访问 
+Var* Parser::member(Var* base)
+{
+    bool isArrow = false;
+    if(firstIs(ARROW)) {
+        isArrow = true;
+    } 
+    move();
+
+    string member = ((ID*)look)->name;
+    move();
+
+    Type* baseType = base->getType();
+    Var* memberType = Type::getMember(baseType, member);
+    int offset = Type::getOffset(baseType, member);
+    Var* tmp = ir.genOffset(base, memberType, offset, isArrow);
+    return membertail(tmp);
+}
+
+// <membertail> -> <member><membertail>
+//              -> e
+Var* Parser::membertail(Var* base)
+{
+    if(firstIs(POINT)_OR_(ARROW)) {
+        return member(base);
+    }
+
+    return base;
+}
+
 
 // <realarg> -> <arg><arglist>
 

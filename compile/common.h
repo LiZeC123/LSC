@@ -17,7 +17,8 @@ typedef enum {
     LPAREN,RPAREN,                  //()
     LBRACK,RBRACK,                  //[]
     LBRACE,RBRACE,                  //{}
-    COMMA,COLON,SEMICON,POINT,      //逗号,冒号,分号,小数点
+    COMMA,COLON,SEMICON,            //逗号,冒号,分号
+    POINT, ARROW,                   //小数点, 箭头符号
     ASSIGN,                         //赋值
     KW_IF,KW_ELSE,                  //if-else
     KW_SWITCH,KW_CASE,KW_DEFAULT,   //swicth-case-deault

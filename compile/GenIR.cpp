@@ -500,18 +500,29 @@ Var* GenIR::genCall(Fun* fun, std::vector<Var*>& args)
     }
 }
 
-Var* GenIR::genOffset(Var* base, Type* member, int offset)
+Var* GenIR::genOffset(Var* base, Var* memberType, int offset, bool isArrow)
 {
     if(!base || offset < 0) {
         return nullptr;
     }
 
+    if(isArrow) {
+        // 如果是以箭头方式访问, 说明base变量存储的就是地址, 因此使用取内容指令获得地址值
+        base = genAssign(base);
+    } else {
+        // 否则说明base变量表示的是一个成员变量, 因此先获得此成员变量的地址
+        base = genLea(base);
+    }
+
     Var* tmp = new Var(symtab.getScopePath(), base);
     symtab.addInst(new InterInst(OP_ACCESS, tmp, base, new Var(offset)));
-    tmp->setType(member);
-    tmp->setPtrLevel(1);
+    
+    // 执行完ACCESS后,仅完成偏移值的计算, 相当于对应成员变量的指针
+    tmp->setType(memberType->getType());
+    tmp->setPtrLevel(memberType->getPtrLevel() + 1);
     symtab.addVar(tmp);
 
+    // 执行取内容操作, 得到对应的成员变量
     return genPtr(tmp);
 }
 
