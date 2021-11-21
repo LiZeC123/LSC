@@ -37,7 +37,7 @@ char f4()
     return X_Char;
 }
 
-void TestBase()
+void BaseTest()
 {
     int f = f1();
     int g = f2(42, -1);
@@ -147,10 +147,7 @@ void TestRecursive()
 
 int main()
 {
-    // 返回指针
-    // 可变参数
-
-    TestBase();
+    BaseTest();
 
     TestArray();
     TestStringArray();
