@@ -109,64 +109,67 @@ uninstall(){
 }
 
 
+subCmd=$1
 
-if [ $1x == "ass"x ]
-then
-	makeAssembler
-elif [ $1x == "cmp"x ]
-then
-	makeCompiler
-elif [ $1x == "lit"x ]
-then
-	makeLinker
-elif [ $1x == "lib"x ]
-then
-	makeLibary
-elif [ $1x == "main"x ]
-then
-	makeMain
-elif [ $1x == "lar"x ]
-then
-	makeLar
-elif [ $1x == "clear"x ]
-then
-	makeClear
-elif [ $1x == "install"x ]
-then
-	install
-elif [ $1x == "uninstall"x ]
-then
-	uninstall
-elif [ $1x == "reinstall"x ]
-then
-	uninstall
-	install
-elif [ $1x == "full-reinstall"x ]
-then
-	uninstall
-	echo "清除编译中间结果..."
-	makeClear
-	install
-elif [ $1x == "all"x ]
-then
-	makeAll
-else
-	echo "无效的参数: $1"
-	echo ""
-	echo "用法: ./makeProject [参数]"
-	echo "参数可以选择以下值:"
-	echo "install     编译并安装lsc编译系统"
-	echo "uninstall   卸载lsc编译系统"
-	echo "reinstall   重装lsc编译系统"
-	echo "all         编译整个项目"
-	echo "ass         编译汇编器"
-	echo "cmp         编译编译器"
-	echo "lit         编译连接器"
-	echo "lib         编译标准库"
-	echo "lar         编译压缩模块"
-	echo "main        编译主函数"
-	echo "clear       清除编译中间结果"	
-	echo ""
-fi
+case $subCmd in
+	ass)
+		makeAssembler
+		;;
+	cmp)
+		makeCompiler
+		;;
+	lit)
+		makeLinker
+		;;
+	lib)
+		makeLibary
+		;;
+	lar)
+		makeLar
+		;;
+	main)
+		makeMain
+		;;
+	clear)
+		makeClear
+		;;
+	install | i )
+		install
+		;;
+	uninstall | u)
+		uninstall
+		;;
+	reinstall | r)
+		uninstall
+		install
+		;;
+	full-reinstall | fr)
+		uninstall
+		echo "清除编译中间结果..."
+		makeClear
+		install	
+		;;
+	all)
+		makeAll
+		;;
+	*)
+		echo "无效的参数: $1"
+		echo ""
+		echo "用法: ./makeProject [参数]"
+		echo "参数可以选择以下值:"
+		echo "install     编译并安装lsc编译系统"
+		echo "uninstall   卸载lsc编译系统"
+		echo "reinstall   重装lsc编译系统"
+		echo "all         编译整个项目"
+		echo "ass         编译汇编器"
+		echo "cmp         编译编译器"
+		echo "lit         编译连接器"
+		echo "lib         编译标准库"
+		echo "lar         编译压缩模块"
+		echo "main        编译主函数"
+		echo "clear       清除编译中间结果"	
+		echo ""
+		;;
+esac
 
 
