@@ -64,6 +64,10 @@ makeClear(){
 	cd ..
 }
 
+runTest(){
+	./runProjectTest
+}
+
 copyStdLib(){
 	sudo cp ./stdlib/lscio.h   /usr/include/lsc/lscio.h
 	sudo cp ./stdlib/lsclib.h  /usr/include/lsc/lsclib.h
@@ -78,7 +82,7 @@ copyExeFile(){
 	sudo cp ./compile/lscc /usr/local/bin/lscc
 	sudo cp ./ass/lsca 	   /usr/local/bin/lsca
 	sudo cp ./lit/lscl     /usr/local/bin/lscl
-  sudo cp ./lar/lar      /usr/local/bin/lar
+	sudo cp ./lar/lar      /usr/local/bin/lar
 }
 
 removeExeFile(){
@@ -98,7 +102,10 @@ install(){
 	copyStdLib
 	copyExeFile
 
-	echo "安装完成"
+	echo "运行测试用例..."
+	runTest
+
+	echo "安装完成!"
 }
 
 uninstall(){
