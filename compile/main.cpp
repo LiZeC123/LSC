@@ -118,16 +118,19 @@ int main(int argc,char* argv[])
         parser.setPrintToken();
     }
 
-    // 开始分析
-    parser.analyse();
+    try {
+        // 分析代码
+        parser.analyse();
 
-  
-    // 根据需求输出中间结果
-    printTables(args,tab);
+        // 根据需求输出中间结果
+        printTables(args,tab);
 
-    
-    // 生成汇编代码文件
-    genFile(filename,tab);
+        // 生成汇编代码文件
+        genFile(filename,tab);
+    } catch(std::runtime_error& e) {
+        printf("%s\n",e.what());
+        printf("compilation terminated.\n");
+    }
 
     if(err.getErrorNum() > 0 && args.printStats){
         printf("\n编译完成!\n");
