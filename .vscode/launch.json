@@ -2,6 +2,29 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "编译器模块调试",
+            "type": "cppdbg",
+            "request": "launch",
+            "preLaunchTask": "makeCompile",
+            "program": "${workspaceFolder}/compile/lscc",
+            "args": [
+                "${workspaceFolder}/test/99test.c"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
             "name": "Lar Decode Launch",
             "type": "cppdbg",
             "request": "launch",
@@ -78,29 +101,6 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
-        },
-        {
-            "name": "Compile Launch",
-            "type": "cppdbg",
-            "request": "launch",
-            "preLaunchTask": "makeCompile",
-            "program": "${workspaceFolder}/compile/lscc",
-            "args": [
-                "${workspaceFolder}/test/99test.c"
-            ],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
