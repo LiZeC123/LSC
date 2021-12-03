@@ -97,6 +97,8 @@ int arrayTest()
 
 void sizeOfTest()
 {
+    sizeof(int);    // 空sizeof语句测试
+
     char arr[7];
     checkEquals(sizeof("123456"), 7, __LINE__);
     checkEquals(sizeof(arr), 7, __LINE__);

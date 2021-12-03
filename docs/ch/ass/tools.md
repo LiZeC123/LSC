@@ -7,6 +7,8 @@
 ---------------
 可以从[此处](http://www.nasm.us/pub/nasm/releasebuilds/)获得各个版本的NASM,选择其中的最新的稳定版下载即可,例如当前的最新版是[2.13](http://www.nasm.us/pub/nasm/releasebuilds/2.13/). 
 
+> 也可以直接使用apt安装
+
 进入下载页面后,可以选择.tar.gz后缀的文件下载. 注意,一般有两个.tar.gz后缀的文件,其中一个是文档(以_xdoc.tar.gz结尾),另外一个才是真正的项目源代码. 
 
 
@@ -29,6 +31,7 @@ tar zxvf nasm-XXX.tar.gz
 ------------------
 
 进入解压后的目录,打开命令行,依次输入以下命令
+
 ``` shell
 ./configure
 make
@@ -39,12 +42,18 @@ sudo make install
 
 测试
 ---------------------
+
 在命令行输入
+
 ```
 nasm -version
 ```
 
-如果出现版本信息,说明nasm安装正常
+如果出现版本信息,说明nasm安装正常. 关于NASM的基本操作,  可以参考如下的一些资料
+
+- [NASM Tutorial](https://cs.lmu.edu/~ray/notes/nasmtutorial/)
+- [NASM 示例](https://cee.github.io/NASM-Tutorial/)
+
 
 nasm汇编过程
 ------------------------
@@ -52,7 +61,9 @@ nasm汇编过程
 以下演示一个基本的nasm汇编的操作过程.
 
 #### 1. 编写源代码
+
 在任意目录下建立一个hello.asm文件,并输入以下内容
+
 ``` asm
 section .text
 global main
@@ -69,7 +80,9 @@ db "Hello world!",0ah,0dh
 ```
 
 #### 2. 汇编
+
 在此目录下打开命令行,输入以下代码进行汇编
+
 ``` shell
 nasm -f elf64(elf32) hello.asm 
 ```
@@ -79,21 +92,16 @@ nasm -f elf64(elf32) hello.asm
 - 执行完毕后,应该产生hello.o文件
 
 #### 3. 链接
-最后使用gcc对代码进行链接即可生成可执行程序
-如果之前指定的是`-f elf64`,则可直接调用gcc进行链接,即
+
+使用GCC组件中的ld工具对生成的`.o`文件进行连接操作, 即
 
 ``` shell
-gcc hello.o -o hello
+ld hello.o
 ```
 
-否则需要对gcc使用`-m32`来制定按照32位进行链接,即
-
-``` shell
-gcc -o hello hello.o -m32
-```
-
-如果没有错误,进行此步操作以后,即可生成可执行文件hello
+如果没有错误, 进行此步操作以后, 即可生成可执行文件a.out
 
 #### 4. 执行
+
 输入`./hello`, 此时如果命令行输出 `Hell Wordl!` 则说明程序生成正确
 

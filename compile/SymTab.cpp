@@ -55,14 +55,13 @@ int Type::getSize()
     } else if(type == KW_CHAR) {
         return 1;
     } else if (type == KW_VOID) {
-        // TODO: void 类型没有大小, 需要报错
-        throw runtime_error("Void Type Cannot Get Size");
+        // void类型size与char相同
+        return 1;
     } else {
         if(structTab.find(name) != structTab.end()){
             return structTab[name]->getSize();
         }
         else {
-            //TODO: 未定义结构体的处理
             throw runtime_error("Struct Type Cannot Get Size");
         }
     }
@@ -112,7 +111,7 @@ int Type::getOffset(Type* base, std::string member)
     if(structTab.find(name) != structTab.end()) {
         return structTab[name]->getOffset(member);
     }
-    //TODO: 检查是否为结构体类, 并适当处理
+    
     throw runtime_error("Get Offset Of Undefined Type. Base=" + name + "member="+member);
 }
 
@@ -122,8 +121,8 @@ Var* Type::getMember(Type* base, std::string member)
     if(structTab.find(name) != structTab.end()) {
         return structTab[name]->getMember(member);
     }
-    //TODO: 检查是否为结构体类, 并适当处理
-    throw runtime_error("Get Offset Of Undefined Member. Base=" + name + "member="+member);
+
+    throw runtime_error("Get Member Of Undefined Type. Base=" + name + "member="+member);
 }
 
 

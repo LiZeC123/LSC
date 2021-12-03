@@ -8,7 +8,7 @@
 #define FIRST_TYPE firstIs(KW_INT)_OR_(KW_CHAR)_OR_(KW_VOID)_OR_(KW_STRUCT)
 //表达式First集
 #define FIRST_EXPR firstIs(LPAREN)_OR_(NUM)_OR_(CH)_OR_(STR)_OR_(IDENT)_OR_(NOT)         \
-_OR_(SUB)_OR_(LEA)_OR_(MUL)_OR_(INC)_OR_(DEC)
+_OR_(SUB)_OR_(LEA)_OR_(MUL)_OR_(INC)_OR_(DEC)_OR_(KW_SIZEOF)
 //左值First集
 #define LVAL_OP firstIs(ASSIGN)_OR_(OR)_OR_(AND)_OR_(GT)_OR_(GE)_OR_(LT)_OR_(LE)_OR_(EQU) \
 _OR_(NEQU)_OR_(AND)_OR_(SUB)_OR_(MUL)_OR_(DIV)_OR_(MOD)_OR_(INC)_OR_(DEC)
