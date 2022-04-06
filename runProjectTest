@@ -1,23 +1,35 @@
 #! /bin/bash
 
-code=""
+pass=0
+all=0
 if [ $1x == "-n"x ]
 then
 	file=`find . -name  "${2}*.c"`
     echo $file;
     lsc $file;
     ./z.out
-    code+=$?
 else
     for file in `ls ./test/*.c`;
     do
         echo $file;
         lsc $file;
         ./z.out
-        code+=$?
+
+        if [ $? -eq 0 ]
+        then
+            pass=`expr $pass + 1`
+        fi
+        all=`expr $all + 1`
     done
 fi
 
-echo
-echo "返回码为$code"
-exit $((code))
+echo ""
+echo "共执行${all}个测试用例, 通过${pass}个测试用例"
+if [ "$all" == "$pass" ]
+then
+    echo "全部测试用例通过测试"
+    exit 0
+else
+    echo "部分测试用例未通过测试"
+    exit 1
+fi
