@@ -51,13 +51,9 @@ void initTree(struct TreeNode *root) {
 }
 
 struct LinkedNode *reverseList(struct LinkedNode *head) {
-  if ((head == LNULL) || (head->next == LNULL)) {
+  if (head == LNULL || head->next == LNULL) {
     return head;
   }
-
-  // if (head->next == LNULL) {
-  //   return head;
-  // }
 
   struct LinkedNode *newHead = reverseList(head->next);
   head->next->next = head;
@@ -85,8 +81,8 @@ void ReverseTest() {
 
 void ReverseTest2() {
   struct LinkedNode *head = LNULL;
-  // head = reverseList(head);
-  // checkEquals(head, LNULL, __LINE__);
+  head = reverseList(head);
+  checkEquals(head, LNULL, __LINE__);
 
   head = (struct LinkedNode *)lscmalloc(sizeof(struct LinkedNode));
   head->data = 42;
@@ -109,8 +105,19 @@ struct TreeNode *SwapTree(struct TreeNode *root) {
 }
 
 int sameTree(struct TreeNode *A, struct TreeNode *B) {
-  return 0;
-  //if()
+  if (A == TNULL && B == TNULL) {
+    return 1;
+  }
+
+  if (A == TNULL || B == TNULL) {
+    return 0;
+  }
+
+  if (A->value != B->value) {
+    return 0;
+  }
+
+  return sameTree(A->left, B->left) && sameTree(A->right, B->right);
 }
 
 void SwapTest() {
@@ -125,10 +132,27 @@ void SwapTest() {
   base = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
   initTree(base);
 
-  // checkTrue(sameTree(base, root), __LINE__);
+  checkTrue(sameTree(base, root), __LINE__);
 }
 
+void SwapTest2() {
+  struct TreeNode *root = TNULL;
+  struct TreeNode *base = TNULL;
+  root = SwapTree(root);
+  root = SwapTree(root);
+  checkTrue(sameTree(TNULL, root), __LINE__);
 
+  root = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
+  base = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
+  root->value = 42;
+  base->value = 42;
+  root->left = TNULL;
+  base->left = TNULL;
+  root->right = TNULL;
+  base->right = TNULL;
+
+  checkTrue(sameTree(base, root), __LINE__);
+}
 
 int main() {
   ReverseTest();
