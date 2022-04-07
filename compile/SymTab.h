@@ -271,6 +271,7 @@ public:
 
 public:
     static Var* varVoid;
+    static Var* zero;
     static Var* one;
     static Var* four;
     

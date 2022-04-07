@@ -8,6 +8,7 @@
 using namespace std;
 
 Var* SymTab::varVoid = nullptr;
+Var* SymTab::zero = nullptr;
 Var* SymTab::one = nullptr;
 Var* SymTab::four = nullptr;
 
@@ -867,6 +868,7 @@ Fun::~Fun()
 SymTab::SymTab()
 {
     varVoid = new Var();
+    zero = new Var(0);
     one = new Var(1);
     four = new Var(4);
     scopeId = 0;
