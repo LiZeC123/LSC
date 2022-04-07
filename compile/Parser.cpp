@@ -907,7 +907,7 @@ Symbol Parser::lop()
 }
 
 // <val>    -> <elem><rop> 
-// <val>    -> <elem><expr>     # 强制类型转换   
+// <val>    -> <elem><aloexpr>     # 强制类型转换   
 Var* Parser::val()
 {
     Var* val = elem();
@@ -918,7 +918,8 @@ Var* Parser::val()
     }
 
     if(val->isCastType() && (FIRST_EXPR)) {
-        Var* rval = expr();
+        // 强制类型转换后只能接一个aloexpr级别的表达式，以免对符号优先级判定产生错误
+        Var* rval = aloexpr();
         return ir.genCastOp(val, rval);
     }
 
