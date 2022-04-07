@@ -723,11 +723,32 @@ Var* Parser::orexpr()
 Var* Parser::ortail(Var* lval)
 {
     if(match(OR)){
+        InterInst* _else; 
+        InterInst* _exit = new InterInst(); 
+
+        Var* tmp = new Var(symtab.getScopePath(),new Type(KW_INT),0);
+        symtab.addVar(tmp); 
+
+        // 如果为真，直接短路返回真，否则跳转至else分支执行
+        ir.genIfHead(lval, _else);
+        symtab.addInst(new InterInst(OP_AS,tmp,SymTab::one));
+        symtab.addInst(new InterInst(OP_JMP,_exit));   
+
+        // else分支内执行求值操作
+        // 当前表达式的值仅取决与右侧值，并递归计算整个表达式的值
+        symtab.addInst(_else); 
         Var* rval = andexpr();
-        // 左结合,在递归之前生成代码
-        Var* result = ir.genTwoOp(lval,OR,rval);
-        return ortail(result);
+        Var* tail = ortail(rval);
+        
+        // 将计算值赋予tmp变量，使得无论是否短路，均从tmp返回
+        symtab.addInst(new InterInst(OP_AS,tmp,tail));
+
+        // 最后插入exit块的代码
+        ir.genElseTail(_exit);
+
+        return tmp;
     }
+
     return lval;
 }
 
@@ -743,9 +764,31 @@ Var* Parser::andexpr()
 Var* Parser::andtail(Var* lval)
 {
     if(match(AND)){
+        InterInst* _else; 
+        InterInst* _exit = new InterInst(); 
+
+        Var* tmp = new Var(symtab.getScopePath(),new Type(KW_INT),0);
+        symtab.addVar(tmp); 
+
+        // 如果为假，直接短路返回假，否则跳转至else分支执行
+        Var* nlval = ir.genOneLeftOp(NOT, lval);
+        ir.genIfHead(nlval, _else);
+        symtab.addInst(new InterInst(OP_AS,tmp,SymTab::zero));
+        symtab.addInst(new InterInst(OP_JMP,_exit));   
+
+        // else分支内执行求值操作
+        // 当前表达式的值仅取决与右侧值，并递归计算整个表达式的值
+        symtab.addInst(_else); 
         Var* rval = comexpr();
-        Var* result = ir.genTwoOp(lval,AND,rval);
-        return andtail(result);
+        Var* tail = andtail(rval);
+        
+        // 将计算值赋予tmp变量，使得无论是否短路，均从tmp返回
+        symtab.addInst(new InterInst(OP_AS,tmp,tail));
+
+        // 最后插入exit块的代码
+        ir.genElseTail(_exit);
+
+        return tmp;
     }
 
     return lval;

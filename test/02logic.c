@@ -38,8 +38,12 @@ int main()
     // 组合逻辑表达式
     checkTrue(true && true && true, __LINE__);
     checkFalse(true && false && true, __LINE__);
+    checkFalse(false && false && true, __LINE__);
+
     checkTrue(true || false || true, __LINE__);
+    checkTrue(false || false || true, __LINE__);
     checkFalse(false || false || false, __LINE__);
+
     checkTrue(false || (true && true), __LINE__);
     checkTrue(true || (false && true), __LINE__);
 
