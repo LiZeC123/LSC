@@ -29,25 +29,20 @@ void initList(struct LinkedNode *head) {
 }
 
 void initTree(struct TreeNode *root) {
-  struct TreeNode *A;
-  struct TreeNode *B;
-  struct TreeNode *C;
+  struct TreeNode * data[5];
 
-  A = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
-  A->value = 1;
-  B = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
-  B->value = 2;
-  C = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
-  C->value = 3;
+  for(int i=0;i<5;i++){
+    data[i] = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
+    data[i]->value = 0x1234cacd + i;
+    data[i]->left = TNULL;
+    data[i]->right = TNULL;
+  }
 
-  root->left = A;
-  root->right = B;
-  A->left = TNULL;
-  A->right = TNULL;
-  B->left = C;
-  B->right = TNULL;
-  C->left = TNULL;
-  C->right = TNULL;
+  root->left = data[0];
+  root->right = data[1];
+  data[0]->left = data[2];
+  data[0]->right = data[3];
+  data[1]->left = data[4];
 }
 
 struct LinkedNode *reverseList(struct LinkedNode *head) {
@@ -156,8 +151,12 @@ void SwapTest2() {
 
 int main() {
   ReverseTest();
+  
   ReverseTest2();
+  
   SwapTest();
+  
+  SwapTest2();
 
   return 0;
 }
