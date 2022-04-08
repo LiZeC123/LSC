@@ -70,7 +70,7 @@ void BasePointAccessTest() {
   sa.mE = 'C';
   sa.mF = 0x0303fede;
 
-  struct StructA* ps;
+  struct StructA* ps = &sa;
 
   checkEquals(ps->mA, 0x12345432, __LINE__);
   checkCharEquals(ps->mB, 'A', __LINE__);
@@ -103,12 +103,42 @@ void SizeOfTest() {
   checkEquals(sizeof(struct Rect), 20, __LINE__);
 }
 
+void ArrayTest() {
+  struct Point2D p2d[10];
+
+  for (int i = 0; i < 10; i++) {
+    p2d[i].x = 0x3f3f3f3f + i;
+    p2d[i].y = 0xcafebabe - i;
+  }
+
+  checkEquals(p2d[0].x, 0x3f3f3f3f + 0, __LINE__);
+  checkEquals(p2d[3].x, 0x3f3f3f3f + 3, __LINE__);
+  checkEquals(p2d[7].x, 0x3f3f3f3f + 7, __LINE__);
+  checkEquals(p2d[9].x, 0x3f3f3f3f + 9, __LINE__);
+
+  checkEquals(p2d[0].y, 0xcafebabe - 0, __LINE__);
+  checkEquals(p2d[4].y, 0xcafebabe - 4, __LINE__);
+  checkEquals(p2d[6].y, 0xcafebabe - 6, __LINE__);
+  checkEquals(p2d[9].y, 0xcafebabe - 9, __LINE__);
+}
+
+struct Sar
+{
+  int x;
+  struct Point2D arr[3];
+};
+
+
 int main() {
   BaseAccessTest();
+
+  BasePointAccessTest();
 
   MutilAccessTest();
 
   SizeOfTest();
+
+  ArrayTest();
 
   return 0;
 }

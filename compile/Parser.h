@@ -92,9 +92,8 @@ private:
     Var* val();
     Symbol rop();
     Var* elem();
-    Var* idexpr(std::string name);
+    Var* idexpr(std::string name, Var* base);
     Var* member(Var* base);
-    Var* membertail(Var* base);
     void realarg(std::vector<Var*>& vec);
     Var* arg();
     void arglist(std::vector<Var*>& vec);

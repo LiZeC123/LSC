@@ -944,7 +944,7 @@ Var* Parser::elem()
     if(firstIs(IDENT)){
         string name = ((ID*)look)->name;
         move();
-        val = idexpr(name);
+        val = idexpr(name, nullptr);
     }
     else if(match(LPAREN)){
         if(FIRST_TYPE) {
@@ -997,13 +997,13 @@ Var* Parser::castype()
     return type;
 }
 
-// <idexpr> -> [ <expr> ] 
+// <idexpr> -> [ <expr> ]<idexpr>
 //          -> ( <realarg> ) 
-//          -> <member><membertail>         
+//          -> <ARROW><ID><idexpr>
 //          -> e
-Var* Parser::idexpr(string name)
+Var* Parser::idexpr(string name, Var* base)
 {
-    Var* val = nullptr;
+    // Var* val = nullptr;
     if(match(LBRACK)){
         //方括号,是数组
         Var* index = expr();
@@ -1012,8 +1012,9 @@ Var* Parser::idexpr(string name)
             recovery(LVAL_OP,RBRACE_LOST,RBRACE_WRONG);
         }
 
-        Var* array = symtab.getVal(name);
-        return ir.genArray(array,index);
+        Var* array = base ? base : symtab.getVal(name);
+        base = ir.genArray(array,index);
+        return idexpr("", base);
     }
     else if(match(LPAREN)){
         // 圆括号,是函数调用
@@ -1027,19 +1028,18 @@ Var* Parser::idexpr(string name)
         return ir.genCall(fun,args);
     }
     else if(firstIs(POINT)_OR_(ARROW)) {
-        Var* base = symtab.getVal(name);
+        //点或者箭头, 是结构体访问操作
+        base = base ? base : symtab.getVal(name);
         return member(base);
     }
     else{
         // 没有其他后缀,是普通的变量
-        val = symtab.getVal(name);
+        return base ? base : symtab.getVal(name);
     }
-
-    return val;
 }
 
-// <member> -> .<ID><membertail>    # 成员变量访问
-//          -> -><ID><membertail>   # 箭头操作符访问 
+// <member> -> .<ID><idexpr>    # 成员变量访问
+//          -> -><ID><idexpr>   # 箭头操作符访问 
 Var* Parser::member(Var* base)
 {
     bool isArrow = false;
@@ -1055,23 +1055,13 @@ Var* Parser::member(Var* base)
     Var* memberType = Type::getMember(baseType, member);
     int offset = Type::getOffset(baseType, member);
     Var* tmp = ir.genOffset(base, memberType, offset, isArrow);
-    return membertail(tmp);
-}
 
-// <membertail> -> <member><membertail>
-//              -> e
-Var* Parser::membertail(Var* base)
-{
-    if(firstIs(POINT)_OR_(ARROW)) {
-        return member(base);
-    }
-
-    return base;
+    //进入结构体后，变量的名字就不具备定位变量的功能了
+    return idexpr("", tmp);
 }
 
 
 // <realarg> -> <arg><arglist>
-
 void Parser::realarg(vector<Var*>& vec)
 {
     // 如果读取到右括号,说明没有参数,直接返回即可

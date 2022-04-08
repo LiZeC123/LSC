@@ -408,8 +408,7 @@ Var* Var::getStep()
             return SymTab::four;
         }
         else{
-            //TODO: 结构体指针正确的计算偏移值
-            return nullptr;
+            return new Var(this->type->getSize());
         }
     }
     else if(level >= 2){
