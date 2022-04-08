@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "编译器模块调试",
+            "name": "编译器模块",
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "makeCompile",
@@ -88,13 +88,13 @@
             ]
         },
         {
-            "name": "Ass Launch",
+            "name": "汇编器模块",
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "makeAss",
             "program": "${workspaceFolder}/ass/lsca",
             "args": [
-                "${workspaceFolder}/stdlib/lsclib.s"
+                "${workspaceFolder}/test/99test.s"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -110,7 +110,7 @@
             ]
         },
         {
-            "name": "Link Launch",
+            "name": "链接器模块",
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "makeLit",

@@ -242,6 +242,7 @@ void Parser::oprand(OpType& type,int& len,int& regNum)
         type = IMMEDIATE;
         move();
         instr.imm32 = - ((Num*)look)->val;  // 取负数
+        move();
         break;
     default:
         type = REGISTER;

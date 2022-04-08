@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "Generator.h"
 #include "Scanner.h"
 #include "Parser.h"
@@ -201,6 +202,10 @@ void Generator::genOneOp(Symbol s,OpType type,int len)
 
 void Generator::genNonOp(Symbol s)
 {
+    if(s != I_RET) {
+        throw std::runtime_error("Unknow NonOp Code");
+    }
+
     int op = NonOpCodep[s-I_RET];
     writeBytes(op,1);
 }
