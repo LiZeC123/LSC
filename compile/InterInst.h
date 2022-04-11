@@ -7,6 +7,7 @@
 class Var;
 class Fun;
 class InterCode;
+class Block;
 using std::string;
 
 /**
@@ -29,6 +30,17 @@ public:
     void initVar(Var* var,FILE* file);
     void toX86(InterCode* inst,FILE* file);
 
+    void setFirst();
+    bool isFirstOp();
+    InterInst* getTarget();
+    void setBlock(Block* block);
+    Block* getBlock();
+
+    bool isJumpOp();
+    bool isCondOp();
+
+
+
     void printSelf();
 private:
     std::string label;      // 用于表示是指令还是标签
@@ -38,6 +50,9 @@ private:
     Var* arg2;
     Fun* fun;               // 如果是函数调用指令,则保存被调函数
     InterInst* target;      // 如果是跳转指令,则保存跳转的目标地址
+
+    bool isfirstOp;         // 是否为首指令
+    Block* block;           // 此代码的所处的数据流块
 
     void init();
 };
@@ -50,12 +65,14 @@ public:
     InterCode(Fun* currFun);
     InterCode(const InterCode&) = delete;
     InterCode& operator=(const InterCode&) = delete;
+
     void addInst(InterInst* inst);
+
+    void markFirstOp();
+
     Fun* getFun();
-
-    void printSelf();
-
     const std::vector<InterInst*> getCode();
+    void printSelf();
 
     ~InterCode();
 

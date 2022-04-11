@@ -384,6 +384,35 @@ void InterInst::toX86(InterCode* inst,FILE* file)
 	}
 }
 
+void InterInst::setFirst() {
+	this->isfirstOp = true;
+}
+
+bool InterInst::isFirstOp() {
+	return this->isfirstOp;
+}
+
+InterInst* InterInst::getTarget() {
+	return this->target;
+}
+
+void InterInst::setBlock(Block* block) {
+	this->block = block;
+}
+
+Block* InterInst::getBlock() {
+	return this->block;
+}
+
+bool InterInst::isJumpOp() {
+	return op == OP_JMP || op == OP_RET || op ==OP_RETV;
+}
+
+bool InterInst::isCondOp() {
+	
+	return op == OP_JF || op == OP_JNE;
+}
+
 void InterInst::printSelf()
 {
     printf("\t");
@@ -450,6 +479,18 @@ Fun* InterCode::getFun()
 const vector<InterInst*> InterCode::getCode()
 {
     return code;
+}
+
+void InterCode::markFirstOp() {
+	unsigned int len = code.size();
+	code[0]->setFirst();
+	code[len-1]->setFirst();
+	for(unsigned int i=1;i<len-1;i++) {
+		if(code[i]->isJumpOp() || code[i]->isCondOp()) {
+			code[i]->getTarget()->setFirst();
+			code[i+1]->setFirst();
+		}
+	}
 }
 
 void InterCode::printSelf()
