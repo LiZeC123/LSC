@@ -40,7 +40,7 @@ int Scanner::scan()
     if (ch == -1)
     {
         fclose(fin);
-        fin = NULL;
+        fin = nullptr;
     }
     else if (ch != '\n')
     {
