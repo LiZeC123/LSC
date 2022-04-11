@@ -1,4 +1,6 @@
-OBJ = main.o Error.o GenIR.o InterInst.o Lexer.o Parser.o Scanner.o SymTab.o Token.o 
+SRC=$(wildcard *.cpp)
+OBJ=$(SRC:.cpp=.o)
+
 WARNFLG = -Wall -Wextra
 DEBUG = -g
 STD = -std=c++11
