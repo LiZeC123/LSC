@@ -4,6 +4,8 @@
 #include <assert.h>
 #include "SymTab.h"
 #include "Error.h"
+#include "DFG.h"
+#include "Propagation.h"
 
 using namespace std;
 
@@ -674,24 +676,31 @@ void Var::printSelf()
     printf("\n");
 }
 
-Fun::Fun(bool isExtern, Type* type,int ptrLevel,std::string name,std::vector<Var*> para) :
-    intercode(this)
-{
-    externed = isExtern;
-    this->type = type;
-    this->name = name;
-    this->paraVar = para;
-    this->ptrLevel = ptrLevel;
-    curEsp = 0;
-    maxDepth = 0;
-    for(unsigned int i=0,argOff=8;i<para.size();i++,argOff+=4){
-        paraVar[i]->setOffset(argOff);
-    }
-    
-    // 检查是否有可变参数, 可变参数只能是最后一个参数
-    if(para.size() > 0 && para[para.size() -1]->getName() == "<vararg>") {
-        this->vararg = true;
-    }
+void Var::setIndex(int index){
+    this->index = index;
+}
+
+int Var::getIndex() {
+    return this->index;
+}
+
+Fun::Fun(bool isExtern, Type* type, int ptrLevel, std::string name, std::vector<Var*> para)
+    : intercode(this), optCode(this) {
+  externed = isExtern;
+  this->type = type;
+  this->name = name;
+  this->paraVar = para;
+  this->ptrLevel = ptrLevel;
+  curEsp = 0;
+  maxDepth = 0;
+  for (unsigned int i = 0, argOff = 8; i < para.size(); i++, argOff += 4) {
+    paraVar[i]->setOffset(argOff);
+  }
+
+  // 检查是否有可变参数, 可变参数只能是最后一个参数
+  if (para.size() > 0 && para[para.size() - 1]->getName() == "<vararg>") {
+    this->vararg = true;
+  }
 }
 
 bool Fun::getExtern()
@@ -855,13 +864,6 @@ void Fun::printSelf()
     for(auto& i:v){
         i->printSelf();
     }
-}
-
-Fun::~Fun()
-{    
-    // 形参存放在变量表中,无需处理
-    // returnPoint存放在intercode中, 无需处理
-    // 直接由编译器调用各成员析构函数即可完成内存释放
 }
 
 SymTab::SymTab()
@@ -1116,6 +1118,11 @@ Fun* SymTab::getCurrFun()
     return currFun;
 }
 
+void SymTab::optimize() {
+
+}
+
+
 void SymTab::toX86(FILE* file)
 {
     fprintf(file,"section .data\n");
@@ -1127,27 +1134,6 @@ void SymTab::toX86(FILE* file)
             fprintf(file, "global %s\n", fun->getName().c_str());
             fprintf(file, "%s:\n", fun->getName().c_str());
             it->second->toX86(file);
-        }
-    }
-}
-
-SymTab::~SymTab()
-{
-    for(auto it = funTab.begin(); it != funTab.end();++it){
-        auto fun = it->second;
-        delete fun;
-    }
-
-    for(auto it = strTab.begin(); it != strTab.end(); ++it){
-        auto str = it->second;
-        delete str;
-    }
-
-    for(auto it = varTab.begin(); it != varTab.end(); ++it){
-        auto vec = it->second;
-
-        for(auto val: (*vec)){
-            delete val;
         }
     }
 }

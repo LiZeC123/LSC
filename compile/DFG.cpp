@@ -7,6 +7,13 @@ Block::Block(vector<InterInst*> codes) {
   }
 }
 
+DFG::DFG(InterCode& code) {
+  code.markFirstOp();
+  this->codeList = code.getCode();
+  createBlocks();
+  linkBlocks();
+}
+
 void DFG::createBlocks() {
   vector<InterInst*> tmp;
   tmp.push_back(codeList[0]);
@@ -35,4 +42,8 @@ void DFG::linkBlocks() {
       blocks[i + 1]->prevs.push_back(block);
     }
   }
+}
+
+void DFG::toCode(InterCode& optCode) {
+  optCode.clear();
 }

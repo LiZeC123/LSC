@@ -137,13 +137,15 @@ void printHelpInfo()
 {	
 	printf("指令格式 lsc [options] file ...\n");
 	printf("Options:\n");
-	printf("  -h 显示此信息\n");
-	printf("  -v 显示编译器版本信息\n");
-	printf("  -o 指定输出的可执行文件名\n");
-	printf("  -S 只进行编译\n");
-	printf("  -C 只进行编译和汇编\n");
-	printf("  -T 保留中间文件\n");
-	printf("  -x 输出调试控制指令信息\n");
+	printf("  -h  显示此信息\n");
+	printf("  -v  显示编译器版本信息\n");
+	printf("  -o  指定输出的可执行文件名\n");
+	printf("  -S  只进行编译\n");
+	printf("  -C  只进行编译和汇编\n");
+	printf("  -T  保留中间文件\n");
+	printf("  -O1 启用O1等级优化\n");
+	printf("  -O2 启用O2等级优化\n");
+	printf("  -x  输出调试控制指令信息\n");
 }
 
 void printMoreOptions()
@@ -153,6 +155,7 @@ void printMoreOptions()
 	printf("  --printFunTab       输出函数表\n");
 	printf("  --printStrTab       输出字符串表\n");
 	printf("  --printTokenStream  输出Token流\n");
+	printf("  --printDFG          输出数据流图\n");
 	printf("\n");
 	printf("汇编器指令:\n");
 	printf("  --printSymbolTable  输出符号表\n");
@@ -168,7 +171,7 @@ bool analyseModuleOptions(string option,Args& args)
 	// 各模块可支持的参数
 	const static set<string> cmpOptionArgs = {
 		"--printValTab","--printFunTab","--printStrTab",
-		"--printTokenStream"};
+		"--printTokenStream", "--printDFG", "-O1", "-O2"};
 	const static set<string> assOptionArgs = {"--printSymbolTable"};
 	const static set<string> litOptionArgs = {"--printLinkInfo"};
 

@@ -384,34 +384,35 @@ void InterInst::toX86(InterCode* inst,FILE* file)
 	}
 }
 
-void InterInst::setFirst() {
-	this->isfirstOp = true;
-}
+void InterInst::setFirst() { this->isfirstOp = true; }
 
-bool InterInst::isFirstOp() {
-	return this->isfirstOp;
-}
+bool InterInst::isFirstOp() { return this->isfirstOp; }
 
-InterInst* InterInst::getTarget() {
-	return this->target;
-}
+InterInst* InterInst::getTarget() { return this->target; }
 
-void InterInst::setBlock(Block* block) {
-	this->block = block;
-}
+void InterInst::setBlock(Block* block) { this->block = block; }
 
-Block* InterInst::getBlock() {
-	return this->block;
-}
+Block* InterInst::getBlock() { return this->block; }
 
 bool InterInst::isJumpOp() {
-	return op == OP_JMP || op == OP_RET || op ==OP_RETV;
+  return op == OP_JMP || op == OP_RET || op == OP_RETV;
 }
 
-bool InterInst::isCondOp() {
-	
-	return op == OP_JF || op == OP_JNE;
+bool InterInst::isCondOp() { return op == OP_JF || op == OP_JNE; }
+
+bool InterInst::isDecOp() { return op == OP_DEC; }
+
+bool InterInst::isExpr() {
+  return (op >= OP_AS && op <= OP_OR) || op == OP_GET;
 }
+
+Operator InterInst::getOp() { return op; }
+
+Var* InterInst::getResult() { return result; }
+
+Var* InterInst::getArg1() { return arg1; }
+
+Var* InterInst::getArg2() { return arg2; }
 
 void InterInst::printSelf()
 {
@@ -461,25 +462,15 @@ void InterInst::printSelf()
 	printf("\n");
 }
 
-InterCode::InterCode(Fun* currFun)
-{
-	this->fun = currFun;
-}
+InterCode::InterCode(Fun* currFun) { this->fun = currFun; }
 
-void InterCode::addInst(InterInst* inst)
-{
-    code.push_back(inst);
-}
+void InterCode::addInst(InterInst* inst) { code.push_back(inst); }
 
-Fun* InterCode::getFun()
-{
-	return fun;
-}
+void InterCode::clear() { code.clear(); }
 
-const vector<InterInst*> InterCode::getCode()
-{
-    return code;
-}
+Fun* InterCode::getFun() { return fun; }
+
+const vector<InterInst*> InterCode::getCode() { return code; }
 
 void InterCode::markFirstOp() {
 	unsigned int len = code.size();
@@ -493,17 +484,11 @@ void InterCode::markFirstOp() {
 	}
 }
 
+bool InterCode::isEmpty() { return code.empty(); }
+
 void InterCode::printSelf()
 {
     for(auto&i:code){
         i->printSelf();
     }
 }
-
-InterCode::~InterCode()
-{
-	for(auto i:code){
-		delete i;
-	}
-}
-

@@ -7,6 +7,7 @@
 using std::list;
 using std::vector;
 
+// 数据流图的基本块
 class Block {
  public:
   Block(vector<InterInst*> codes);
@@ -15,21 +16,27 @@ class Block {
   list<InterInst*> insts;
   list<Block*> prevs;
   list<Block*> succs;
+
+  vector<double> inVals;   // 输入值集合
+  vector<double> outVals;  // 输出值集合
+
+  bool visited;
+  bool reachable;
 };
 
+// 数据流图
 class DFG {
  public:
-  //TODO: 构造函数
+  
+  DFG(InterCode& code);
+
   void createBlocks();
   void linkBlocks();
+
+
+  void toCode(InterCode& optCode);
 
  public:
   vector<InterInst*> codeList;
   vector<Block*> blocks;
 };
-
-
-// eax ebx 是最常用寄存器，不使用
-// ecx 通常用于逻辑判断，因此不使用
-// edx 仅在除法中使用，因此可以考虑执行除法前入栈保存
-// esi edi 完全没有使用，可以直接分配

@@ -144,6 +144,12 @@ public:
 
     void value();
     void printSelf();
+
+
+    // 数据流分析相关接口
+    void setIndex(int index);
+    int getIndex();
+    
                
 private:
     bool literal;                   // 是否是字面常量值
@@ -174,6 +180,10 @@ private:
 
 
     int offset;                     // 变量的栈帧偏移值
+
+    // 数据流分析相关
+    int index;
+    bool live;
 
 };
 
@@ -206,11 +216,11 @@ public:
     int getMaxDep();
     int getParaValSize();           // 获得函数参数占用的空间大小
 
+    void optimize(SymTab* tab);
+
     void toX86(FILE* file);
 
     void printSelf();
-
-    ~Fun();
 
 private:
     bool externed;                  // 是否有extern声明
@@ -226,6 +236,7 @@ private:
 
     std::vector<int> scopeEsp;      // 作用域栈指针位置
     InterCode intercode;            // 中间代码
+    InterCode optCode;              // 代码优化后的中间代码
     InterInst* returnPoint;         // 函数返回点
 };
 
@@ -265,9 +276,10 @@ public:
     // 外部接口
     Fun* getCurrFun();
 
-    void toX86(FILE* file);
+    // 执行代码优化操作
+    void optimize();
 
-    ~SymTab();
+    void toX86(FILE* file);
 
 public:
     static Var* varVoid;
