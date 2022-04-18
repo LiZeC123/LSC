@@ -833,12 +833,29 @@ int Fun::getPtrLevel()
     return ptrLevel;
 }
 
-void Fun::toX86(FILE* file)
-{
-    auto v = intercode.getCode();
-    for(auto& i:v){
-        i->toX86(&intercode,file);
-    }
+void Fun::optimize(SymTab* tab) {
+  if (externed) {
+    return;
+  }
+
+  DFG* dfg = new DFG(intercode);
+
+  ConstPropagation cnp(dfg,tab, paraVar);
+  // cnp.propagation();
+  // 常量传播 复写传播 死代码消除
+  // 窥孔优化
+  // 寄存器分配
+//   CopyPropagation cpp(dfg);
+//   cpp.propagation();
+
+  dfg->toCode(optCode);
+}
+
+void Fun::toX86(FILE* file) {
+  auto& code = optCode.isEmpty() ? intercode : optCode;
+  for (auto& i : code.getCode()) {
+    i->toX86(&intercode, file);
+  }
 }
 
 void Fun::printSelf()
@@ -1119,7 +1136,10 @@ Fun* SymTab::getCurrFun()
 }
 
 void SymTab::optimize() {
-
+    for(auto it = funTab.begin();it!=funTab.end();it++){
+        Fun* fun = it->second;
+        fun->optimize(this);
+    }
 }
 
 

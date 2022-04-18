@@ -8,7 +8,8 @@
             "preLaunchTask": "makeCompile",
             "program": "${workspaceFolder}/compile/lscc",
             "args": [
-                "${workspaceFolder}/test/99test.c"
+                "${workspaceFolder}/test/99test.c",
+                "-O2"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

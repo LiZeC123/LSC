@@ -7,7 +7,7 @@ then
 	file=`find . -name  "${2}*.c"`
     echo $file;
     rm -rf ./z.out
-    lsc $file;
+    lsc -O2 $file;
     ./z.out
 
     if [ $? -eq 0 ]
@@ -20,7 +20,7 @@ else
     do
         echo $file;
         rm -rf ./z.out
-        lsc $file;
+        lsc -O2 $file;
         ./z.out
 
         if [ $? -eq 0 ]
