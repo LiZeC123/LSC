@@ -16,6 +16,7 @@ class Args {
   bool printToken = false;
   bool printStats = false;
   bool printDFG = false;
+  bool printOpt = false;
   bool optimize = false;
 };
 
@@ -39,6 +40,8 @@ Args analyseOptions(int argc, char* argv[]) {
       args.printDFG = true;
     } else if (option == "-O2") {
       args.optimize = true;
+    } else if (option == "--printOpt") {
+      args.printOpt = true;
     }
   }
 
@@ -120,11 +123,11 @@ int main(int argc, char* argv[]) {
     // 分析代码
     parser.analyse();
 
-    // 根据需求输出中间结果
-    printTables(args, tab);
-
     // 根据需求执行代码优化
     optimize(args, tab);
+
+    // 根据需求输出中间结果
+    printTables(args, tab);
 
     // 生成汇编代码文件
     genFile(filename, tab);

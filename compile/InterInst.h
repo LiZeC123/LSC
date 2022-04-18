@@ -23,6 +23,9 @@ class InterInst {
   InterInst(Operator op, Var* arg1 = nullptr);              // 声明,返回
   InterInst();  // 构造唯一标签
   InterInst(Operator op, InterInst* tar, Var* arg1 = nullptr, Var* arg2 = nullptr);  // 跳转,return
+  
+  void replace(Operator op, Var* result, Var* arg1, Var* arg2 = nullptr);
+  void replace(Operator op, InterInst* tar, Var* arg1 = nullptr, Var* arg2 = nullptr);
 
   void loadVar(string reg32, string reg8, Var* var, FILE* file);
   void leaVar(string reg32, Var* var, FILE* file);

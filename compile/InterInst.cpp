@@ -85,6 +85,20 @@ InterInst::InterInst(Operator op,InterInst* tar,Var* arg1,Var* arg2)
     this->arg2 = arg2;
 }
 
+void InterInst::replace(Operator op, Var* result, Var* arg1, Var* arg2) {
+  this->op = op;
+  this->result = result;
+  this->arg1 = arg1;
+  this->arg2 = arg2;
+}
+
+void InterInst::replace(Operator op,InterInst* tar,Var* arg1,Var* arg2) {
+	this->op = op;
+	this->target = tar;
+	this->arg1 = arg1;
+	this->arg2 = arg2;
+}
+
 void InterInst::loadVar(string reg32,string reg8,Var* var,FILE* file)
 {
 	if(!var){

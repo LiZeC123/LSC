@@ -840,15 +840,14 @@ void Fun::optimize(SymTab* tab) {
   }
 
   DFG* dfg = new DFG(intercode);
-  dfg->printSelf();
+  // dfg->printSelf();
 
   ConstPropagation cnp(dfg,tab, paraVar);
   cnp.propagation();
+  
   // 常量传播 复写传播 死代码消除
   // 窥孔优化
   // 寄存器分配
-//   CopyPropagation cpp(dfg);
-//   cpp.propagation();
 
   dfg->toCode(optCode);
 }
@@ -883,6 +882,16 @@ void Fun::printSelf()
     for(auto& i:v){
         i->printSelf();
     }
+
+    // if (optCode.isEmpty()) {
+    //     return;
+    // }
+
+    // printf("\n优化后代码\n");
+    // v = optCode.getCode();
+    // for(auto& i:v){
+    //     i->printSelf();
+    // }
 }
 
 SymTab::SymTab()

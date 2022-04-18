@@ -27,10 +27,16 @@ class ConstPropagation {
  private:
   DFG* dfg;
   SymTab* tab;
-  vector<Var*> vars;     // 局部变量集合
-  vector<Var*> glbVars;  // 全局变量集合
-  vector<double> boundVals;   // 边界值集合
+  vector<Var*> vars;         // 局部变量集合
+  vector<Var*> glbVars;      // 全局变量集合
+  vector<double> boundVals;  // 边界值集合
   vector<double> initVals;
+
+  void simplifyInst(InterInst *inst);
+  void simplifyExpr(InterInst *inst);
+  double execOp(Operator op, int left, int right);
+
+  //double getConstValue(Var* v, InterInst* inst);
 
   static double UNDEF;
   static double NAC;

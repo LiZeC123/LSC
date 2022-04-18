@@ -77,12 +77,165 @@ void ConstPropagation::analyse() {
         changed = true;
       }
     }
-
-    dfg->printSelf();
   }
 }
 
-void ConstPropagation::algebraSimplify() {}
+void ConstPropagation::algebraSimplify() {
+  for (Block *block : dfg->blocks) {
+    for (InterInst *inst : block->insts) {
+      simplifyInst(inst);
+    }
+  }
+}
+
+void ConstPropagation::simplifyInst(InterInst *inst) {
+  Operator op = inst->getOp();
+  Var *result = inst->getResult();
+  Var *arg1 = inst->getArg1();
+  Var *arg2 = inst->getArg2();
+
+  if (inst->isExpr()) {
+    double rs = inst->outVals[result->getIndex()];
+    if (rs != UNDEF && rs != NAC) {
+      Var *newVar = new Var((int)rs);
+      tab->addVar(newVar);
+      inst->replace(OP_AS, result, newVar);
+    } else if (op >= OP_ADD && op <= OP_OR &&
+               !(op == OP_AS || op == OP_NEG || op == OP_NOT)) {
+      simplifyExpr(inst);
+    }
+  } else if (op == OP_ARG || op == OP_RETV) {
+    // 如果函数参数或者返回值为常量，则直接替换为对应的常量值
+    if (arg1->getIndex() != -1) {
+      double rs = inst->outVals[arg1->getIndex()];
+      if (rs != UNDEF && rs != NAC) {
+        Var *newVar = new Var((int)rs);
+        tab->addVar(newVar);
+        //替换新的操作符与常量操作数
+        inst->replace(op, result, newVar, arg2);
+      }
+    }
+  }
+}
+
+void ConstPropagation::simplifyExpr(InterInst *inst) {
+  Operator op = inst->getOp();
+  Var *result = inst->getResult();
+  Var *arg1 = inst->getArg1();
+  Var *arg2 = inst->getArg2();
+
+  //常量传播不能处理的情况由代数化简完成
+  double lp, rp;  //左右操作数
+  if (arg1->getIndex() == -1) {
+    if (arg1->isBase()) lp = arg1->getVal();
+  } else
+    lp = inst->inVals[arg1->getIndex()];  //左操作数
+
+  if (arg2->getIndex() == -1) {
+    if (arg2->isBase()) rp = arg2->getVal();
+  } else
+    rp = inst->inVals[arg2->getIndex()];  //右操作数
+
+  int left, right;                //记录操作数值
+  bool dol = false, dor = false;  //处理哪一个操作数
+  if (lp != UNDEF && lp != NAC) {
+    left = lp;
+    dol = true;
+  } else if (rp != UNDEF && rp != NAC) {
+    right = rp;
+    dor = true;
+  } else {
+    //都不是常量不进行处理！
+    return;
+  }
+
+  Var *newArg1 = nullptr;  //记录有效的操作数
+  Var *newArg2 = nullptr;  //可选的操作数
+
+  Operator newOp = OP_AS;  //化简成功后默认为赋值运算
+  if (op == OP_ADD) {      // z=0+y z=x+0
+    if (dol && left == 0) {
+      newArg1 = arg2;
+    }
+    if (dor && right == 0) {
+      newArg1 = arg1;
+    }
+  } else if (op == OP_SUB) {  // z=0-y z=x-0
+    if (dol && left == 0) {
+      newOp = OP_NEG;
+      newArg1 = arg2;
+    }
+    if (dor && right == 0) {
+      newArg1 = arg1;
+    }
+  } else if (op == OP_MUL) {  // z=0*y z=x*0 z=1*y z=x*1
+    if ((dol && left == 0) || (dor && right == 0)) {
+      newArg1 = SymTab::zero;
+    }
+    if (dol && left == 1) {
+      newArg1 = arg2;
+    }
+    if (dor && right == 1) {
+      newArg1 = arg1;
+    }
+  } else if (op == OP_DIV) {  // z=0/y z=x/1
+    if (dol && left == 0) {
+      newArg1 = SymTab::zero;
+    }
+    if (dor && right == 1) {
+      newArg1 = arg1;
+    }
+  } else if (op == OP_MOD) {  // z=0%y z=x%1
+    if ((dol && left == 0) || (dor && right == 1)) {
+      newArg1 = SymTab::zero;
+    }
+  } else if (op == OP_AND) {  // z=0&&y z=x&&0 z=1&&y z=x&&1
+    if ((dol && left == 0) || (dor && right == 0)) {
+      newArg1 = SymTab::zero;
+    }
+    if (dol && left != 0) {  // z=y!=0
+      newOp = OP_NE;
+      newArg1 = arg2;
+      newArg2 = SymTab::zero;
+    }
+    if (dor && right != 0) {  // z=x!=0
+      newOp = OP_NE;
+      newArg1 = arg1;
+      newArg2 = SymTab::zero;
+    }
+  } else if (op == OP_OR) {  // z=0||y z=x||0 z=1||y z=x||1
+    if ((dol && left != 0) || (dor && right != 0)) {
+      newArg1 = SymTab::one;
+    }
+    if (dol && left == 0) {  // z=y!=0
+      newOp = OP_NE;
+      newArg1 = arg2;
+      newArg2 = SymTab::zero;
+    }
+    if (dor && right == 0) {  // z=x!=0
+      newOp = OP_NE;
+      newArg1 = arg1;
+      newArg2 = SymTab::zero;
+    }
+  }
+
+  if (newArg1) {
+    // 如果能够进行代数简化，则替换相应的指令
+    inst->replace(newOp, result, newArg1, newArg2);
+  } else {
+    // 否则使用已知的常量信息替换指令中的变量
+    if (dol) {
+      newArg1 = new Var(left);
+      tab->addVar(newArg1);
+      newArg2 = arg2;
+    } else if (dor) {
+      newArg2 = new Var(right);
+      tab->addVar(newArg2);
+      newArg1 = arg1;
+    }
+    inst->replace(op, result, newArg1, newArg2);
+  }
+}
 
 void ConstPropagation::condJmpOpt() {}
 
@@ -152,8 +305,8 @@ void ConstPropagation::translate(InterInst *inst, vector<double> &in,
   Var *arg1 = inst->getArg1();
   Var *arg2 = inst->getArg2();
 
-  if (inst->isExpr()) {  //基本运算表达式x=?，计算新发现的传播值
-    double tmp;          //存储临时值结果
+  if (inst->isExpr()) {  //基本运算表达式
+    double tmp;
     if (op == OP_AS || op == OP_NEG || op == OP_NOT) {  //一元运算x=y x=-y x=!y
       if (arg1->getIndex() == -1) {  //参数不在值列表，必是常量
         if (arg1->isBase()) tmp = arg1->getVal();  //排除字符串类型常量
@@ -175,64 +328,75 @@ void ConstPropagation::translate(InterInst *inst, vector<double> &in,
         if (arg2->isBase()) rp = arg2->getVal();  //初始化的基本类型变量为const
       } else
         rp = in[arg2->getIndex()];  //右操作数
-      if (lp == NAC || rp == NAC)
-        tmp = NAC;  //有一个NAC结果必是NAC
-      else if (lp == UNDEF || rp == UNDEF)
-        tmp = UNDEF;  //都不是NAC，有一个是UNDEF，结果UNDEF
-      else {          //都是常量，可以计算
-        int left = lp, right = rp;
-        if (op == OP_ADD)
-          tmp = left + right;
-        else if (op == OP_SUB)
-          tmp = left - right;
-        else if (op == OP_MUL)
-          tmp = left * right;
-        else if (op == OP_DIV) {
-          if (!right)
-            tmp = NAC;
-          else
-            tmp = left / right;
-        }  //除数为0,特殊处理！
-        else if (op == OP_MOD) {
-          if (!right)
-            tmp = NAC;
-          else
-            tmp = left % right;
-        } else if (op == OP_GT)
-          tmp = left > right;
-        else if (op == OP_GE)
-          tmp = left >= right;
-        else if (op == OP_LT)
-          tmp = left < right;
-        else if (op == OP_LE)
-          tmp = left <= right;
-        else if (op == OP_EQU)
-          tmp = left == right;
-        else if (op == OP_NE)
-          tmp = left != right;
-        else if (op == OP_AND)
-          tmp = left && right;
-        else if (op == OP_OR)
-          tmp = left || right;
+      if (lp == NAC || rp == NAC) {
+        //有一个NAC结果必是NAC
+        tmp = NAC;
+      } else if (lp == UNDEF || rp == UNDEF) {
+        //都不是NAC，有一个是UNDEF，结果UNDEF
+        tmp = UNDEF;
+      } else {
+        //都是常量，直接计算结果
+        tmp = execOp(op, (int)lp, (int)rp);
       }
     } else if (op == OP_GET) {  //破坏运算x=*y
       tmp = NAC;
     }
     out[rst->getIndex()] = tmp;  //更新out集合值
   } else if (op == OP_SET || (op == OP_ARG && !arg1->isBase())) {
-    //破坏运算*x=y 或者 arg x没有影响，arg p->p是指针，破坏！！！
-    for (unsigned int i = 0; i < out.size(); ++i)
-      out[i] = NAC;            // out全部置为NAC
-  } else if (op == OP_PROC) {  //破坏运算call f()
+    // 如果产生指针操作，则默认所有变量都可能被修改
+    for (unsigned int i = 0; i < out.size(); ++i) out[i] = NAC;
+  } else if (op == OP_PROC) {
+    // 默认函数调用可能导致任意全局变量被修改
     for (unsigned int i = 0; i < glbVars.size(); ++i)
-      out[glbVars[i]->getIndex()] = NAC;  //全局变量全部置为NAC
-  } else if (op == OP_CALL) {             //破坏运算call f()
+      out[glbVars[i]->getIndex()] = NAC;
+  } else if (op == OP_CALL) {
     for (unsigned int i = 0; i < glbVars.size(); ++i)
-      out[glbVars[i]->getIndex()] = NAC;  //全局变量全部置为NAC
-    out[rst->getIndex()] = NAC;  //函数返回值失去常量性质！——保守预测
+      out[glbVars[i]->getIndex()] = NAC;
+    out[rst->getIndex()] = NAC;
   }
 
   //拷贝信息指令的in，out信息，方便代数化简，条件跳转优化和不可达代码消除
   inst->inVals = in;
   inst->outVals = out;
 }
+
+double ConstPropagation::execOp(Operator op, int left, int right) {
+  double tmp = 0;
+  if (op == OP_ADD)
+    tmp = left + right;
+  else if (op == OP_SUB)
+    tmp = left - right;
+  else if (op == OP_MUL)
+    tmp = left * right;
+  else if (op == OP_DIV) {
+    if (!right)
+      tmp = NAC;
+    else
+      tmp = left / right;
+  }  //除数为0,特殊处理！
+  else if (op == OP_MOD) {
+    if (!right)
+      tmp = NAC;
+    else
+      tmp = left % right;
+  } else if (op == OP_GT)
+    tmp = left > right;
+  else if (op == OP_GE)
+    tmp = left >= right;
+  else if (op == OP_LT)
+    tmp = left < right;
+  else if (op == OP_LE)
+    tmp = left <= right;
+  else if (op == OP_EQU)
+    tmp = left == right;
+  else if (op == OP_NE)
+    tmp = left != right;
+  else if (op == OP_AND)
+    tmp = left && right;
+  else if (op == OP_OR)
+    tmp = left || right;
+
+  return tmp;
+}
+
+// double ConstPropagation::getConstValue(Var *v, InterInst *inst) {}
