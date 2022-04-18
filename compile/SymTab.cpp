@@ -340,6 +340,7 @@ void Var::baseInit()
     ptr = nullptr;
     offset = 0;
     isCast = false;
+    index = -1;     // 能够进行分析的变量从0开始计数，因此index默认值为-1
 }
 
 string Var::getName()
@@ -839,9 +840,10 @@ void Fun::optimize(SymTab* tab) {
   }
 
   DFG* dfg = new DFG(intercode);
+  dfg->printSelf();
 
   ConstPropagation cnp(dfg,tab, paraVar);
-  // cnp.propagation();
+  cnp.propagation();
   // 常量传播 复写传播 死代码消除
   // 窥孔优化
   // 寄存器分配

@@ -59,20 +59,26 @@ void ConstPropagation::propagation() {
 }
 
 void ConstPropagation::analyse() {
-  dfg->blocks[0]->outVals = boundVals;
-  for (Block *block : dfg->blocks) {
+  dfg->blocks[0]->outVals = boundVals;  //入口块只有out值
+  for (unsigned int i = 1; i < dfg->blocks.size(); i++) {
+    Block *block = dfg->blocks[i];
+    block->inVals = initVals;
     block->outVals = initVals;
   }
 
   bool changed = true;
   while (changed) {
     changed = false;
-    for (Block *block : dfg->blocks) {
+    // 从第1块开始依次执行join和translate操作
+    for (unsigned int i = 1; i < dfg->blocks.size(); i++) {
+      Block *block = dfg->blocks[i];
       join(block);
       if (translate(block)) {
         changed = true;
       }
     }
+
+    dfg->printSelf();
   }
 }
 
@@ -81,6 +87,19 @@ void ConstPropagation::algebraSimplify() {}
 void ConstPropagation::condJmpOpt() {}
 
 void ConstPropagation::join(Block *block) {
+  // 首先判断特殊情况
+  int prevCount = block->prevs.size();
+  if (prevCount == 0) {
+    // 没有前驱，则in集合为默认值
+    block->inVals = initVals;
+    return;
+  }
+  if (prevCount == 1) {
+    // 只有一个前驱，则in集合直接等于前驱的out集合
+    block->inVals = block->prevs.front()->outVals;
+    return;
+  }
+  // 否则针对多个前驱，合并不同前驱的计算结果
   for (unsigned int i = 0; i < block->inVals.size(); i++) {
     double val = UNDEF;
     for (Block *pb : block->prevs) {

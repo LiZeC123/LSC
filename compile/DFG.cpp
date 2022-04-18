@@ -7,6 +7,37 @@ Block::Block(vector<InterInst*> codes) {
   }
 }
 
+void Block::printSelf() {
+	printf("-----------%p----------\n",this);
+	printf("前驱：");
+	for (list<Block*>::iterator i = prevs.begin(); i != prevs.end(); ++i)
+	{
+		printf("%p ",*i);
+	}
+	printf("\n");
+	printf("后继：");
+	for (list<Block*>::iterator i = succs.begin(); i != succs.end(); ++i)
+	{
+		printf("%p ",*i);
+	}
+	printf("\n代码\n");
+	for (list<InterInst*>::iterator i = insts.begin(); i != insts.end(); ++i)
+	{
+		(*i)->printSelf();
+	}
+  printf("in值集合\n");
+  for(auto v: inVals) {
+    printf("%7.1f", v);
+  }
+  printf("\n");
+  
+  printf("out值集合\n");
+  for(auto v: inVals) {
+    printf("%7.1f", v);
+  }
+  printf("\n");
+}
+
 DFG::DFG(InterCode& code) {
   code.markFirstOp();
   this->codeList = code.getCode();
@@ -46,4 +77,10 @@ void DFG::linkBlocks() {
 
 void DFG::toCode(InterCode& optCode) {
   optCode.clear();
+}
+
+void DFG::printSelf() {
+  for(Block* block: this->blocks) {
+    block->printSelf();
+  }
 }

@@ -12,6 +12,8 @@ class Block {
  public:
   Block(vector<InterInst*> codes);
 
+  void printSelf();
+
  public:
   list<InterInst*> insts;
   list<Block*> prevs;
@@ -35,6 +37,8 @@ class DFG {
 
 
   void toCode(InterCode& optCode);
+
+  void printSelf();
 
  public:
   vector<InterInst*> codeList;
