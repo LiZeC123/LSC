@@ -399,4 +399,123 @@ double ConstPropagation::execOp(Operator op, int left, int right) {
   return tmp;
 }
 
-// double ConstPropagation::getConstValue(Var *v, InterInst *inst) {}
+CopyPropagation::CopyPropagation(DFG *g) : dfg(g) {
+  dfg->toCode(optCode);
+
+  for (InterInst *inst : optCode.getCode()) {
+    if (inst->getOp() == OP_AS) {
+      copyExpr.push_back(inst);
+    }
+  }
+
+  U.init(copyExpr.size(), true);
+  E.init(copyExpr.size(), false);
+
+  for (InterInst *inst : optCode.getCode()) {
+    inst->copyInfo.gen = E;
+    inst->copyInfo.kill = E;
+
+    Var *rs = inst->getResult();
+    Operator op = inst->getOp();
+
+    if (inst->isUncertainOp()) {
+      inst->copyInfo.kill = U;
+    } else if (op >= OP_AS && op <= OP_GET) {
+      for (unsigned int i = 0; i < copyExpr.size(); i++) {
+        if (copyExpr[i] == inst) {
+          inst->copyInfo.gen.set(i);
+        } else if (rs == copyExpr[i]->getResult() ||
+                   rs == copyExpr[i]->getArg1()) {
+          inst->copyInfo.kill.set(i);
+        }
+      }
+    }
+  }
+}
+
+void CopyPropagation::propagation() {
+  analyse();
+
+  for (InterInst *inst : optCode.getCode()) {
+    Var *rs = inst->getResult();
+    Operator op = inst->getOp();
+    Var *arg1 = inst->getArg1();
+    Var *arg2 = inst->getArg2();
+
+    if (op == OP_SET) {
+      //取值运算，检查 *arg1=result
+      //找到result赋值源头，肯定不是空
+      Var *newRs = find(inst->copyInfo.in, rs);
+      inst->replace(op, newRs, arg1);
+    } else if (op >= OP_AS && op <= OP_GET && op != OP_LEA) {
+      //一般表达式，排除p=&x运算，检查arg1/2
+      Var *newArg1 = find(inst->copyInfo.in, arg1);
+      Var *newArg2 = find(inst->copyInfo.in, arg2);
+      inst->replace(op, rs, newArg1, newArg2);
+    } else if (op == OP_JT || op == OP_JF || op == OP_ARG || op == OP_RETV) {
+      //条件表达式,参数表达式，返回表达式
+      Var *newArg1 = find(inst->copyInfo.in, arg1);
+      inst->replace(op, rs, newArg1);
+    }
+  }
+}
+
+void CopyPropagation::analyse() {
+  dfg->blocks[0]->copyInfo.out = E;
+  for (unsigned int i = 1; i < dfg->blocks.size(); i++) {
+    dfg->blocks[i]->copyInfo.out = U;
+  }
+
+  bool change = true;
+  while (change) {
+    change = false;
+    for (unsigned int i = 1; i < dfg->blocks.size(); i++) {
+      Block *block = dfg->blocks[i];
+      // TODO: 不可达判定
+      Set tmp = U;
+      for (Block *p : block->prevs) {
+        tmp = tmp & p->copyInfo.out;
+      }
+
+      block->copyInfo.in = tmp;
+      if (translate(block)) {
+        change = true;
+      }
+    }
+  }
+}
+
+bool CopyPropagation::translate(Block *block) {
+  Set tmp = block->copyInfo.in;
+
+  for (InterInst *inst : block->insts) {
+    Set &in = inst->copyInfo.in;
+    Set &out = inst->copyInfo.out;
+    in = tmp;
+    out = (in - inst->copyInfo.kill) | (inst->copyInfo.gen);
+    tmp = out;
+  }
+
+  bool flag = (tmp != block->copyInfo.out);
+  block->copyInfo.out = tmp;
+  return flag;
+}
+
+Var *CopyPropagation::find(Set &in, Var *var) { return _find(in, var, var); }
+
+Var *CopyPropagation::_find(Set &in, Var *var, Var *src) {
+  if (!var) {
+    return nullptr;
+  }
+
+  for (unsigned int i = 0; i < copyExpr.size(); i++) {
+    if (in.get(i) && var == copyExpr[i]->getResult()) {
+      var = copyExpr[i]->getArg1();
+      if (src == var) {
+        break;
+      }
+      return _find(in, var, src);
+    }
+  }
+  return var;
+}

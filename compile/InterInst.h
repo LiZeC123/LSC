@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "common.h"
+#include "Set.h"
 
 // 直接声明,避免两个头文件相互引用导致编译错误
 class Var;
@@ -11,6 +12,16 @@ class InterCode;
 class Block;
 using std::string;
 using std::vector;
+
+
+
+struct CopyInfo {
+  Set in;
+  Set out;
+  Set gen;
+  Set kill;
+};
+
 
 /**
  * 表示一条中间指令的类
@@ -43,6 +54,7 @@ class InterInst {
   bool isCondOp();
   bool isDecOp();
   bool isExpr();
+  bool isUncertainOp();
 
   Operator getOp();
   Var* getResult();
@@ -52,6 +64,7 @@ class InterInst {
   //数据流信息
   vector<double> inVals;   //常量传播in集合
   vector<double> outVals;  //常量传播out集合
+  CopyInfo copyInfo;
 
   void printSelf();
 
@@ -72,6 +85,7 @@ class InterInst {
 
 class InterCode {
  public:
+  InterCode() = default;
   InterCode(Fun* currFun);
   InterCode(const InterCode&) = delete;
   InterCode& operator=(const InterCode&) = delete;

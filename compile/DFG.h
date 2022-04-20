@@ -21,6 +21,7 @@ class Block {
 
   vector<double> inVals;   // 输入值集合
   vector<double> outVals;  // 输出值集合
+  CopyInfo copyInfo;
 
   bool visited;
   bool reachable;

@@ -420,6 +420,10 @@ bool InterInst::isExpr() {
   return (op >= OP_AS && op <= OP_OR) || op == OP_GET;
 }
 
+bool InterInst::isUncertainOp() {
+  return op == OP_SET || op == OP_PROC || op == OP_CALL;
+}
+
 Operator InterInst::getOp() { return op; }
 
 Var* InterInst::getResult() { return result; }

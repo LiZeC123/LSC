@@ -844,8 +844,11 @@ void Fun::optimize(SymTab* tab) {
 
   ConstPropagation cnp(dfg,tab, paraVar);
   cnp.propagation();
+
+  CopyPropagation cpp(dfg);
+  cpp.propagation();
   
-  // 常量传播 复写传播 死代码消除
+  // 死代码消除
   // 窥孔优化
   // 寄存器分配
 

@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "DFG.h"
+#include "Set.h"
 #include "SymTab.h"
 
 using std::vector;
@@ -32,11 +33,11 @@ class ConstPropagation {
   vector<double> boundVals;  // 边界值集合
   vector<double> initVals;
 
-  void simplifyInst(InterInst *inst);
-  void simplifyExpr(InterInst *inst);
+  void simplifyInst(InterInst* inst);
+  void simplifyExpr(InterInst* inst);
   double execOp(Operator op, int left, int right);
 
-  //double getConstValue(Var* v, InterInst* inst);
+  // double getConstValue(Var* v, InterInst* inst);
 
   static double UNDEF;
   static double NAC;
@@ -48,5 +49,18 @@ class CopyPropagation {
   void propagation();
 
  private:
+  void analyse();
+  bool translate(Block* block);
+  Var* find(Set& in, Var* var);
+  Var* _find(Set& in, Var* var, Var* src);
+
+ private:
   DFG* dfg;
+
+  Set U;
+  Set E;
+
+  vector<InterInst*> copyExpr;
+
+  InterCode optCode;
 };
