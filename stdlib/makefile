@@ -1,18 +1,15 @@
-OBJ = start.o lscore.o lscio.o lsclib.o
+OBJ = lscore.o lscio.o
 
 CA = ../ass/lsca
 CC = ../compile/lscc
+CFLAG = -O2
 
 
 lib:$(OBJ)
 
-start.o:start.s
-	$(CA) start.s
 lscio.o: lscio.c
-	$(CC) lscio.c
+	$(CC) lscio.c $(CFLAG)
 	$(CA) lscio.s	
-lsclib.o: lsclib.s
-	$(CA) lsclib.s
 lscore.o: lscore.s
 	$(CA) lscore.s
 clear:
