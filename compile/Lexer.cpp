@@ -51,13 +51,9 @@ bool Macros::isMacro(std::string name)
 
 vector<Token*>* Macros::getRealToken(std::string name)
 {
-    // 如果上一轮有分配内存, 本轮释放
-    deleteLast();
-
     if(name == "__LINE__"){
         last = new vector<Token*>{ new Num(scan.getRow()) };
         return last;
-
     }
     else if(name=="__FILE__"){
         last = new vector<Token*>{ new Str(scan.getFilename()) };
@@ -75,41 +71,38 @@ void Macros::addMacro(std::string name,vector<Token*>* list)
     }
     else{
         macros[name] = list;
+        expand();   // 循环展开宏
     }
 }
 
-Macros::~Macros()
-{
-    for(auto it = macros.begin(); it != macros.end(); ++it){
-        auto vec = it->second;
+void Macros::expand() {
+  bool changed = true;
+  while (changed) {
+    changed = false;
+    for (auto iter = macros.begin(); iter != macros.end(); ++iter) {
+      auto name = iter->first;
+      auto list = iter->second;
+      if (list == nullptr) {
+        // 特殊宏列表为null，直接跳过
+        continue;
+      }
 
-        // __LINE__ 等宏对应的内容为nullptr, 不需要释放
-        if(vec != nullptr){
-            for(auto v:(*vec)){
-                delete v;
-            }
-            delete vec;
+      auto tmp = new vector<Token*>();
+      for (Token* t : *list) {
+        ID* id = dynamic_cast<ID*>(t);
+        if (id && isMacro(id->name)) {
+          auto ex = macros[id->name];
+          tmp->insert(tmp->end(), ex->begin(), ex->end());
+          changed = true;
+        } else {
+          tmp->push_back(t);
         }
-    }
+      }
+      macros[name] = tmp;
 
-    if(last != nullptr){
-        delete last;
     }
+  }
 }
-
-
-void Macros::deleteLast()
-{
-    if(last != nullptr){
-        for(auto token:(*last)){
-            delete token;
-        }
-    }
-    delete last;
-    last = nullptr;
-}
-
-
 
 Lexer::Lexer(Scanner* sc) : scanner(sc), macros(*sc)
 {
@@ -277,28 +270,28 @@ Token* Lexer::nextMacroToken()
 
 Token* Lexer::nextToken()
 {
-    // 如果是宏, 返回相应的Token
+    // 如果还处于宏替换的内容之中，则直接返回对应的内容
     Token* m = nextMacroToken();
     if(m != nullptr){
         return m;
     }
 
-    // 释放上一轮的符号
-    // token仅仅被readToken()赋值, 其他模块产生的Token由各自模块处理
-    if(token != nullptr){
-        delete token;
-    }
+    // 否则读取下一个符号
     token = readToken();
 
-    // 如果是宏的第一个符号, 返回相应的Token
-    if(token->sym == MACRO){
-        return nextMacroToken();
+    // 如果该符号是一个宏，则返回展开值
+    if(token->sym == IDENT ) {
+        string name = ((ID*)token)->name;
+        if(macros.isMacro(name)) {
+            macroTokenList = macros.getRealToken(name);
+            macroTokenIndex = 0;
+            return nextMacroToken();
+        }
     }
     
     // 如果是文件结束,则先判断是否是处理头文件
     if(token->sym == END && !scanStack.empty()){
-        // 释放当前Scanner,并且切换到栈顶的Scanner
-        delete scanner;
+        // 恢复到上一个Scanner
         scanner = scanStack.back();
         scanStack.pop_back();
 
@@ -309,6 +302,7 @@ Token* Lexer::nextToken()
         return nextToken();
     }
     
+    // 其他一般情况，直接返回Token
     return token;
 }
 
@@ -319,15 +313,8 @@ Token * Lexer::getIdent()
         name.push_back(ch);
         scan();
     }while((ch>='a'&&ch<='z')||(ch>='A'&&ch<='Z')||ch=='_'||(ch>='0'&&ch<='9'));
-    
-    //匹配结束,首先检查是否为宏名
-    if(macros.isMacro(name)){
-        macroTokenList = macros.getRealToken(name);
-        macroTokenIndex = 0;
-        return new Token(MACRO);
-    }
-    
-    // 不是宏再检查是关键字还是标识符
+        
+    // 检查是关键字还是标识符
     Symbol tag=key.getSym(name);
     if(tag==IDENT){
         //正常的标志符
@@ -491,7 +478,6 @@ void Lexer::getMacro()
         }
         
         macros.addMacro(((ID*)name)->name,list);
-        delete name;
     }
     else if(key->sym == KW_INCLUDE){
         // include
@@ -502,8 +488,6 @@ void Lexer::getMacro()
             scanner = newScan;
         }
     }
-
-    delete key;
 }
 
 Scanner* Lexer::loadIncludeFile()
@@ -518,21 +502,17 @@ Scanner* Lexer::loadIncludeFile()
             name = readToken();
         }
 
-        delete sp;
-        delete name;
         return includeStdFile(fileNameToken);
     }
     else if(sp->sym == STR){
         // 用户自定义头文件
         string userfile = ((Str*)sp)->str;
 
-        delete sp;
         return includeUserFile(userfile);
     }
     else{
         LEXERROR(INCLUDE_ERR);
 
-        delete sp;
         return nullptr;
     }
 }
@@ -548,8 +528,6 @@ Scanner* Lexer::includeStdFile(vector<Token*> words){
         else{
             name.append(token->toString());
         }
-
-        delete token;
     }
 
     return new Scanner(name);
@@ -566,10 +544,4 @@ Scanner* Lexer::includeUserFile(string name)
     }
 
     return new Scanner(filename);
-}
-
-
-Lexer::~Lexer()
-{
-    delete token;
 }

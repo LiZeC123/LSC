@@ -3,6 +3,8 @@
 #define MAX_SIZE 10
 #define LESS_THAN <=
 #define C1 (1 + 2)
+#define C3 (C2 * C2 * C1)
+#define C2 (C1 + C1)
 #define FALSE_CONDITION 0
 #define WELCOME "Welcome to LSC"
 
@@ -30,6 +32,8 @@ int main()
 
     checkEquals(C1 + C1, 6, __LINE__);
     checkEquals(C1 * C1, 9, __LINE__);
+    checkEquals(C3, 108, __LINE__);
+    checkEquals(C3 + C2 + C1, 108 + 6 + 3, __LINE__);
 
     if (FALSE_CONDITION)
     {

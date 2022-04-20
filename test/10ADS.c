@@ -11,16 +11,18 @@ struct TreeNode {
   struct TreeNode *right;
 };
 
-#define LNULL (struct LinkedNode *)0
-#define TNULL (struct TreeNode *)0
+#define List struct LinkedNode
+#define Tree struct TreeNode
+#define LNULL (List *)0
+#define TNULL (Tree *)0
 
-void initList(struct LinkedNode *head) {
-  struct LinkedNode *p = head;
+void initList(List *head) {
+  List *p = head;
   head->data = 9;
 
   for (int i = 9; i > 0; i--) {
     p->data = i;
-    p->next = (struct LinkedNode *)lscmalloc(sizeof(struct LinkedNode));
+    p->next = (List *)lscmalloc(sizeof(List));
     p = p->next;
   }
 
@@ -28,11 +30,11 @@ void initList(struct LinkedNode *head) {
   p->next = LNULL;
 }
 
-void initTree(struct TreeNode *root) {
-  struct TreeNode * data[5];
+void initTree(Tree *root) {
+  Tree *data[5];
 
-  for(int i=0;i<5;i++){
-    data[i] = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
+  for (int i = 0; i < 5; i++) {
+    data[i] = (Tree *)lscmalloc(sizeof(Tree));
     data[i]->value = 0x1234cacd + i;
     data[i]->left = TNULL;
     data[i]->right = TNULL;
@@ -45,18 +47,18 @@ void initTree(struct TreeNode *root) {
   data[1]->left = data[4];
 }
 
-struct LinkedNode *reverseList(struct LinkedNode *head) {
+List *reverseList(List *head) {
   if (head == LNULL || head->next == LNULL) {
     return head;
   }
 
-  struct LinkedNode *newHead = reverseList(head->next);
+  List *newHead = reverseList(head->next);
   head->next->next = head;
   head->next = LNULL;
   return newHead;
 }
 
-void printList(struct LinkedNode *head) {
+void printList(List *head) {
   for (; head != 0; head = head->next) {
     lscPrintInt(head->data);
     wrap();
@@ -64,8 +66,7 @@ void printList(struct LinkedNode *head) {
 }
 
 void ReverseTest() {
-  struct LinkedNode *head =
-      (struct LinkedNode *)lscmalloc(sizeof(struct LinkedNode));
+  List *head = (List *)lscmalloc(sizeof(List));
   initList(head);
   head = reverseList(head);
   int count = 0;
@@ -75,31 +76,31 @@ void ReverseTest() {
 }
 
 void ReverseTest2() {
-  struct LinkedNode *head = LNULL;
+  List *head = LNULL;
   head = reverseList(head);
   checkEquals(head, LNULL, __LINE__);
 
-  head = (struct LinkedNode *)lscmalloc(sizeof(struct LinkedNode));
+  head = (List *)lscmalloc(sizeof(List));
   head->data = 42;
   head->next = LNULL;
   head = reverseList(head);
   checkEquals(head, head, __LINE__);
 }
 
-struct TreeNode *SwapTree(struct TreeNode *root) {
+Tree *SwapTree(Tree *root) {
   if (root == TNULL) {
     return root;
   }
 
-  struct TreeNode *left = SwapTree(root->left);
-  struct TreeNode *right = SwapTree(root->right);
+  Tree *left = SwapTree(root->left);
+  Tree *right = SwapTree(root->right);
   root->left = right;
   root->right = left;
 
   return root;
 }
 
-int sameTree(struct TreeNode *A, struct TreeNode *B) {
+int sameTree(Tree *A, Tree *B) {
   if (A == TNULL && B == TNULL) {
     return 1;
   }
@@ -116,29 +117,29 @@ int sameTree(struct TreeNode *A, struct TreeNode *B) {
 }
 
 void SwapTest() {
-  struct TreeNode *root;
-  root = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
+  Tree *root;
+  root = (Tree *)lscmalloc(sizeof(Tree));
   initTree(root);
 
   root = SwapTree(root);
   root = SwapTree(root);
 
-  struct TreeNode *base;
-  base = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
+  Tree *base;
+  base = (Tree *)lscmalloc(sizeof(Tree));
   initTree(base);
 
   checkTrue(sameTree(base, root), __LINE__);
 }
 
 void SwapTest2() {
-  struct TreeNode *root = TNULL;
-  struct TreeNode *base = TNULL;
+  Tree *root = TNULL;
+  Tree *base = TNULL;
   root = SwapTree(root);
   root = SwapTree(root);
   checkTrue(sameTree(TNULL, root), __LINE__);
 
-  root = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
-  base = (struct TreeNode *)lscmalloc(sizeof(struct TreeNode));
+  root = (Tree *)lscmalloc(sizeof(Tree));
+  base = (Tree *)lscmalloc(sizeof(Tree));
   root->value = 42;
   base->value = 42;
   root->left = TNULL;
@@ -151,11 +152,11 @@ void SwapTest2() {
 
 int main() {
   ReverseTest();
-  
+
   ReverseTest2();
-  
+
   SwapTest();
-  
+
   SwapTest2();
 
   return 0;
