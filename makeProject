@@ -102,10 +102,12 @@ install(){
 	copyStdLib
 	copyExeFile
 
+	echo "安装完成!"
+}
+
+test(){
 	echo "运行测试用例..."
 	runTest
-
-	echo "安装完成!"
 }
 
 uninstall(){
@@ -142,6 +144,10 @@ case $subCmd in
 		;;
 	install | i )
 		install
+		test
+		;;
+	update | u )
+		install
 		;;
 	uninstall | u)
 		uninstall
@@ -149,12 +155,14 @@ case $subCmd in
 	reinstall | r)
 		uninstall
 		install
+		test
 		;;
 	full-reinstall | fr)
 		uninstall
 		echo "清除编译中间结果..."
 		makeClear
-		install	
+		install
+		test	
 		;;
 	all)
 		makeAll
@@ -167,6 +175,7 @@ case $subCmd in
 		echo "install     编译并安装lsc编译系统"
 		echo "uninstall   卸载lsc编译系统"
 		echo "reinstall   重装lsc编译系统"
+		echo "update			更新lsc编译系统"
 		echo "all         编译整个项目"
 		echo "ass         编译汇编器"
 		echo "cmp         编译编译器"
