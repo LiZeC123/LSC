@@ -490,6 +490,7 @@ void InterCode::markFirstOp() {
 	unsigned int len = code.size();
 	code[0]->setFirst();
 	code[len-1]->setFirst();
+	code[1]->setFirst();
 	for(unsigned int i=1;i<len-1;i++) {
 		if(code[i]->isJumpOp() || code[i]->isCondOp()) {
 			code[i]->getTarget()->setFirst();

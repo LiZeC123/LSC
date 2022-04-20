@@ -45,7 +45,7 @@ DFG::DFG(InterCode& code) {
 void DFG::createBlocks() {
   vector<InterInst*> tmp;
   tmp.push_back(codeList[0]);
-  for (unsigned int i = 0; i < codeList.size(); i++) {
+  for (unsigned int i = 1; i < codeList.size(); i++) {
     if (codeList[i]->isFirstOp()) {
       blocks.push_back(new Block(tmp));
       tmp.clear();
