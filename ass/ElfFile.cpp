@@ -57,7 +57,9 @@ void ElfFile::addSym(Label* label)
     sym->st_name = 0;
     sym->st_value = label->getAddr();
     sym->st_size = label->getTimes() * label->getLen() * label->getCont().size();
-    if(label->isGlobal()){
+    if(label->isGlobal() || label->isExterned()){
+        // 明确声明的全局符号, 或者在当前状态下确认为外部符号, 则设置为全局符号
+        // 以便于后续链接器处理这些符号
         sym->st_info = ELF32_ST_INFO(STB_GLOBAL,STT_NOTYPE);
     }
     else{

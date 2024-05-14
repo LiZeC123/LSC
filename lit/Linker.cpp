@@ -60,20 +60,21 @@ void Linker::collectInfo()
         // 记录符号引用信息
         for(auto it = elf->symTab.begin();it != elf->symTab.end();it++){
             if(ELF32_ST_BIND(it->second->st_info) == STB_GLOBAL) {
+                // 只处理全局符号
                 SymLink* symLink = new SymLink();
                 symLink->name = it->first;
-                // 导出符号
-                symLink->recv = nullptr;
-                symLink->prov = elf;
-                symDef.push_back(symLink);
-            }
-            else if (it->second->st_shndx == STN_UNDEF) {
-                SymLink *symLink = new SymLink();
-                symLink->name = it->first;
-                // 导入符号
-                symLink->recv = elf;
-                symLink->prov = nullptr;
-                symLinks.push_back(symLink);
+                if(it->second->st_shndx == STN_UNDEF){
+                    // 导入符号
+                    symLink->recv = elf;
+                    symLink->prov = nullptr;
+                    symLinks.push_back(symLink);
+                }
+                else{
+                    // 导出符号
+                    symLink->recv = nullptr;
+                    symLink->prov = elf;
+                    symDef.push_back(symLink);
+                }
             }
         }
     }
