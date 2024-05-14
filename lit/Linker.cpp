@@ -126,10 +126,23 @@ bool Linker::symValid()
     return isValid;
 }
 
+bool endsWith(const std::string& str, const std::string& suffix) {
+    if (str.length() < suffix.length()) {
+        return false;
+    }
+    return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
+}
+
+
 void Linker::symParser()
 {
     for(ElfFile* elf:fileList){
         for(auto it=elf->symTab.begin();it!=elf->symTab.end();it++){
+            if(it->first == "" || endsWith(it->first, ".c")) {
+                // 在链接GCC生成的目标文件时, 可能存在一些特殊符号(文件名等)
+                // 过滤这些符号, 以免产生指针问题
+                continue;
+            }
             Elf32_Sym* sym = it->second;
             if(sym->st_shndx != STN_UNDEF){
                 string name = elf->shdrNames[sym->st_shndx];
@@ -158,6 +171,11 @@ void Linker::relocate()
 
             // 重定位段
             string segName = tab[j]->segName;
+            if (segName != ".text" && segName != ".data") {
+                // 过滤其他无关的段
+                continue;
+            }
+
             Elf32_Shdr* seg = fileList[i]->shdrTab[segName];
 
             //重定位符号地址(符号本身相对段基址偏移)
