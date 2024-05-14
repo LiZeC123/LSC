@@ -26,7 +26,7 @@
             ]
         },
         {
-            "name": "Lar Decode Launch",
+            "name": "压缩解码模块",
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "makeLar",
@@ -48,7 +48,7 @@
             ]
         },
         {
-            "name": "Lar Encode Launch",
+            "name": "压缩编码模块",
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "makeLar",
@@ -70,7 +70,7 @@
             ]
         },
         {
-            "name": "Lib Launch",
+            "name": "运行时库模块",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/test/a.out",
@@ -117,16 +117,18 @@
             "preLaunchTask": "makeLit",
             "program": "${workspaceFolder}/lit/lscl",
             "args": [
-                "/usr/include/lsc/start.o",
-                "/usr/include/lsc/lscio.o",
-                "/usr/include/lsc/lsclib.o",
-                "${workspaceFolder}/test/macroTest.o"
+                "${workspaceFolder}/test/crt/loscall.o",
+                "${workspaceFolder}/test/crt/start.o",
+                "${workspaceFolder}/test/crt/stdio.o",
+                "${workspaceFolder}/test/crt/string.o",
+                "${workspaceFolder}/test/prog_no_arg.o"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
